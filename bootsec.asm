@@ -1,12 +1,28 @@
 [org 0x7c00]
 
+KERNEL_OFFSET equ 0x1000
+
 mov bp, 0x9000
 mov sp, bp
 
 mov bx, MSG_REAL_MODE
 call print_string
 
-call switchToProtectedMode  ;This never returns
+;Load kernel sectors
+mov ah, 0x02
+mov al, 15
+;dl does not need to be changed
+mov ch, 0
+mov dh, 0
+mov cl, 2
+mov bx, KERNEL_OFFSET
+int 0x13
+
+mov ah, 0xe
+mov al, 'A'
+int 0x10
+
+call switch_to_PM  ;This never returns
 
 jmp $   ;and this never executes
 
@@ -19,6 +35,7 @@ jmp $   ;and this never executes
 start_protected_mode:
    mov ebx, MSG_PROT_MODE
    call print_string_pm
+   call KERNEL_OFFSET
    jmp $
 
 ;Global variables
