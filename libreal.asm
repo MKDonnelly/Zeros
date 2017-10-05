@@ -48,3 +48,13 @@ print_string:
  .print_done:
    popa
    ret
+
+
+; Suspend the system 
+; this does not consume large
+; amounts of cpu as does an
+; infinite loop
+sysSuspend:
+   cli
+   hlt
+   jmp sysSuspend
