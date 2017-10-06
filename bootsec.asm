@@ -18,10 +18,6 @@ mov cl, 2
 mov bx, KERNEL_OFFSET
 int 0x13
 
-mov ah, 0xe
-mov al, 'A'
-int 0x10
-
 call switch_to_PM  ;This never returns
 
 jmp $   ;and this never executes
@@ -45,3 +41,4 @@ MSG_PROT_MODE db "Successfully landed in 32-bit Protected Mode", 0
 ; Padding and magic number
 times 510-($-$$) db 0
 dw 0xaa55
+
