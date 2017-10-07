@@ -1,8 +1,8 @@
 #!/bin/bash
 
 CFLAGS="-fno-pie -m32 -ffreestanding -fno-stack-protector -nostdlib -Wall"
-CPROGS="kmain.c libprint.c libvgaentry.c"
-OBJFILES="kmain.o libprint.o libvgaentry.o"
+CPROGS="kmain.c libprint.c libvgaentry.c libportio.c libcursor.c libscroll.c libscreencap.c libtiming.c"
+OBJFILES="kmain.o libprint.o libvgaentry.o libportio.o libcursor.o libscroll.o libscreencap.o libtiming.o"
 
 
 if [[ "$1" == "clean" ]]

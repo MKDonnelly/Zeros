@@ -1,7 +1,12 @@
 #pragma once
 
+#include "libvgaentry.h"
+
 void k_putchar(char);
 void k_newline();
+void k_printfull(char *msg, enum vga_color color, int offset);
+void k_print(char *msg);
+void k_clear_screen();
 
-//char* VIDEO_MEMORY = (char*)0xb8000;
-//int CUR_SCREEN_OFFSET = 0;
+int get_cursor();
+void move_cursor(int, int);

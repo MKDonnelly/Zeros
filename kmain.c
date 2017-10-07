@@ -4,14 +4,20 @@ asm("jmp kmain"); //The bootsector immedietelly jumps to the
 		  //add this so that kmain is always called.
 
 #include "libprint.h"
+extern char* VIDEO_MEMORY;
 #include "libvgaentry.h"
+#include "libportio.h"
+#include "libcursor.h"
+#include "libscroll.h"
+#include "libscreencap.h"
+#include "libtiming.h"
 
 void kmain(){
-   k_putchar('H');
-   k_putchar('E');
-   k_putchar('L');
-   k_newline();
-   k_putchar('L');
-   k_putchar('O');
+
+  k_clear_screen();
+  k_print("Testing..."); 
+  delay_second(1);
+  k_print("Delay?");
+
 }
 
