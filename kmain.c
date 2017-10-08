@@ -11,13 +11,21 @@ extern char* VIDEO_MEMORY;
 #include "libscroll.h"
 #include "libscreencap.h"
 #include "libtiming.h"
+#include "libcpu.h"
+#include "libkeyboard.h"
+
 
 void kmain(){
 
+
   k_clear_screen();
-  k_print("Testing..."); 
-  delay_second(1);
-  k_print("Delay?");
+  k_print("Enter some text: ");
+  idt_init();
+  kb_init();
+
+  
+  while(1);
+  //stop_cpu();
 
 }
 

@@ -20,7 +20,6 @@ int 0x13
 
 call switch_to_PM  ;This never returns
 
-jmp $   ;and this never executes
 
 %include "libreal.asm"
 %include "32switch.asm"
