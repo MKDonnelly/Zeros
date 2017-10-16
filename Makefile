@@ -1,25 +1,25 @@
-C_SOURCES = $(wildcard kernel/*.c drivers/*.c)
-CFLAGS=-ffreestanding -nostdlib -fno-stack-protector 
+CPROGS = $(wildcard kernel/*.c drivers/*.c lib/*.c)
+CHEADERS = $(wildcard kernel/*.h drivers/*.h)
+OBJECTS = ${CPROGS:.c=.o}
 
-OBJ = ${C_SOURCES:.c=.o}
+CFLAGS = -fno-pie -m32 -ffreestanding -fno-stack-protector -nostdlib -Wall
 
-all: kernel.bin bootsec.bin os-img
+osimage: boot/bootsec.bin kernel/kmain.bin
+	cat $^ > osimage.img
 
-kernel.bin: ${OBJ}
-	ld -o $@ -Ttext 0x1000 $^ --oformat binary
+kernel/kmain.bin: ${OBJECTS}
+	ld -m elf_i386 -o kernel/kmain.bin -T link.ld --oformat binary ${OBJECTS}
 
-%.o : %.c
-	gcc $(CFLAGS) -c $< -o $@
+%.o: %.asm
+	nasm -f bin -o $@ $<
 
-bootsec.bin:	
-	@nasm ./boot/bootsec.asm -f bin -o bootsec.bin
-
-os-img: kernel.bin bootsec.bin
-	@cat bootsec.bin kernel.bin > myos.img
-
-qemu: os-img
-	@qemu-system-x86_64 myos.img
+%.o: %.c ${CHEADERS}
+	gcc ${CFLAGS} -c $< -o $@
+%.bin: %.asm
+	nasm $< -f bin -o $@
 
 clean:
-	\rm -rf *.o *.bin *.img
-	find . -name '*\.o' -exec rm -rf {} \;
+	find . -name '*\.o' -exec \rm -rf {} \;
+	find . -name '*\.bin' -exec \rm -rf {} \;
+	\rm osimage.img
+
