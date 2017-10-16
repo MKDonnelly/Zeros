@@ -4,10 +4,11 @@ OBJECTS = ${CPROGS:.c=.o}
 
 CFLAGS = -fno-pie -m32 -ffreestanding -fno-stack-protector -nostdlib -Wall
 
-osimage: boot/bootsec.bin kernel/kmain.bin
+osimage: boot/bootsec.bin kernel/kmain.bin 
 	cat $^ > osimage.img
 
 kernel/kmain.bin: ${OBJECTS}
+	nasm -f elf32 cpu/interrupt.asm
 	ld -m elf_i386 -o kernel/kmain.bin -T link.ld --oformat binary ${OBJECTS} cpu/interrupt.o
 
 %.o: %.asm

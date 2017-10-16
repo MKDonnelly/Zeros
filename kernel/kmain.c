@@ -20,7 +20,6 @@ void kmain(){
   isr_install();
 
   __asm__ __volatile__("int $2");
-  __asm__ __volatile__("int $3");
 
   //struct vga_text_console sys_console;
 

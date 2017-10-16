@@ -1,39 +1,40 @@
-#ifndef IDT_H
-#define IDT_H
 
+#pragma once
 #include "types.h"
 
-/* Segment selectors */
 #define KERNEL_CS 0x08
 
-/* How every interrupt gate (handler) is defined */
-typedef struct {
-    u16 low_offset; /* Lower 16 bits of handler function address */
-    u16 sel; /* Kernel segment selector */
-    u8 always0;
-    /* First byte
-     * Bit 7: "Interrupt is present"
-     * Bits 6-5: Privilege level of caller (0=kernel..3=user)
-     * Bit 4: Set to 0 for interrupt gates
-     * Bits 3-0: bits 1110 = decimal 14 = "32 bit interrupt gate" */
-    u8 flags; 
-    u16 high_offset; /* Higher 16 bits of handler function address */
-} __attribute__((packed)) idt_gate_t ;
+//The main structure is the interrupt table (int_table)
+//and is composed of an array of 256 idt_entry's.
+//each entry within this table is an idt_entry and contains
+//information about the specific interrupt.
 
-/* A pointer to the array of interrupt handlers.
- * Assembly instruction 'lidt' will read it */
-typedef struct {
-    u16 limit;
-    u32 base;
-} __attribute__((packed)) idt_register_t;
+typedef struct{
+   u16 lower_offset;     //Lower 16 bits of memory offset for handler
+   u16 segment_sel;      //The kernel segment selector
+   u8 zeroed;
+   /*Flags byte
+    *Bit 7: Is interrupt present?
+    *Bits 6-5: Privilege level of caller (0=ring 0, 3 = ring 3)
+    *Bit 4: Set to 0 for interrupt gate
+    *Bits 3-0: 1110 = 14 = 32 bit interrupt gate
+    * */   
+   u8 flags;
+   u16 higher_offset;    //higher 16 bits for offset of handler
+}__attribute__((packed)) idt_entry;
+
+typedef struct{
+   u16 length;
+   u32 base_addr;
+}__attribute((packed)) idt_descriptor;
 
 #define IDT_ENTRIES 256
-idt_gate_t idt[IDT_ENTRIES];
-idt_register_t idt_reg;
+idt_entry int_table[IDT_ENTRIES];
+idt_descriptor idt_des;
 
-
-/* Functions implemented in idt.c */
+//Functions in idt.c
 void set_idt_gate(int n, u32 handler);
 void set_idt();
 
-#endif
+
+
