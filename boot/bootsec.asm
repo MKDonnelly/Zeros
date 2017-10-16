@@ -5,9 +5,6 @@ KERNEL_OFFSET equ 0x1000
 mov bp, 0x8000
 mov sp, bp
 
-;mov bx, MSG_REAL_MODE
-;call print_string
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Switch to 13h video mode
 ;mov ax, 0x13
@@ -40,9 +37,6 @@ start_protected_mode:
    call KERNEL_OFFSET
    jmp $
 
-;Global variables
-MSG_REAL_MODE db "Started in 16-bit Real mode", 0
-MSG_PROT_MODE db "Successfully landed in 32-bit Protected Mode", 0
 
 ; Padding and magic number
 times 510-($-$$) db 0

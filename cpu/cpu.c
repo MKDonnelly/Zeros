@@ -1,3 +1,6 @@
+
+//Various routines to manage the cpu
+
 void stop_cpu(){
    __asm__("suspend:");
    __asm__("cli");

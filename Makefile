@@ -1,4 +1,4 @@
-CPROGS = $(wildcard kernel/*.c drivers/*.c lib/*.c)
+CPROGS = $(wildcard kernel/*.c drivers/*.c lib/*.c cpu/*.c)
 CHEADERS = $(wildcard kernel/*.h drivers/*.h)
 OBJECTS = ${CPROGS:.c=.o}
 
@@ -8,7 +8,7 @@ osimage: boot/bootsec.bin kernel/kmain.bin
 	cat $^ > osimage.img
 
 kernel/kmain.bin: ${OBJECTS}
-	ld -m elf_i386 -o kernel/kmain.bin -T link.ld --oformat binary ${OBJECTS}
+	ld -m elf_i386 -o kernel/kmain.bin -T link.ld --oformat binary ${OBJECTS} cpu/interrupt.o
 
 %.o: %.asm
 	nasm -f bin -o $@ $<
