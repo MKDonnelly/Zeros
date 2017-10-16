@@ -1,6 +1,6 @@
 
-#include "libvgaentry.h"
-#include "libportio.h"
+#include "vgaentry.h"
+#include "portio.h"
 
 #define NEWLINE 10
 #define ROWS 25

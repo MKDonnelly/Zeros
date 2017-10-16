@@ -7,7 +7,7 @@ int strlen(char inputarray[]){
    return i;
 }
 
-
+//Reverse the given string
 void reverse(char s[]){
    int i, j;
    char c;
@@ -19,6 +19,8 @@ void reverse(char s[]){
    }
 }
 
+//Convert the integer n into 
+//an ascii string.
 void itoa(int n, char s[]){
    int i, sign;
 

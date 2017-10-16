@@ -1,6 +1,6 @@
 #pragma once
 
-#include "libvgaentry.h"
+#include "vgaentry.h"
 
 void k_putchar(char);
 void k_newline();

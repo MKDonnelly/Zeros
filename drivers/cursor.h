@@ -1,6 +1,6 @@
 #pragma once
 
-#include "libportio.h"
+#include "portio.h"
 
 int get_cursor();
 void move_cursor(int, int);

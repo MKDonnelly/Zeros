@@ -1,7 +1,7 @@
 #define ROWS 25
 #define COLS 80
 
-#include "libportio.h"
+#include "portio.h"
 
 #define REG_SCREEN_CTRL 0x3D4
 #define REG_SCREEN_DATA 0x3D5

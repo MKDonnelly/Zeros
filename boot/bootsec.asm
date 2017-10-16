@@ -10,8 +10,8 @@ mov sp, bp
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Switch to 13h video mode
-mov ax, 0x13
-int 0x10
+;mov ax, 0x13
+;int 0x10
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;Load kernel sectors
@@ -30,26 +30,13 @@ int 0x13
 call switch_to_PM  ;This never returns
 
 
-%include "boot/libreal.asm"
+%include "boot/realMode.asm"
 %include "boot/32switch.asm"
-%include "boot/libpm.asm"
+%include "boot/protectedMode.asm"
 
 [bits 32]
 
 start_protected_mode:
-   ;Initilize the segment registers
-   ;to point to the data segment
-   mov ax, DATA_SEG
-   mov ds, ax
-   mov ss, ax
-   mov es, ax
-   mov fs, ax
-   mov gs, ax
-   
-   ;Setup the stack
-   mov ebp, 0x90000
-   mov esp, ebp
-
    call KERNEL_OFFSET
    jmp $
 

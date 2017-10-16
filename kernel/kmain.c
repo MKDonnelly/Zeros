@@ -3,18 +3,15 @@ asm("jmp kmain"); //The bootsector immedietelly jumps to the
 		  //undesirable if there is a function above kmain.
 		  //add this so that kmain is always called.
 
-#include "../drivers/libportio.h"
-#include "../drivers/libtiming.h"
-#include "../drivers/libcpu.h"
-//#include "../drivers/libkeyboard.h"
-#include "../lib/libstr.h"
-#include "../drivers/libconsole.h"
+#include "../drivers/portio.h"
+#include "../drivers/timing.h"
+#include "../drivers/cpu.h"
+#include "../lib/string.h"
+#include "../drivers/console.h"
 
 #define LINES 200
 #define COLS 320
-
 #define LIGHT_GREEN 10
-
 
 
 char *VIDEO = (char*)0xA0000;
@@ -150,34 +147,11 @@ void drawLine3(struct point p1, struct point p2, int color){
 
 void kmain(){
 
-   //drawLine(10, 100, 20, LIGHT_GREEN );
-   //drawSquare( 160, 100, 10, 10, LIGHT_GREEN );
-   struct point p1 = { 
-	   .x = 0,
-	   .y = 0,
-   };
-   struct point p2 = {
-           .x = 10,
-	   .y = 0,
-   };
-   drawLine3( p1, p2, LIGHT_GREEN);
+  struct vga_text_console sys_console;
 
-//  char *vidmem = (char*)0xA0000;
-//  for(int i = 0; i < 320; i++){
-//    vidmem[i] = 10;
-//  }
-
-	
   initConsole( &sys_console );
-  sys_console.k_clear_screen();
-  sys_console.k_putchar('H');
-  sys_console.k_newline();
-  sys_console.k_putchar('E');
-  sys_console.k_newline();
   sys_console.k_print("Testing...");
 
-  //idt_init();
-  //kb_init();
   stop_cpu();
 
 }

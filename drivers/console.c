@@ -1,12 +1,12 @@
 
-#include "libprint.h"
-#include "libvgaentry.h"
-#include "libscreencap.h"
-#include "libcursor.h"
-#include "libscroll.h"
-#include "libconsole.h"
+#include "print.h"
+#include "vgaentry.h"
+#include "screencap.h"
+#include "cursor.h"
+#include "scroll.h"
+#include "console.h"
 
-void initConsole(struct _vga_text_console *dev){
+void initConsole(struct vga_text_console *dev){
    
    dev->k_putchar      = &k_putchar;         //Defined in libprint
    dev->k_clear_screen = &k_clear_screen;    //Defined in libprint

@@ -12,14 +12,14 @@
 #define CMOS_MONTH_REG    0x08
 #define CMOS_YEAR_REG     0x09
 
-#include "libportio.h"
+#include "portio.h"
 
 unsigned short getCMOSReg(unsigned short reg){
    port_byte_out(CMOS_COMMAND_PORT, NMI_disable_bit | reg );
    return port_byte_in(CMOS_READ_PORT); 
 }
 
-
+//TODO: THIS IS BROKEN
 void CMOS_delay(int sec){
    unsigned short curSec = getCMOSReg( CMOS_SECOND_REG );
    while( getCMOSReg( CMOS_SECOND_REG ) != curSec + sec);

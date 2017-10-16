@@ -1,12 +1,12 @@
 
 #pragma once
 
-#include "libvgaentry.h"
+#include "vgaentry.h"
 
 //A console device to be used by the system.
 //this aggregates most functions that alter
 //the screen.
-struct _vga_text_console{
+struct vga_text_console{
 
    void (*k_putchar)(char);
    void (*k_clear_screen)(void);
@@ -25,7 +25,7 @@ struct _vga_text_console{
 
    void (*scroll)(void);
    void (*scroll_by)(int);
-} sys_console;
+};
 
-void initConsole( struct _vga_text_console *);
+void initConsole( struct vga_text_console *);
 
