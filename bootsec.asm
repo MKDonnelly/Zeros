@@ -2,15 +2,24 @@
 
 KERNEL_OFFSET equ 0x1000
 
-mov bp, 0x9000
+mov bp, 0x8000
 mov sp, bp
 
-mov bx, MSG_REAL_MODE
-call print_string
+;mov bx, MSG_REAL_MODE
+;call print_string
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;Switch to 13h video mode
+mov ax, 0x13
+int 0x10
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;Load kernel sectors
 mov ah, 0x02
-mov al, 15
+mov al, 50    ;Load this many 512-bit sectors
+              ;Set it high just to be sure that
+              ;as the kernel gets larger, everything
+              ;is loaded.
 ;dl does not need to be changed
 mov ch, 0
 mov dh, 0
@@ -28,8 +37,19 @@ call switch_to_PM  ;This never returns
 [bits 32]
 
 start_protected_mode:
-   mov ebx, MSG_PROT_MODE
-   call print_string_pm
+   ;Initilize the segment registers
+   ;to point to the data segment
+   mov ax, DATA_SEG
+   mov ds, ax
+   mov ss, ax
+   mov es, ax
+   mov fs, ax
+   mov gs, ax
+   
+   ;Setup the stack
+   mov ebp, 0x90000
+   mov esp, ebp
+
    call KERNEL_OFFSET
    jmp $
 

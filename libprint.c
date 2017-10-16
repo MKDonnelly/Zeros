@@ -37,7 +37,18 @@ void k_newline(){
   CUR_SCREEN_OFFSET = ( (current_line + 1) * 160); 
 }
 
-void k_printfull(char *msg, enum vga_color color, int offset){
+void k_printfull(char *msg, enum vga_color color){
+
+   int i;
+   for(i = 0; msg[i] != 0; i++ ){
+      VIDEO_MEMORY[CUR_SCREEN_OFFSET] = msg[i];
+      VIDEO_MEMORY[CUR_SCREEN_OFFSET + 1] = color;
+      CUR_SCREEN_OFFSET += 2;  //Skip two since each space on the
+                               //screen has two bytes.
+   }
+}
+
+/*void k_printfull(char *msg, enum vga_color color, int offset){
 
    unsigned int current_line = (int)( CUR_SCREEN_OFFSET / 160 );
    unsigned int startPrintingAt = current_line * 160 + offset * 2;
@@ -47,11 +58,12 @@ void k_printfull(char *msg, enum vga_color color, int offset){
       VIDEO_MEMORY[startPrintingAt + i * 2] = msg[i];
       VIDEO_MEMORY[startPrintingAt + i * 2 + 1] = color;
    }
-   CUR_SCREEN_OFFSET += i * 2;
-}
+}*/
+
+
 
 //k_printfull with defaults
 void k_print(char *msg){
-   k_printfull(msg, make_color(COLOR_WHITE, COLOR_BLACK), 0);
+   k_printfull(msg, make_color(COLOR_WHITE, COLOR_BLACK));
 }
 

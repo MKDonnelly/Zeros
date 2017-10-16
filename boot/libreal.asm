@@ -49,6 +49,7 @@ print_string:
    popa
    ret
 
+
 ; Suspend the system 
 ; this does not consume large
 ; amounts of cpu as does an
@@ -57,5 +58,3 @@ sysSuspend:
    cli
    hlt
    jmp sysSuspend
-
-

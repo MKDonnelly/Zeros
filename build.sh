@@ -1,8 +1,8 @@
 #!/bin/bash
 
 CFLAGS="-fno-pie -m32 -ffreestanding -fno-stack-protector -nostdlib -Wall"
-CPROGS="kmain.c libprint.c libvgaentry.c libportio.c libcursor.c libscroll.c libscreencap.c libtiming.c libcpu.c libkeyboard.c"
-OBJFILES="kmain.o libprint.o libvgaentry.o libportio.o libcursor.o libscroll.o libscreencap.o libtiming.o libcpu.o libkeyboard.o"
+CPROGS="kmain.c libprint.c libvgaentry.c libportio.c libcursor.c libscroll.c libscreencap.c libtiming.c libcpu.c libkeyboard.c libstr.c libconsole.c libcmos.c"
+OBJFILES="kmain.o libprint.o libvgaentry.o libportio.o libcursor.o libscroll.o libscreencap.o libtiming.o libcpu.o libkeyboard.o libstr.o libconsole.o libcmos.o"
 
 
 if [[ "$1" == "clean" ]]
@@ -30,12 +30,12 @@ cat bootsec.bin kmain.bin > osimage.img
 exit
 
 #compile kernel libraries
-gcc $CFLAGS -c libprint.c -o libprint.o
+#gcc $CFLAGS -c libprint.c -o libprint.o
 
 #Compile c kernel
 #gcc -fno-pie -m32 -ffreestanding -c kmain.c -o kmain.o
-gcc $CFLAGS -c kmain.c -o kmain.o
+#gcc $CFLAGS -c kmain.c -o kmain.o
 #ld -m elf_i386 -o kmain.bin -T link.ld kmain.o --oformat binary
-ld -m elf_i386 -o kmain.bin -T link.ld --oformat binary kmain.o libprint.o
+#ld -m elf_i386 -o kmain.bin -T link.ld --oformat binary kmain.o libprint.o
 
 #Combine the bootsector and kernel into a single image

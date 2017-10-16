@@ -1,0 +1,4 @@
+
+Enable A20 gate before IDT and GDT
+Add in types.h
+Convert to using meson

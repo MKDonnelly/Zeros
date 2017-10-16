@@ -83,6 +83,7 @@ void kb_init(void)
 {
   /* 0xFD is 11111101 - enables only IRQ1 (keyboard)*/
   port_byte_out(0x21 , 0xFD);
+  port_byte_out(0xA1, 0xFF);
 }
 
 
