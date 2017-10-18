@@ -2,25 +2,37 @@ CPROGS = $(wildcard kernel/*.c drivers/*.c drivers/vgatext/*.c drivers/serial/*.
 CHEADERS = $(wildcard kernel/*.h drivers/*.h)
 OBJECTS = ${CPROGS:.c=.o}
 
-CFLAGS = -fno-pie -m32 -ffreestanding -fno-stack-protector -nostdlib -Wall 
+CFLAGS = -fno-pie -m32 -ffreestanding -fno-stack-protector -nostdlib -Wall -g
+
+qemu: osimage
+	qemu-system-x86_64 -serial file:serial.log osimage.img
+
+qemu-dbg: osimage
+	qemu-system-x86_64 -serial file:serial.log osimage.img -s -S &
+	gdb -q -x gdbdebug
+
 
 osimage: boot/bootsec.bin kernel/kmain.bin 
-	cat $^ > osimage.img
+	@cat $^ > osimage.img
 
 kernel/kmain.bin: ${OBJECTS}
-	nasm -f elf32 cpu/interrupt.asm
-	ld -m elf_i386 -o kernel/kmain.bin -T link.ld --oformat binary ${OBJECTS} cpu/interrupt.o
+	@nasm -f elf32 cpu/interrupt.asm
+	//Do this to allow remote debugging
+	@ld -m elf_i386 -o kernel/kmain.elf -T link.ld ${OBJECTS} cpu/interrupt.o
+	@objcopy --only-keep-debug kernel/kmain.elf kernel/kmain.sym
+	@objcopy -O binary kernel/kmain.elf kernel/kmain.bin
 
 %.o: %.asm
-	nasm -f bin -o $@ $<
+	@nasm -f bin -o $@ $<
 
 %.o: %.c ${CHEADERS}
-	gcc ${CFLAGS} -c $< -o $@
+	@gcc ${CFLAGS} -c $< -o $@
 %.bin: %.asm
-	nasm $< -f bin -o $@
+	@nasm $< -f bin -o $@
 
 clean:
-	find . -name '*\.o' -exec \rm -rf {} \;
-	find . -name '*\.bin' -exec \rm -rf {} \;
-	\rm osimage.img
+	@find . -name '*\.o' -exec \rm -rf {} \;
+	@find . -name '*\.bin' -exec \rm -rf {} \;
+	@find . -name '*\.elf' -exec \rm -rf {} \;
+	@\rm osimage.img 2> /dev/null
 

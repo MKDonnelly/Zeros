@@ -1,0 +1,10 @@
+Remote debugging
+   start the kernel with
+     qemu-system-x86_64 <osimage> -s -S
+   run gdb in a separate terminal with
+     gdb -q
+     -> target remote localhost:1234
+     -> symbol-file kernel/kmain.elf
+     -> list
+   This can now be debugged as usual
+

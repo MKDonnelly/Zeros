@@ -18,12 +18,11 @@ asm("jmp kmain"); //The bootsector immedietelly jumps to the
 
 void kmain(){
 
+  int var = 0;
   struct vga_text_console sys_console;
   initConsole( &sys_console );
+  var = 10;
   sys_console.k_print("Testing...");
-
-  sp_init();  
-  sp_putstr("This is a test\n");
 
   //isr_install();
   //__asm__ __volatile__("int $2");
