@@ -5,27 +5,28 @@ asm("jmp kmain"); //The bootsector immedietelly jumps to the
 
 #include "../drivers/portio.h"
 #include "../drivers/timing.h"
-#include "../drivers/print.h"
-#include "../cpu/cpu.h"
-#include "../lib/string.h"
-#include "../drivers/console.h"
-#include "../cpu/types.h"
+#include "../drivers/vgatext/console.h"
+#include "../drivers/serial/serial.h"
 
+#include "../lib/string.h"
+
+#include "../cpu/cpu.h"
+#include "../cpu/types.h"
 #include "../cpu/isr.h"
 #include "../cpu/idt.h"
 
 
 void kmain(){
 
-  isr_install();
+  struct vga_text_console sys_console;
+  initConsole( &sys_console );
+  sys_console.k_print("Testing...");
 
-  __asm__ __volatile__("int $2");
+  sp_init();  
+  sp_putstr("This is a test\n");
 
-  //struct vga_text_console sys_console;
-
-  //initConsole( &sys_console );
-  //sys_console.k_print("Testing...");
-  
+  //isr_install();
+  //__asm__ __volatile__("int $2");
   stop_cpu();
 
 }

@@ -1,6 +1,6 @@
 
 #include "vgaentry.h"
-#include "portio.h"
+#include "../../drivers/portio.h"
 
 #define NEWLINE 10
 #define ROWS 25

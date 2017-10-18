@@ -1,0 +1,5 @@
+
+
+Serial drivers. To use these in qemu, add 
+   -serial file:serial.log
+to capture the output.

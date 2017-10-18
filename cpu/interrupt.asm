@@ -24,8 +24,8 @@ isr_common_stub:
 
 global isr2
 isr2:
-   call isr_handler
-   hlt
+   ;call isr_handler
+   ;hlt
    cli
    push byte 0
    push byte 2

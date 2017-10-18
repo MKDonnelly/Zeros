@@ -2,3 +2,6 @@
 Enable A20 gate before IDT and GDT
 Add in types.h
 Convert to using meson
+Work on VGA 13h mode driver
+Work on cmos driver (better delay, convert date from BCD to binary)
+

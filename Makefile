@@ -1,8 +1,8 @@
-CPROGS = $(wildcard kernel/*.c drivers/*.c lib/*.c cpu/*.c)
+CPROGS = $(wildcard kernel/*.c drivers/*.c drivers/vgatext/*.c drivers/serial/*.c lib/*.c cpu/*.c)
 CHEADERS = $(wildcard kernel/*.h drivers/*.h)
 OBJECTS = ${CPROGS:.c=.o}
 
-CFLAGS = -fno-pie -m32 -ffreestanding -fno-stack-protector -nostdlib -Wall
+CFLAGS = -fno-pie -m32 -ffreestanding -fno-stack-protector -nostdlib -Wall 
 
 osimage: boot/bootsec.bin kernel/kmain.bin 
 	cat $^ > osimage.img
