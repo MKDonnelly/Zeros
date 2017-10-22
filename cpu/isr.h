@@ -3,7 +3,6 @@
 
 #include "types.h"
 
-
 extern void isr2();
 
 typedef struct {
@@ -13,6 +12,5 @@ typedef struct {
    u32 eip, cs ,eflags, useresp, ss;
 }reg_struct;
 
-
-void isr_install();
-void isr_handler(reg_struct r);
+void install_isrs();
+void main_int_handler(reg_struct r);

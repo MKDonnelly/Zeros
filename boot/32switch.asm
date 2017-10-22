@@ -57,7 +57,7 @@ switch_to_PM:
    ;Load the GDT
    lgdt [gdt_descriptor]
 
-   ;Set the bit in cr0
+   ;Set the PE bit in CR0 
    mov eax, cr0
    or eax, 0x1
    mov cr0, eax

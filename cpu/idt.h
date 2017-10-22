@@ -2,6 +2,10 @@
 #pragma once
 #include "types.h"
 
+//Look in the GDT. 0x08 is eight 
+//bytes from the start of the gdt,
+//which is exactly where the gdt code 
+//section is.
 #define KERNEL_CS 0x08
 
 //The main structure is the interrupt table (int_table)
@@ -15,7 +19,7 @@ typedef struct{
    u8 zeroed;
    /*Flags byte
     *Bit 7: Is interrupt present?
-    *Bits 6-5: Privilege level of caller (0=ring 0, 3 = ring 3)
+    *Bits 6-5: Privilege level of caller (0=ring 0, 3=ring 3)
     *Bit 4: Set to 0 for interrupt gate
     *Bits 3-0: 1110 = 14 = 32 bit interrupt gate
     * */   
@@ -26,15 +30,15 @@ typedef struct{
 typedef struct{
    u16 length;
    u32 base_addr;
-}__attribute((packed)) idt_descriptor;
+}__attribute__((packed)) idt_descriptor;
 
 #define IDT_ENTRIES 256
 idt_entry int_table[IDT_ENTRIES];
 idt_descriptor idt_des;
 
 //Functions in idt.c
-void set_idt_gate(int n, u32 handler);
-void set_idt();
+void add_idt_entry(int, u32);
+void load_idt();
 
 
 

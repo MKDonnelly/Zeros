@@ -1,4 +1,28 @@
-[extern isr_handler]
+[extern main_int_handler]
+
+;%macro SETUP_INT 0
+;   pusha
+;   mov ax, ds
+;   push eax
+;   mov ax, 0x10
+;   mov ds, ax
+;   mov es, ax
+;   mov fs, ax
+;   mov gs, ax
+;%endmacro
+
+;%macro END_INT 0
+;   pop eax
+;   mov ds, ax
+;   mov es, ax
+;   mov fs, ax
+;   mov gs, ax
+;   popa
+;   add esp, 8
+;   sti
+;   iret
+;%endmacro
+   
 
 isr_common_stub:
    pusha
@@ -10,7 +34,7 @@ isr_common_stub:
    mov fs, ax
    mov gs, ax
 
-   call isr_handler
+   call main_int_handler
 
    pop eax
    mov ds, ax
@@ -24,8 +48,6 @@ isr_common_stub:
 
 global isr2
 isr2:
-   ;call isr_handler
-   ;hlt
    cli
    push byte 0
    push byte 2

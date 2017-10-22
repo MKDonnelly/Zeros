@@ -7,7 +7,7 @@ CFLAGS = -fno-pie -m32 -ffreestanding -fno-stack-protector -nostdlib -Wall -g
 qemu: osimage
 	qemu-system-x86_64 -serial file:serial.log osimage.img
 
-qemu-dbg: osimage
+debug: osimage
 	qemu-system-x86_64 -serial file:serial.log osimage.img -s -S &
 	gdb -q -x gdbdebug
 
@@ -17,7 +17,6 @@ osimage: boot/bootsec.bin kernel/kmain.bin
 
 kernel/kmain.bin: ${OBJECTS}
 	@nasm -f elf32 cpu/interrupt.asm
-	//Do this to allow remote debugging
 	@ld -m elf_i386 -o kernel/kmain.elf -T link.ld ${OBJECTS} cpu/interrupt.o
 	@objcopy --only-keep-debug kernel/kmain.elf kernel/kmain.sym
 	@objcopy -O binary kernel/kmain.elf kernel/kmain.bin
@@ -35,4 +34,5 @@ clean:
 	@find . -name '*\.bin' -exec \rm -rf {} \;
 	@find . -name '*\.elf' -exec \rm -rf {} \;
 	@\rm osimage.img 2> /dev/null
+	
 

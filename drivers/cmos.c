@@ -1,27 +1,52 @@
-//Sending this bit to port 0x70 disables
-//non-maskable interrupts
-#define NMI_disable_bit 0x80
-#define CMOS_COMMAND_PORT 0x70
-#define CMOS_READ_PORT  0x71
 
-#define CMOS_SECOND_REG   0x00
-#define CMOS_MINUTE_REG   0x02
-#define CMOS_HOURS_REG    0x04
-#define CMOS_WEEKDAY_REG  0x06
-#define CMOS_DOM_REG      0x07
-#define CMOS_MONTH_REG    0x08
-#define CMOS_YEAR_REG     0x09
+#include "cmos.h"
 
-#include "portio.h"
+//The output of this is a BCD number, which
+//needs to be converted to a binary number to
+//be of use.
 
-unsigned short getCMOSReg(unsigned short reg){
-   port_byte_out(CMOS_COMMAND_PORT, NMI_disable_bit | reg );
-   return port_byte_in(CMOS_READ_PORT); 
+void initCMOS(){
+   //We will access bit 2 in status register 2 to output
+   //a binary representation of the dates. First, read in
+   //the current value. 
+   port_byte_out( CMOS_COMMAND_PORT, NMI_disable_bit | 0xB ); 
+   unsigned short statusB = port_byte_in( CMOS_IO_PORT );
+
+   //statusB = statusB | 0x4;   //Set bit 2 in the status register.
+   //Now write the status back to the port.
+   port_byte_out( CMOS_COMMAND_PORT, NMI_disable_bit | 0xB );
+   port_byte_out( CMOS_IO_PORT, statusB | 0x4 );
 }
 
-//TODO: THIS IS BROKEN
+unsigned short getCMOSReg(unsigned short reg){
+/*   //We will access bit 2 in status register 2 to output
+   //a binary representation of the dates. First, read in
+   //the current value. 
+   port_byte_out( CMOS_COMMAND_PORT, NMI_disable_bit | 0xB ); 
+   unsigned short statusB = port_byte_in( CMOS_IO_PORT );
+   statusB = statusB | 0x4;   //Set bit 2 in the status register.
+   //Now write the status back to the port.
+   port_byte_out( CMOS_COMMAND_PORT, NMI_disable_bit | 0xB );
+   port_byte_out( CMOS_IO_PORT, NMI_disable_bit | statusB );*/
+
+   port_byte_out(CMOS_COMMAND_PORT, NMI_disable_bit | reg );
+   return port_byte_in(CMOS_IO_PORT); 
+}
+
+//Delay *roughly* "sec" seconds using the CMOS. Roughly since
+//the time can be +- 1 second.
 void CMOS_delay(int sec){
-   unsigned short curSec = getCMOSReg( CMOS_SECOND_REG );
-   while( getCMOSReg( CMOS_SECOND_REG ) != curSec + sec);
+   int curSec = getCMOSReg( CMOS_SECOND_REG );
+   int curMin = getCMOSReg( CMOS_MINUTE_REG );
+   
+   int endSec = curSec + sec;
+   int endMin = curMin; 
+   if( endSec >= 60 ){
+      endMin++;
+      endSec -= 60;
+   }
+
+   while( getCMOSReg( CMOS_SECOND_REG ) != endSec && 
+	  getCMOSReg( CMOS_MINUTE_REG ) != endMin ) ;
 }
 

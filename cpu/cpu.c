@@ -8,10 +8,18 @@ void stop_cpu(){
    __asm__("jmp suspend");
 }
 
-void disable_interrupts(){
+void disable_ints(){
    __asm__("cli\n\t");
 }
 
-void enable_interrupts(){
+void enable_ints(){
    __asm__("sti\n\t");
 }
+
+/*
+void isr_start(){
+   __asm__("pusha");
+   __asm__("mov ax, ds");
+   __asm__("
+}*/
+

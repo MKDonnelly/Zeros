@@ -7,8 +7,11 @@ asm("jmp kmain"); //The bootsector immedietelly jumps to the
 #include "../drivers/timing.h"
 #include "../drivers/vgatext/console.h"
 #include "../drivers/serial/serial.h"
+#include "../drivers/cmos.h"
+#include "../drivers/vgatext/print.h"
 
 #include "../lib/string.h"
+#include "../lib/bcd.h"
 
 #include "../cpu/cpu.h"
 #include "../cpu/types.h"
@@ -18,15 +21,13 @@ asm("jmp kmain"); //The bootsector immedietelly jumps to the
 
 void kmain(){
 
-  int var = 0;
-  struct vga_text_console sys_console;
-  initConsole( &sys_console );
-  var = 10;
-  sys_console.k_print("Testing...");
+  //int var = 0;
+  //double a = 1 / var;
 
-  //isr_install();
-  //__asm__ __volatile__("int $2");
-  stop_cpu();
+  install_isrs();
+  __asm__ __volatile__("int $2");
+  //stop_cpu();
+  while(1);
 
 }
 
