@@ -33,6 +33,7 @@ clean:
 	@find . -name '*\.o' -exec \rm -rf {} \;
 	@find . -name '*\.bin' -exec \rm -rf {} \;
 	@find . -name '*\.elf' -exec \rm -rf {} \;
+	@find ./kernel -name '*\.sym' -exec \rm {} \;
 	@\rm osimage.img 2> /dev/null
 	
 

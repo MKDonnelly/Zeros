@@ -1,0 +1,18 @@
+How to create and manage interrupts
+
+First, write the interrupt handler that should
+be called in isr.c and add its header to isr.h. Add
+   [extern <int_handler_name>] 
+to the top of interrupt.asm
+In interrupt.asm, write
+   global isr<int#>
+   isr<int#>:
+      push byte <int#> (if number 9-14)
+      push byte <int#>
+      SETUP_INT
+      call <int_handler_name>
+      END_INT
+Finally, in the isr.c install_isrs function
+add
+   add_idt_entry( <int#>, (u32)isr<int#>);   
+

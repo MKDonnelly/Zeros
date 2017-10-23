@@ -1,6 +1,5 @@
 
 #include "idt.h"
-#include "types.h"
 
 void add_idt_entry( int intNumber, u32 handlerFunction) {
    //int_table is the interrupt descriptor table

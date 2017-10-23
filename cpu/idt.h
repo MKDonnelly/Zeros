@@ -2,10 +2,12 @@
 #pragma once
 #include "types.h"
 
-//Look in the GDT. 0x08 is eight 
-//bytes from the start of the gdt,
-//which is exactly where the gdt code 
-//section is.
+// KERNEL_CS describes the index of the segment
+// descriptor to reference in the GDT. In this case,
+// 0x08 references the first valid segment, or 
+// the kernel code segment. This index is also scaled
+// by eight by the CPU to get an offset from the GDT.
+// This is actually a segment selector.
 #define KERNEL_CS 0x08
 
 //The main structure is the interrupt table (int_table)
@@ -36,8 +38,12 @@ typedef struct{
 idt_entry int_table[IDT_ENTRIES];
 idt_descriptor idt_des;
 
-//Functions in idt.c
+//Given an interrupt number and a 
+//function handler, place it into
+//the IDT.
 void add_idt_entry(int, u32);
+//This does the job of actually
+//loading the IDT to the system.
 void load_idt();
 
 

@@ -9,13 +9,13 @@ void initCMOS(){
    //We will access bit 2 in status register 2 to output
    //a binary representation of the dates. First, read in
    //the current value. 
-   port_byte_out( CMOS_COMMAND_PORT, NMI_disable_bit | 0xB ); 
-   unsigned short statusB = port_byte_in( CMOS_IO_PORT );
+   portb_write( CMOS_COMMAND_PORT, NMI_disable_bit | 0xB ); 
+   unsigned short statusB = portb_read( CMOS_IO_PORT );
 
    //statusB = statusB | 0x4;   //Set bit 2 in the status register.
    //Now write the status back to the port.
-   port_byte_out( CMOS_COMMAND_PORT, NMI_disable_bit | 0xB );
-   port_byte_out( CMOS_IO_PORT, statusB | 0x4 );
+   portb_write( CMOS_COMMAND_PORT, NMI_disable_bit | 0xB );
+   portb_write( CMOS_IO_PORT, statusB | 0x4 );
 }
 
 unsigned short getCMOSReg(unsigned short reg){
@@ -29,8 +29,8 @@ unsigned short getCMOSReg(unsigned short reg){
    port_byte_out( CMOS_COMMAND_PORT, NMI_disable_bit | 0xB );
    port_byte_out( CMOS_IO_PORT, NMI_disable_bit | statusB );*/
 
-   port_byte_out(CMOS_COMMAND_PORT, NMI_disable_bit | reg );
-   return port_byte_in(CMOS_IO_PORT); 
+   portb_write(CMOS_COMMAND_PORT, NMI_disable_bit | reg );
+   return portb_read(CMOS_IO_PORT); 
 }
 
 //Delay *roughly* "sec" seconds using the CMOS. Roughly since

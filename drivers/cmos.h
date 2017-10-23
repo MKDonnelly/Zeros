@@ -1,6 +1,10 @@
 
 #pragma once
 
+#include "../cpu/types.h"
+#include "portio.h"
+#include "../lib/bcd.h"
+
 //Sending this bit to port 0x70 disables
 //non-maskable interrupts
 #define NMI_disable_bit 0x80
@@ -15,10 +19,12 @@
 #define CMOS_MONTH_REG    0x08
 #define CMOS_YEAR_REG     0x09
 
-#include "portio.h"
-#include "../lib/bcd.h"
-
+//Initilize the cmos
 void initCMOS();
+//Get the designated cmos register 
+//(see the #define's above)
 unsigned short getCMOSReg(unsigned short);
+//Using the cmos real time clock, delay for
+//a certain number of seconds.
 void CMOS_delay(int);
 

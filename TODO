@@ -6,3 +6,4 @@ write a proper printf w/ format strings
 Add cpuid functions
 Learn what task state segments and call gate descriptors are
 Learn string asm commands and other useful commands
+Clean up interrupts functions

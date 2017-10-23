@@ -16,10 +16,4 @@ void enable_ints(){
    __asm__("sti\n\t");
 }
 
-/*
-void isr_start(){
-   __asm__("pusha");
-   __asm__("mov ax, ds");
-   __asm__("
-}*/
 

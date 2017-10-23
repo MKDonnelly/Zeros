@@ -1,6 +1,11 @@
 
 
 ; Define the global descriptor table
+; A segment descriptor describes
+; a piece of memory in the system. A descriptor table,
+; then, is a set of segment descriptors indexed as 0, 1, ...
+; In the GDT, segment descriptor 0 must be set to null,
+; so the first valid segment descriptor is 1, or gdt_code.
 gdt_start:
    gdt_null:   ; the descriptor table must start with 8
      dd 0x0    ; null bytes.
@@ -44,9 +49,10 @@ gdt_descriptor:
 
 ;Define some handy constants for the GDT segment descriptor offsets, which
 ; are what segment registers must contain when in protected mode. For example,
-; when we set DS = 1x10 in PM, the CPU knows that we mean it to use the
+; when we set DS = 0x10 in PM, the CPU knows that we mean it to use the
 ; segment described at offset 0x10 (i.e. 16 bytes) in out GDT, which in our
 ; case is the DATA segment (0x0 -> NULL; 0x08 -> CODE; 0x10 -> DATA)
+; THESE ARE SEGMENT SELECTORS!
 CODE_SEG equ gdt_code - gdt_start
 DATA_SEG equ gdt_data - gdt_start
 

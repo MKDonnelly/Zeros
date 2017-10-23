@@ -2,15 +2,27 @@
 #pragma once
 
 #include "types.h"
+#include "idt.h"
+#include "../drivers/vgatext/print.h"
+#include "../lib/string.h"
+#include "../drivers/portio.h"
 
-extern void isr2();
+//Defined in assembly.asm
+extern void isr0();
+extern void isr33();
 
 typedef struct {
-   u32 ds;
-   u32 edi, esi, ebp, esp, ebx, edx, ecx, eax;
-   u32 int_no, err_code;
-   u32 eip, cs ,eflags, useresp, ss;
+   udword ds;
+   udword edi, esi, ebp, esp, ebx, edx, ecx, eax;
+   udword int_no, err_code;
+   udword eip, cs ,eflags, useresp, ss;
 }reg_struct;
 
+//This function handles the installation
+//of each interrupt handler
 void install_isrs();
-void main_int_handler(reg_struct r);
+
+//These are the individual handlers
+void zero_divide();
+void keyboard_handler();
+
