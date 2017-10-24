@@ -4,7 +4,7 @@
 
 void k_putchar(char);
 void k_newline();
-void k_printfull(char *msg, enum vga_color color);
+void k_printfull(char *msg);//, enum vga_color color);
 void k_print(char *msg);
 void k_clear_screen();
 

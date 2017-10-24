@@ -25,14 +25,14 @@ void kmain(){
   init_pic();
   //Create the IDT and initilize
   //the interrupt handlers
-  install_isrs();
+  //install_isrs();
   //Enable irq1 (keyboard)
-  enable_irq1();
+  //enable_irq1();
   //Make sure to enable 
   //the interrupts
-  enable_ints();
+  //enable_ints();
 
-  k_print("Press a key: " );
+  k_putchar('A');
 
   //__asm__ __volatile__("int $33");
   //stop_cpu();
