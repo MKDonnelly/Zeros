@@ -1,11 +1,20 @@
-#include "print.h"
+#include "vgatext.h"
+
+char *VIDEO_MEMORY = (char*)0xb8000;
+//Current screen offset as linear offset
+int CUR_SCREEN_OFFSET = 0;  
+int CUR_CURSOR_OFFSET = 0;
 
 //Place a character on the screen at the
-//current screen offset.
+//current screen offset. All other print
+//functions should call this to actually
+//place the character on the screen.
 void k_putchar( char input ){
    VIDEO_MEMORY[CUR_SCREEN_OFFSET] = input;
    CUR_SCREEN_OFFSET += 2; //Skip 2 bytes since 
                            //the second byte is for color
+   CUR_CURSOR_OFFSET++;    //Update the cursor position
+   move_cursorl( CUR_CURSOR_OFFSET ); 
 }
 
 //Clear the screen and update the position
@@ -26,12 +35,9 @@ void k_newline(){
 }
 
 void k_print( char *s ){
-   int i = 0, j = 0;
-   char *vm = (char*)0xb8000;
-   while( s[j] != 0 ){
-      vm[i] = s[j];
-      CUR_SCREEN_OFFSET += 2;
-      j++;
-      i += 2;
+   int i = 0;
+   while( s[i] != 0 ){
+      k_putchar( s[i] );
+      i++;
    }
 }

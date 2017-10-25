@@ -5,11 +5,10 @@ asm("jmp kmain"); //The bootsector immedietelly jumps to the
 
 #include "../drivers/portio.h"
 #include "../drivers/timing.h"
-#include "../drivers/vgatext/console.h"
 #include "../drivers/serial/serial.h"
 #include "../drivers/cmos.h"
-#include "../drivers/vgatext/print.h"
 #include "../drivers/pic.h"
+#include "../drivers/vgatext/vgatext.h"
 
 #include "../lib/string.h"
 #include "../lib/bcd.h"
@@ -22,6 +21,7 @@ asm("jmp kmain"); //The bootsector immedietelly jumps to the
 
 void kmain(){
 
+	
   //Initilize the PIC
   init_pic();
   //Create the IDT and initilize
@@ -34,6 +34,8 @@ void kmain(){
   //enable_ints();
   __asm__ __volatile__("sti");
 
+
+  move_cursorl( 0 );
   k_print("Enter some text: " );
 
   //__asm__ __volatile__("int $35");

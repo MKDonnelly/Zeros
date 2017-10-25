@@ -1,8 +1,7 @@
-
-#include "scroll.h"
+#include "vgatext.h"
 
 void scroll(){
-   unsigned int max = 80 * 24 * 2;
+   unsigned int max = ROWS * COLS * 2;
 
    //Since each character is 80 spaces (160 slots)
    //away from the space directly above, the screen
@@ -13,6 +12,7 @@ void scroll(){
    }
 }
 
+//Just call scroll n times
 void scroll_by(int n){
    for(int i = 0; i < n; i++)
       scroll();

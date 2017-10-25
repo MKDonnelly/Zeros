@@ -1,5 +1,4 @@
-
-#include "vgaentry.h"
+#include "vgatext.h"
 
 //Can set both the forground and background color of
 //text

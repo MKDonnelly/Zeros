@@ -2,7 +2,7 @@
 #pragma once
 
 #include "idt.h"
-#include "../drivers/vgatext/print.h"
+#include "../drivers/vgatext/vgatext.h"
 #include "../drivers/portio.h"
 
 #include "../lib/string.h"
