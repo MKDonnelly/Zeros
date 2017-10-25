@@ -1,6 +1,6 @@
 
 #pragma once
 
-#include "../cpu/types.h"
+#include "types.h"
 
-int bcdtobin( s8 bcdNumber );
+int bcdtobin( sbyte bcdNumber );

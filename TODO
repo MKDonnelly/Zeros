@@ -1,9 +1,10 @@
-
 Enable A20 gate before IDT and GDT
-Convert to using meson
-Work on VGA 13h mode driver
+Manually create a keyboard map
+Work on VGA 13h mode driver and vgatext mode driver
+  implement a frame buffer
 write a proper printf w/ format strings
+   (also make decimal to string, string to int, etc)
 Add cpuid functions
 Learn what task state segments and call gate descriptors are
 Learn string asm commands and other useful commands
-Clean up interrupts functions
+Find out show keyboard_map.h is being double-included

@@ -13,9 +13,10 @@ asm("jmp kmain"); //The bootsector immedietelly jumps to the
 
 #include "../lib/string.h"
 #include "../lib/bcd.h"
+#include "../lib/types.h"
+#include "../lib/keyboard_map.h"
 
 #include "../cpu/cpu.h"
-#include "../cpu/types.h"
 #include "../cpu/isr.h"
 #include "../cpu/idt.h"
 
@@ -25,16 +26,17 @@ void kmain(){
   init_pic();
   //Create the IDT and initilize
   //the interrupt handlers
-  //install_isrs();
+  install_isrs();
   //Enable irq1 (keyboard)
-  //enable_irq1();
+  enable_irq1();
   //Make sure to enable 
   //the interrupts
   //enable_ints();
+  __asm__ __volatile__("sti");
 
-  k_putchar('A');
+  k_print("Enter some text: " );
 
-  //__asm__ __volatile__("int $33");
+  //__asm__ __volatile__("int $35");
   //stop_cpu();
   while(1);
 

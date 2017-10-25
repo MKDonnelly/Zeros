@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../drivers/portio.h"
+#include "common.h"
 
 int get_cursor();
 void move_cursor(int, int);

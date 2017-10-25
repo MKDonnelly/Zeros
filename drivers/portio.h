@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../cpu/types.h"
+#include "../lib/types.h"
 
 sbyte portb_read( uword );
 void portb_write( uword, uword);

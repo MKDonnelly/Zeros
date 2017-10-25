@@ -1,9 +1,9 @@
 
 #pragma once
 
-#include "../cpu/types.h"
-#include "portio.h"
+#include "../lib/types.h"
 #include "../lib/bcd.h"
+#include "portio.h"
 
 //Sending this bit to port 0x70 disables
 //non-maskable interrupts

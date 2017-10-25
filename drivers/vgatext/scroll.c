@@ -1,7 +1,5 @@
 
-#include "print.h"
-extern char* VIDEO_MEMORY;
-
+#include "scroll.h"
 
 void scroll(){
    unsigned int max = 80 * 24 * 2;

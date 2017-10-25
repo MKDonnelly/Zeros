@@ -16,3 +16,7 @@ Finally, in the isr.c install_isrs function
 add
    add_idt_entry( <int#>, (u32)isr<int#>);   
 
+There is a slight variation on interrupts. When
+the interrupt is called as a result of the PIC,
+the byte 0x20 must be sent to re-enable the interrupt
+capabilities of the PIC.

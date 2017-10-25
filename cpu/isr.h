@@ -1,15 +1,29 @@
 
 #pragma once
 
-#include "types.h"
 #include "idt.h"
 #include "../drivers/vgatext/print.h"
-#include "../lib/string.h"
 #include "../drivers/portio.h"
+
+#include "../lib/string.h"
+#include "../lib/types.h"
+
+extern unsigned char keyboard_map[128];
 
 //Defined in assembly.asm
 extern void isr0();
+
+extern void isr30();
+extern void isr31();
+extern void isr32();
 extern void isr33();
+extern void isr34();
+extern void isr35();
+extern void isr36();
+extern void isr37();
+extern void isr38();
+extern void isr39();
+
 
 typedef struct {
    udword ds;
@@ -24,5 +38,6 @@ void install_isrs();
 
 //These are the individual handlers
 void zero_divide();
+void default_pic();
 void keyboard_handler();
 

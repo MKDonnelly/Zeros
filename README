@@ -1,0 +1,20 @@
+
+Directory structure
+   -> boot
+      Anything related to booting the system 
+      is placed in the boot directory.
+   -> cpu
+      Anything related to how the cpu operates,
+      such as interrupts and halting, goes here.
+   -> drivers
+      Anything related to controlling a piece of 
+      hardware that is not the cpu goes here.
+   -> kernel
+      Anything related to the basic kernel 
+      functionality, such as scheduling or memory
+      management, goes here.
+   -> lib
+      Any useful routines that are not hardware
+      specific or core kernel functions.
+      
+

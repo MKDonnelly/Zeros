@@ -1,6 +1,4 @@
-#include "print.h"
-extern char* VIDEO_MEMORY;
-
+#include "screencap.h"
 
 //Array is assumed to be 24x160
 void k_screen_cap(int captureArray[][160]){

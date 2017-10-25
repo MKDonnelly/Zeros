@@ -1,7 +1,13 @@
 
 #pragma once
 
+#include "common.h"
 #include "vgaentry.h"
+#include "print.h"
+#include "screencap.h"
+#include "cursor.h"
+#include "scroll.h"
+
 
 //A console device to be used by the system.
 //this aggregates most functions that alter
@@ -12,7 +18,7 @@ struct vga_text_console{
    void (*k_clear_screen)(void);
    void (*k_newline)(void);
    
-   void (*k_printfull)(char*,enum vga_color);
+   //void (*k_printfull)(char*,enum vga_color);
    void (*k_print)(char*);
 
    void (*k_screen_cap)(int[][160]);
@@ -28,4 +34,5 @@ struct vga_text_console{
 };
 
 void initConsole( struct vga_text_console *);
+
 

@@ -1,6 +1,6 @@
 
 #pragma once
-#include "types.h"
+#include "../lib/types.h"
 
 // KERNEL_CS describes the index of the segment
 // descriptor to reference in the GDT. In this case,
