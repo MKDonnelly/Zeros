@@ -10,12 +10,17 @@ int CUR_CURSOR_OFFSET = 0;
 //functions should call this to actually
 //place the character on the screen.
 void k_putchar( char input ){
-   VIDEO_MEMORY[CUR_SCREEN_OFFSET] = input;
-   CUR_SCREEN_OFFSET += 2; //Skip 2 bytes since 
+   if( input == '\n' || input == '\r' ){
+      k_newline();
+   }else{
+      VIDEO_MEMORY[CUR_SCREEN_OFFSET] = input;
+      CUR_SCREEN_OFFSET += 2; //Skip 2 bytes since 
                            //the second byte is for color
-   CUR_CURSOR_OFFSET++;    //Update the cursor position
-   move_cursorl( CUR_CURSOR_OFFSET ); 
+      CUR_CURSOR_OFFSET++;    //Update the cursor position
+      move_cursorl( CUR_CURSOR_OFFSET ); 
+   }
 }
+
 
 //Clear the screen and update the position
 void k_clear_screen( ){
@@ -32,9 +37,15 @@ void k_clear_screen( ){
 void k_newline(){
   int current_line = (int)( CUR_SCREEN_OFFSET / 160 );
   CUR_SCREEN_OFFSET = ( (current_line + 1) * 160); 
+
+  //Also modify the current cursor location
+  //Add 1 to the y value since we want to go
+  //to the next line.
+  move_cursor( 0, current_line + 1);
+  CUR_CURSOR_OFFSET = k_xy_to_linear( 0, current_line + 1 );
 }
 
-void k_print( char *s ){
+void k_print(char *s){
    int i = 0;
    while( s[i] != 0 ){
       k_putchar( s[i] );

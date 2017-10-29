@@ -21,54 +21,30 @@ asm("jmp kmain"); //The bootsector immedietelly jumps to the
 #include "../cpu/isr.h"
 #include "../cpu/idt.h"
 
-void my_handler(struct registers r){
-   k_print(" Handler called! ");
-   asm("hlt");
-}
+#include "kmalloc.h"
 
 void kmain(){
 
+	
   //Initilize the PIC
   remap_pic();
   //Create the IDT and initilize
   //the interrupt handlers
   install_interrupts();
-  //Enable irq1 (keyboard)
-  enable_irqs();
-
+  
   init_keyboard();
-
-  ////////////////
-  //register_interrupt( 30, my_handler );
-  ///////////////
+  move_cursorl( k_xy_to_linear( 0, 0 ) );
 
   //Make sure to enable 
   //the interrupts
   //enable_ints();
   asm volatile("sti");
 
-  //asm("int $30");
-  //asm("int $31");
-
-  //move_cursorl( 0 );
-  //k_print("Enter some text: " );
-  
-  //ubyte val = portb_read( 0x21 );
-  //char st[10];
-  //itoa( val, st );
-  //k_print( st );
-
+  /*
+  char *memory = (char*)kmalloc(20);
+  memory = "hello";
+  k_print( memory );*/
   while(1);
-  //stop_cpu();
+
+  stop_cpu();
 }
-
-/* Setup the keyboard:
- * init_pic();
- * install_isrs();
- * enable_irqs();
- * asm volatile("sti");
- *
- * while(1);
- *
- * */
-

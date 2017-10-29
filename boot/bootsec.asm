@@ -35,8 +35,12 @@ call switch_to_PM  ;This never returns
 
 start_protected_mode:
    call KERNEL_OFFSET
-   jmp $
-
+;   jmp $
+; Stop the cpu if the kernel
+; ends its main loop
+kernel_trap:
+   hlt
+   jmp kernel_trap
 
 ; Padding and magic number
 times 510-($-$$) db 0

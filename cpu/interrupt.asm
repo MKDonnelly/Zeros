@@ -13,7 +13,7 @@ global isr%1
 isr%1:
 
    ;push error code if int nunmber <8 || 9 || > 14
-   %if %1 <= 9 || %1 > 14 
+   %if %1 < 8 || %1 == 9 || %1 > 14 
      push byte 0
    %endif
 

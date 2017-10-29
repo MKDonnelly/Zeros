@@ -1,7 +1,6 @@
 Learn how pic port programming works 
 Learn what task state segments and call gate descriptors are
 
-Add constants for pic.c
 Enable A20 gate before IDT and GDT
 Work on VGA 13h mode driver 
   implement a frame buffer
@@ -11,3 +10,9 @@ Add cpuid functions
 Learn string asm commands and other useful commands
 Find out why keyboard_map.h is being double-included
 Manually create a keyboard map
+Learn qemu to better debug the kernel
+
+Impelement:
+   APIC
+   HPET
+   

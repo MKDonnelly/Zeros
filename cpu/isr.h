@@ -25,6 +25,8 @@ extern void isr37();
 extern void isr38();
 extern void isr39();
 
+extern void isr44();
+
 //When calling an interrupt, 
 //the registers are pushed
 //to the stack. This is the

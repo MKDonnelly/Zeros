@@ -58,3 +58,20 @@ void delay_second(double sec){
    }
 }
 
+/*
+udword ticks = 0;
+
+void timer_handler(){
+   ticks++;
+   k_print("Tick: ");
+
+   char ta[100];
+   itoa( ticks, ta );
+   k_print( ta );
+   k_newline();
+
+   //Write EOI, or else the timer
+   //will not trigger again
+   portb_write( 0x20, 0x20 );
+}*/
+
