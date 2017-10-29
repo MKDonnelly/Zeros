@@ -4,16 +4,16 @@
 #include "idt.h"
 #include "../drivers/vgatext/vgatext.h"
 #include "../drivers/portio.h"
-#include "../drivers/timing.h"
 
 #include "../lib/string.h"
 #include "../lib/types.h"
+
+#define TOTAL_INTERRUPTS 256
 
 extern unsigned char keyboard_map[128];
 
 //Defined in assembly.asm
 extern void isr0();
-
 extern void isr30();
 extern void isr31();
 extern void isr32();
@@ -46,12 +46,21 @@ struct registers{
    udword returnEIP, returnCS, eflags;
 }__attribute__((packed));
 
-//This is where each handler 
+//This is where each handler is held when registered
+void (*int_handlers[TOTAL_INTERRUPTS])(struct registers);
 
+//This is a boolean array to signify that the interrupt
+//handler of the given number is present. Modify this
+//later to not waste 7 out of 8 bits
+char int_present[TOTAL_INTERRUPTS];
 
 //This function handles the installation
 //of each interrupt handler
 void install_interrupts();
+
+//This function registers the interrupt so that
+//main_interrupt_handler may use it
+void register_interrupt( int number, void (*handler)(struct registers));
 
 //All interrupts must pass through this to
 //be routed to the correct destination.

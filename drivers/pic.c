@@ -2,7 +2,7 @@
 #include "pic.h"
 
 //Initilize the PIC
-void init_pic(){
+void remap_pic(){
   portb_write( 0x20, 0x11 );
   portb_write( 0xA0, 0x11 );
 

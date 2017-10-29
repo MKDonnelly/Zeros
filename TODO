@@ -1,8 +1,7 @@
 Learn how pic port programming works 
 Learn what task state segments and call gate descriptors are
 
-Re-work interrupts to allow any c function to
-   initilize an interrupt
+Add constants for pic.c
 Enable A20 gate before IDT and GDT
 Work on VGA 13h mode driver 
   implement a frame buffer

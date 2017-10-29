@@ -10,6 +10,7 @@ asm("jmp kmain"); //The bootsector immedietelly jumps to the
 #include "../drivers/pic.h"
 #include "../drivers/vgatext/vgatext.h"
 #include "../drivers/vga13h/vga13hmode.h"
+#include "../drivers/keyboard.h"
 
 #include "../lib/string.h"
 #include "../lib/bcd.h"
@@ -20,26 +21,43 @@ asm("jmp kmain"); //The bootsector immedietelly jumps to the
 #include "../cpu/isr.h"
 #include "../cpu/idt.h"
 
+void my_handler(struct registers r){
+   k_print(" Handler called! ");
+   asm("hlt");
+}
 
 void kmain(){
 
   //Initilize the PIC
-  init_pic();
+  remap_pic();
   //Create the IDT and initilize
   //the interrupt handlers
   install_interrupts();
   //Enable irq1 (keyboard)
   enable_irqs();
+
+  init_keyboard();
+
+  ////////////////
+  //register_interrupt( 30, my_handler );
+  ///////////////
+
   //Make sure to enable 
   //the interrupts
   //enable_ints();
   asm volatile("sti");
 
-  asm("int $32");
-  asm("int $31");
+  //asm("int $30");
+  //asm("int $31");
 
   //move_cursorl( 0 );
   //k_print("Enter some text: " );
+  
+  //ubyte val = portb_read( 0x21 );
+  //char st[10];
+  //itoa( val, st );
+  //k_print( st );
+
   while(1);
   //stop_cpu();
 }
