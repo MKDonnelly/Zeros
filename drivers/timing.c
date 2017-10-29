@@ -8,6 +8,18 @@
 #define I8253_FREQ 1193181
 #define COUNT_10MS   ( ( I8253_FREQ + 99 ) / 100 )
 
+void init_t(udword frequency){
+   udword divisor = I8253_FREQ / frequency;
+   ubyte lowByte = (ubyte)(divisor & 0xFF);
+   ubyte highByte = (ubyte)( (divisor >> 8) & 0xFF);
+
+   //Initilize the timer
+   portb_write( I8253_CMD, 0x36 );
+   portb_write( I8253_CH0, lowByte);
+   portb_write( I8253_CH0, highByte);
+}
+
+
 void i8253_set( unsigned int c ){
 
    unsigned char counter;

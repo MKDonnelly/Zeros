@@ -1,4 +1,4 @@
-CPROGS = $(wildcard kernel/*.c drivers/*.c drivers/vgatext/*.c drivers/serial/*.c lib/*.c cpu/*.c)
+CPROGS = $(wildcard kernel/*.c drivers/*.c drivers/vgatext/*.c drivers/serial/*.c lib/*.c cpu/*.c drivers/vga13h/*.c)
 CHEADERS = $(wildcard kernel/*.h drivers/*.h)
 OBJECTS = ${CPROGS:.c=.o}
 
@@ -10,7 +10,6 @@ qemu: osimage
 debug: osimage
 	qemu-system-x86_64 -serial file:serial.log osimage.img -s -S &
 	gdb -q -x gdbdebug
-
 
 osimage: boot/bootsec.bin kernel/kmain.bin 
 	@cat $^ > osimage.img

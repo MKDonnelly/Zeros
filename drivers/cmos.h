@@ -13,7 +13,7 @@
 
 #define CMOS_SECOND_REG   0x00
 #define CMOS_MINUTE_REG   0x02
-#define CMOS_HOURS_REG    0x04
+#define CMOS_HOUR_REG    0x04
 #define CMOS_WEEKDAY_REG  0x06
 #define CMOS_DOM_REG      0x07
 #define CMOS_MONTH_REG    0x08

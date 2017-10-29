@@ -21,8 +21,9 @@ void init_pic(){
 }
 
 //irq1 is the keyboard interrupt
-void enable_irq1(){
-   //0xfd = 11111101, so irq1 is enabled
+void enable_irqs(){
+   //0xfd = 11111101, so irq1, is enabled
    portb_write( 0x21, 0xfd );
+   //portb_write( 0x21, 0xfc ); w/ timer
 }
 

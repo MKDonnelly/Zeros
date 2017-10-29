@@ -19,3 +19,4 @@ unsigned int i8253_get();
 //number of seconds.
 void delay_second(double sec);
 
+void init_t(udword);

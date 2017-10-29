@@ -1,10 +1,14 @@
+Learn how pic port programming works 
+Learn what task state segments and call gate descriptors are
+
+Re-work interrupts to allow any c function to
+   initilize an interrupt
 Enable A20 gate before IDT and GDT
-Manually create a keyboard map
-Work on VGA 13h mode driver and vgatext mode driver
+Work on VGA 13h mode driver 
   implement a frame buffer
 write a proper printf w/ format strings
    (also make decimal to string, string to int, etc)
 Add cpuid functions
-Learn what task state segments and call gate descriptors are
 Learn string asm commands and other useful commands
-Find out show keyboard_map.h is being double-included
+Find out why keyboard_map.h is being double-included
+Manually create a keyboard map

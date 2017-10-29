@@ -7,8 +7,9 @@
 
 void initCMOS(){
    //We will access bit 2 in status register 2 to output
-   //a binary representation of the dates. First, read in
-   //the current value. 
+   //a binary representation of the dates instead of a BCD
+   //value which would need to be converted. First, read in
+   //the current value, set the bit, and write the value back. 
    portb_write( CMOS_COMMAND_PORT, NMI_disable_bit | 0xB ); 
    unsigned short statusB = portb_read( CMOS_IO_PORT );
 
@@ -19,15 +20,8 @@ void initCMOS(){
 }
 
 unsigned short getCMOSReg(unsigned short reg){
-/*   //We will access bit 2 in status register 2 to output
-   //a binary representation of the dates. First, read in
-   //the current value. 
-   port_byte_out( CMOS_COMMAND_PORT, NMI_disable_bit | 0xB ); 
-   unsigned short statusB = port_byte_in( CMOS_IO_PORT );
-   statusB = statusB | 0x4;   //Set bit 2 in the status register.
-   //Now write the status back to the port.
-   port_byte_out( CMOS_COMMAND_PORT, NMI_disable_bit | 0xB );
-   port_byte_out( CMOS_IO_PORT, NMI_disable_bit | statusB );*/
+   //Read a value from the cmos. See the header file
+   //for definitions of registers.
 
    portb_write(CMOS_COMMAND_PORT, NMI_disable_bit | reg );
    return portb_read(CMOS_IO_PORT); 

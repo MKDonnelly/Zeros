@@ -1,7 +1,5 @@
-#define LINES 200
-#define COLS 320
-#define LIGHT_GREEN 10
 
+#include "vga13hmod.h"
 
 char *VIDEO = (char*)0xA0000;
 

@@ -9,6 +9,7 @@ asm("jmp kmain"); //The bootsector immedietelly jumps to the
 #include "../drivers/cmos.h"
 #include "../drivers/pic.h"
 #include "../drivers/vgatext/vgatext.h"
+#include "../drivers/vga13h/vga13hmode.h"
 
 #include "../lib/string.h"
 #include "../lib/bcd.h"
@@ -19,28 +20,37 @@ asm("jmp kmain"); //The bootsector immedietelly jumps to the
 #include "../cpu/isr.h"
 #include "../cpu/idt.h"
 
+
 void kmain(){
 
-	
   //Initilize the PIC
   init_pic();
   //Create the IDT and initilize
   //the interrupt handlers
-  install_isrs();
+  install_interrupts();
   //Enable irq1 (keyboard)
-  enable_irq1();
+  enable_irqs();
   //Make sure to enable 
   //the interrupts
   //enable_ints();
-  __asm__ __volatile__("sti");
+  asm volatile("sti");
 
+  asm("int $32");
+  asm("int $31");
 
-  move_cursorl( 0 );
-  k_print("Enter some text: " );
-
-  //__asm__ __volatile__("int $35");
-  //stop_cpu();
+  //move_cursorl( 0 );
+  //k_print("Enter some text: " );
   while(1);
-
+  //stop_cpu();
 }
+
+/* Setup the keyboard:
+ * init_pic();
+ * install_isrs();
+ * enable_irqs();
+ * asm volatile("sti");
+ *
+ * while(1);
+ *
+ * */
 

@@ -4,6 +4,7 @@
 #include "idt.h"
 #include "../drivers/vgatext/vgatext.h"
 #include "../drivers/portio.h"
+#include "../drivers/timing.h"
 
 #include "../lib/string.h"
 #include "../lib/types.h"
@@ -24,20 +25,34 @@ extern void isr37();
 extern void isr38();
 extern void isr39();
 
-
-typedef struct {
-   udword ds;
+//When calling an interrupt, 
+//the registers are pushed
+//to the stack. This is the
+//structure of those registers
+//which a c function can use.
+//Pusha pushes in the following order:
+//eax, ecx, edx, ebx, esp (original value),
+//ebp, esi, edi.
+//In addition, an interrupt pushes an error code
+//and interrupt number. Read this backwards and from
+//bottom to top to see how the registers are pushed.
+//eflags, then returnCS, then returnEIP, then error, then
+//int_number ...
+struct registers{
+   udword dataSegment;
    udword edi, esi, ebp, esp, ebx, edx, ecx, eax;
-   udword int_no, err_code;
-   udword eip, cs ,eflags, useresp, ss;
-}reg_struct;
+   ubyte int_number, error;
+   //automatically pushed by cpu
+   udword returnEIP, returnCS, eflags;
+}__attribute__((packed));
+
+//This is where each handler 
+
 
 //This function handles the installation
 //of each interrupt handler
-void install_isrs();
+void install_interrupts();
 
-//These are the individual handlers
-void zero_divide();
-void default_pic();
-void keyboard_handler();
-
+//All interrupts must pass through this to
+//be routed to the correct destination.
+void main_interrupt_handler(struct registers);

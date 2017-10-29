@@ -1,20 +1,36 @@
-[extern zero_divide]
-[extern keyboard_handler]
-[extern default_pic]
+; One and only one callback function
+; This is the master interrupt handler;
+; all interrupts must go through it to
+; be routed to the correct function.
+[extern main_interrupt_handler]
 
-%macro SETUP_INT 0
+; Initilize an interrupt of the given
+; number. This calls the main interrupt
+; handler in isr.c -- int_handler -- which
+; routes interrupts to the correct functions.
+%macro INTERRUPT_NUMBER 1
+global isr%1
+isr%1:
+
+   ;push error code if int nunmber <8 || 9 || > 14
+   %if %1 <= 9 || %1 > 14 
+     push byte 0
+   %endif
+
+   push byte %1 ;;Push the interrupt number
+
    cli
    pusha
-   mov ax, ds
-   push eax
+   mov ax, ds  ;Save the data segment
+   push eax    ;descriptor
    mov ax, 0x10
    mov ds, ax
    mov es, ax
    mov fs, ax
    mov gs, ax
-%endmacro
 
-%macro END_INT 0
+   call main_interrupt_handler 
+
    pop eax
    mov ds, ax
    mov es, ax
@@ -22,109 +38,28 @@
    mov gs, ax
    popa
    add esp, 8
-   sti
    iret
 %endmacro
-   
-; <int_handler> is defined in isr.c
-; For each interrupt:
-; global <name>
-; <name>:
-;   push byte 0 (error code if int nunmber <8 || 9 || > 14
-;   push byte <int #>
-;   SETUP_INT
-;   call <int_handler>
-;   END_INT
 
+; Zero divide trap
+INTERRUPT_NUMBER 0
 
-; ISR 0, divide by zero trap
-global isr0 
-isr0:
-   push byte 0
-   push byte 0
-   SETUP_INT
-   call zero_divide
-   END_INT
+;Testing isr
+INTERRUPT_NUMBER 30
 
-global isr30
-isr30:
-   push byte 0
-   push byte 30
-   SETUP_INT
-   call default_pic 
-   END_INT
+INTERRUPT_NUMBER 31
 
-global isr31
-isr31:
-   push byte 0
-   push byte 31
-   SETUP_INT
-   call default_pic
-   END_INT
-
-global isr32
-isr32:
-   push byte 0
-   push byte 32
-   SETUP_INT
-   call default_pic
-   END_INT
+;For timer
+INTERRUPT_NUMBER 32
 
 ; Handles the PIC keyboard 
 ; interrupt on IRQ1.
-global isr33
-isr33:
-   push byte 0
-   push byte 33
-   SETUP_INT
-   call keyboard_handler
-   END_INT
+INTERRUPT_NUMBER 33
 
-global isr34
-isr34:
-   push byte 0
-   push byte 34
-   SETUP_INT
-   call default_pic
-   END_INT
-
-global isr35
-isr35:
-   push byte 0
-   push byte 35
-   SETUP_INT
-   call default_pic
-   END_INT
-
-global isr36
-isr36:
-   push byte 0
-   push byte 36
-   SETUP_INT
-   call default_pic
-   END_INT
-
-global isr37
-isr37:
-   push byte 0
-   push byte 37
-   SETUP_INT
-   call default_pic
-   END_INT
-
-global isr38
-isr38:
-   push byte 0
-   push byte 38
-   SETUP_INT
-   call default_pic
-   END_INT
-
-global isr39
-isr39:
-   push byte 0
-   push byte 39
-   SETUP_INT
-   call default_pic
-   END_INT
+INTERRUPT_NUMBER 34
+INTERRUPT_NUMBER 35
+INTERRUPT_NUMBER 36
+INTERRUPT_NUMBER 37
+INTERRUPT_NUMBER 38
+INTERRUPT_NUMBER 39
 
