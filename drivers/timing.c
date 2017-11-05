@@ -8,6 +8,7 @@
 #define I8253_FREQ 1193181
 #define COUNT_10MS   ( ( I8253_FREQ + 99 ) / 100 )
 
+/*
 void init_t(udword frequency){
    udword divisor = I8253_FREQ / frequency;
    ubyte lowByte = (ubyte)(divisor & 0xFF);
@@ -17,9 +18,51 @@ void init_t(udword frequency){
    portb_write( I8253_CMD, 0x36 );
    portb_write( I8253_CH0, lowByte);
    portb_write( I8253_CH0, highByte);
+}*/
+
+
+void set_i8253_freq(udword freq){
+   udword opFreq = I8253_FREQ / freq;
+
+   //Tell the timer we are going to initilize it
+   portb_write( I8253_CMD, I8253_CMD_LOAD );
+
+   //Write the frequency to the timer
+   ubyte lowerByte = (ubyte)(opFreq & 0xFF );
+   ubyte higherByte = (ubyte)( (opFreq >> 8) & 0xFF );
+   portb_write( I8253_CH0, lowerByte );
+   portb_write( I8253_CH0, higherByte );
 }
 
+int timer_ticks = 0;
 
+void i8253_int_callback( struct registers r){
+   //k_print("In timer callback");
+
+   if( timer_ticks == 18 ){
+      k_print("One second has passed");
+      timer_ticks = 0;
+   }else{
+      timer_ticks++;
+   }
+
+   //Send EOI or else PIC will not trigger 
+   //another interrupt
+   portb_write( 0x20, 0x20 );
+}
+
+void set_i8253_interrupt(){
+   //Initilize the 8253 timer to generate and 
+   //interrupt.
+
+   ubyte curPICMask = portb_read( 0x21 );
+   portb_write( 0x21, curPICMask & TIMER_PIC_MASK );
+
+   register_interrupt( 32, i8253_int_callback );
+
+}
+
+/*
 void i8253_set( unsigned int c ){
 
    unsigned char counter;
@@ -56,7 +99,7 @@ void delay_second(double sec){
       i++;
 
    }
-}
+}*/
 
 /*
 udword ticks = 0;

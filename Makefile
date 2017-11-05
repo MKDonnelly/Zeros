@@ -2,7 +2,7 @@ CPROGS = $(wildcard kernel/*.c drivers/*.c drivers/vgatext/*.c drivers/serial/*.
 CHEADERS = $(wildcard kernel/*.h drivers/*.h)
 OBJECTS = ${CPROGS:.c=.o}
 
-CFLAGS = -fno-pie -m32 -ffreestanding -fno-stack-protector -nostdlib -Wall -g
+CFLAGS = -fno-pie -m32 -ffreestanding -fno-stack-protector -nostdlib -nostdinc -fno-builtin  -Wall -g
 
 qemu: osimage
 	qemu-system-x86_64 -serial file:serial.log osimage.img
@@ -33,6 +33,7 @@ clean:
 	@find . -name '*\.bin' -exec \rm -rf {} \;
 	@find . -name '*\.elf' -exec \rm -rf {} \;
 	@find ./kernel -name '*\.sym' -exec \rm {} \;
+	@\rm serial.log 2> /dev/null
 	@\rm osimage.img 2> /dev/null
 	
 

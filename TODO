@@ -4,13 +4,24 @@ Learn what task state segments and call gate descriptors are
 Enable A20 gate before IDT and GDT
 Work on VGA 13h mode driver 
   implement a frame buffer
-write a proper printf w/ format strings
-   (also make decimal to string, string to int, etc)
 Add cpuid functions
 Learn string asm commands and other useful commands
 Find out why keyboard_map.h is being double-included
 Manually create a keyboard map
 Learn qemu to better debug the kernel
+Add into pic.c a function to enable IRQ's by number
+  also make a function to disable an IRQ
+  also make a function to automatically figure out
+    which pics to send the EOI to at the end of an IRQ
+Add into cpu.c a function to raise an interrupt by number
+Go through and clean up magic numbers
+Write a simple shell
+Implement hex to ascii
+Get amount of memory in real mode
+ and pass it to the kernel
+   xor ax, ax
+   int 0x12
+   ;AX = amount of KB of RAM
 
 Impelement:
    APIC

@@ -7,6 +7,18 @@ int strlen(char inputarray[]){
    return i;
 }
 
+//Copy str2 (a valid c-string) into 
+//str1.
+void strcpy( char *str1, char *str2 ){
+   int i = 0;
+   while( str2[i] != 0 ){
+      str1[i] = str2[i];
+      i++;
+   }
+   //Make sure to set the null byte
+   str1[i] = '\0';
+}
+
 //Reverse the given string
 void reverse(char s[]){
    int i, j;

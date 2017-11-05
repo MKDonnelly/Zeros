@@ -34,6 +34,10 @@ call switch_to_PM  ;This never returns
 [bits 32]
 
 start_protected_mode:
+   ;Enable a20 line
+   mov al, 2
+   out 0x92, al
+
    call KERNEL_OFFSET
 ;   jmp $
 ; Stop the cpu if the kernel

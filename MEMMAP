@@ -1,0 +1,17 @@
+Memory map of kernel
+
+0x0   BIOS memory
+|BIOS
+|BIOS
+|BIOS
+0x1000 32-bit kernel load address
+|Kernel
+|Kernel
+0x7c00 Bootsector Start
+|Bootsec
+|Bbootsec
+0x7e00 Bootsector End/
+0xFFFFF Low memory end
+
+0x100000 Heap start (1MB mark)
+

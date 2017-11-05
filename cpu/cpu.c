@@ -3,17 +3,17 @@
 
 void stop_cpu(){
    asm("suspend:");
-   asm("cli");
-   asm("hlt");
-   asm("jmp suspend");
+   asm("   cli");
+   asm("   hlt");
+   asm("   jmp suspend");
 }
 
 void disable_ints(){
-   asm("cli\n\t");
+   asm volatile("cli");
 }
 
 void enable_ints(){
-   asm("sti\n\t");
+   asm volatile("sti");
 }
 
 

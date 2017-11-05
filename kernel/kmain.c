@@ -25,7 +25,23 @@ asm("jmp kmain"); //The bootsector immedietelly jumps to the
 
 void kmain(){
 
-	
+   char *mystr = (char*)kmalloc(100, 0);
+   strcpy( mystr, "Testing...");
+   k_print( mystr );
+
+
+   stop_cpu();
+}
+
+//         Examples
+
+/*       Dynamic memory allocation
+  char *mystr = (char*)kmalloc(100, 0);
+  strcpy( mystr, "Testing..." );
+  k_print( mystr );
+*/
+
+/*       Using the keyboard
   //Initilize the PIC
   remap_pic();
   //Create the IDT and initilize
@@ -39,12 +55,5 @@ void kmain(){
   //the interrupts
   //enable_ints();
   asm volatile("sti");
-
-  /*
-  char *memory = (char*)kmalloc(20);
-  memory = "hello";
-  k_print( memory );*/
   while(1);
-
-  stop_cpu();
-}
+*/
