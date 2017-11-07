@@ -16,21 +16,31 @@ asm("jmp kmain"); //The bootsector immedietelly jumps to the
 #include "../lib/bcd.h"
 #include "../lib/types.h"
 #include "../lib/keyboard_map.h"
+#include "../lib/bitwise.h"
 
 #include "../cpu/cpu.h"
 #include "../cpu/isr.h"
 #include "../cpu/idt.h"
 
 #include "kmalloc.h"
+#include "paging.h"
 
 void kmain(){
 
-   char *mystr = (char*)kmalloc(100, 0);
-   strcpy( mystr, "Testing...");
-   k_print( mystr );
+  //Initilize the PIC
+  remap_pic();
+  //Create the IDT and initilize
+  //the interrupt handlers
+  install_interrupts();
 
+  init_keyboard();
+  move_cursorl( k_xy_to_linear( 0, 0 ) );
 
-   stop_cpu();
+  //Make sure to enable 
+  //the interrupts
+  enable_ints();
+
+  while(1);
 }
 
 //         Examples

@@ -13,7 +13,6 @@ void initCMOS(){
    portb_write( CMOS_COMMAND_PORT, NMI_disable_bit | 0xB ); 
    unsigned short statusB = portb_read( CMOS_IO_PORT );
 
-   //statusB = statusB | 0x4;   //Set bit 2 in the status register.
    //Now write the status back to the port.
    portb_write( CMOS_COMMAND_PORT, NMI_disable_bit | 0xB );
    portb_write( CMOS_IO_PORT, statusB | 0x4 );

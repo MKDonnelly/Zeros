@@ -1,7 +1,7 @@
 
 #include "idt.h"
 
-void add_idt_entry( int intNumber, u32 handlerFunction) {
+void add_idt_entry( u8 intNumber, u32 handlerFunction) {
    //int_table is the interrupt descriptor table
    int_table[intNumber].lower_offset = lower_16(handlerFunction);
    int_table[intNumber].segment_sel = KERNEL_CS;  //KERNEL_CS defined in idt.h

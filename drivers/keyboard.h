@@ -6,6 +6,8 @@
 #define KEYBOARD_PIC_MASK 0xFD
 #define KEYBOARD_BUFFER_SIZE 128
 
+extern unsigned char keyboard_map[];
+
 //Characters are appended to the end of the array
 //When the array is full, characters are shifted
 //down and the first is removed.

@@ -4,21 +4,19 @@
 ; be routed to the correct function.
 [extern main_interrupt_handler]
 
-; Initilize an interrupt of the given
-; number. This calls the main interrupt
-; handler in isr.c -- int_handler -- which
-; routes interrupts to the correct functions.
-%macro INTERRUPT_NUMBER 1
-global isr%1
-isr%1:
+; This will be used to map interrupt
+; numbers to interrupt handler when
+; they are defined
+[extern add_idt_entry]
 
-   ;push error code if int nunmber <8 || 9 || > 14
-   %if %1 < 8 || %1 == 9 || %1 > 14 
-     push byte 0
-   %endif
 
-   push byte %1 ;;Push the interrupt number
-
+; This is common to all interrupts.
+; The only thing that differs is 
+; the error code and interrupt
+; number pushed by each. By having
+; each interrupt jump here, we cut
+; down the size of the compiled file.
+interrupt_common:
    cli
    pusha
    mov ax, ds  ;Save the data segment
@@ -39,27 +37,93 @@ isr%1:
    popa
    add esp, 8
    iret
+
+; This defines an interrupt 
+; handler that will be automatically
+; called when the cpu triggers the isr. 
+%macro DEFINE_INTERRUPT 1
+global isr%1
+isr%1:
+   ;Push an error code if none is
+   ;provided by the cpu to keep the
+   ;stack constant through each interrupt.
+   %if %1 < 8 || %1 == 9 || %1 > 14
+      push byte 0
+   %endif
+
+   push byte %1
+   jmp interrupt_common 
 %endmacro
 
-; Zero divide trap
-INTERRUPT_NUMBER 0
 
-;Testing isr
-INTERRUPT_NUMBER 30
+; Initilize every interrupt
+; to point to the main 
+; interrupt handler
+%assign i 0
+%rep 100 
+   DEFINE_INTERRUPT i
+%assign i i+1
+%endrep
 
-INTERRUPT_NUMBER 31
+; This handy routine initilizes
+; interrupt #x to point to 
+; isr#x. Without this, we would
+; have to go
+;    add_idt_entry(#x, (u32)isr#x)
+; 256 times in c!
+global init_idt
+init_idt:
+   push ebp
+   mov ebp, esp
+   sub esp, 0x8
 
-;For timer
-INTERRUPT_NUMBER 32
+%assign j 0
+%rep 100
+   mov eax, isr %+ j
+   sub esp, 0x8
+   push eax
+   push byte j
+   call add_idt_entry
+   add esp, 0x10
+   %assign j j+1
+%endrep
 
-; Handles the PIC keyboard 
-; interrupt on IRQ1.
-INTERRUPT_NUMBER 33
+   leave
+   ret
 
-INTERRUPT_NUMBER 34
-INTERRUPT_NUMBER 35
-INTERRUPT_NUMBER 36
-INTERRUPT_NUMBER 37
-INTERRUPT_NUMBER 38
-INTERRUPT_NUMBER 39
+;   push ebp
+;   mov ebp, esp
+;   mov eax, isr33
+;   push eax
+;   push 0x21
+;   call add_idt_entry
+;   add esp, 0x10
+;   leave
+;   ret
 
+;   push ebp
+;   mov ebp, esp
+;   sub esp, 0x8
+;   mov eax, isr33
+;   sub esp, 0x8
+;   push eax
+;   push 0x21
+;   call add_idt_entry
+;   leave
+;   ret
+
+
+;%macro DEFINE_INTERRUPT 1
+;global isr%1
+;isr%1:
+;    
+;   ;Push an error code if none is
+;   ;provided by the cpu to keep the
+;   ;stack constant through each interrupt.
+;   %if %1 < 8 || %1 == 9 || %1 > 14
+;      push byte 0
+;   %endif
+;
+;   push byte %1
+;   jmp interrupt_common 
+;%endmacro

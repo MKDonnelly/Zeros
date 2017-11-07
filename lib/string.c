@@ -1,3 +1,4 @@
+#include "string.h"
 
 //Find length of string
 int strlen(char inputarray[]){
@@ -47,4 +48,5 @@ void itoa(int n, char s[]){
    s[i] = '\0';
    reverse(s);
 }
+
 

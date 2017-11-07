@@ -7,25 +7,11 @@
 
 #include "../lib/string.h"
 #include "../lib/types.h"
+#include "../lib/bitwise.h"
 
 #define TOTAL_INTERRUPTS 256
 
-extern unsigned char keyboard_map[128];
-
-//Defined in assembly.asm
-extern void isr0();
-extern void isr30();
-extern void isr31();
-extern void isr32();
-extern void isr33();
-extern void isr34();
-extern void isr35();
-extern void isr36();
-extern void isr37();
-extern void isr38();
-extern void isr39();
-
-extern void isr44();
+extern void init_idt();
 
 //When calling an interrupt, 
 //the registers are pushed
@@ -52,9 +38,10 @@ struct registers{
 void (*int_handlers[TOTAL_INTERRUPTS])(struct registers);
 
 //This is a boolean array to signify that the interrupt
-//handler of the given number is present. Modify this
-//later to not waste 7 out of 8 bits
-char int_present[TOTAL_INTERRUPTS];
+//handler of the given number is present. We will use
+//32 bytes since there are 256 interrupts (32 * 8)
+char int_present[ TOTAL_INTERRUPTS / 8 ];
+
 
 //This function handles the installation
 //of each interrupt handler
@@ -63,6 +50,7 @@ void install_interrupts();
 //This function registers the interrupt so that
 //main_interrupt_handler may use it
 void register_interrupt( int number, void (*handler)(struct registers));
+void unregister_interrupt( int );
 
 //All interrupts must pass through this to
 //be routed to the correct destination.
