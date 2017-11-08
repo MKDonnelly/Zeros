@@ -23,10 +23,22 @@ asm("jmp kmain"); //The bootsector immedietelly jumps to the
 #include "../cpu/idt.h"
 
 #include "kmalloc.h"
-#include "paging.h"
+#include "../cpu/paging.h"
 
 void kmain(){
 
+  remap_pic();
+  install_interrupts();
+  enable_ints();
+
+  initialise_paging();
+
+  unsigned int *ptr = (unsigned int*)0xA0000000;
+  unsigned int do_page_fault = *ptr;
+
+  stop_cpu(); 
+
+	/*
   //Initilize the PIC
   remap_pic();
   //Create the IDT and initilize
@@ -40,7 +52,7 @@ void kmain(){
   //the interrupts
   enable_ints();
 
-  while(1);
+  while(1);*/
 }
 
 //         Examples

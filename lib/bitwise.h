@@ -6,8 +6,11 @@
 //bit in a chunk of memory (regardless
 //of the char* type).
 
-void setBit( char*, int );
-void clearBit( char*, int );
-int getBit( char*, int );
+//void setBit( char*, int );
+void setBit( void*, int );
+//void clearBit( char*, int );
+void clearBit( void*, int );
+//int getBit( char*, int );
+int getBit( void*, int );
 
 

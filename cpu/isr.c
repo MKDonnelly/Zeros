@@ -48,5 +48,22 @@ void main_interrupt_handler(struct registers r){
       itoa( r.int_number, number );
       k_print( number );
       k_newline();
+
+      //Make sure to halt if this is a processor error
+      if( r.int_number < 33 )
+	      asm("hlt");
    }
+
+   //Check to see if this interrupt came from a PIC.
+   //If it did, send the appropriate EOI
+   if( r.int_number >= PIC_MASTER_START 
+		   && r.int_number <= PIC_MASTER_START + 8 ){
+      //Interrupt came from master pic
+      portb_write( MASTER_PIC_CTRL, PIC_EOI );
+   }else if( r.int_number >= PIC_SLAVE_START 
+		   && r.int_number <= PIC_SLAVE_START + 8 ){
+      portb_write( MASTER_PIC_CTRL, PIC_EOI );
+      portb_write( SLAVE_PIC_CTRL, PIC_EOI );
+   }
+
 }

@@ -10,7 +10,7 @@
 
 //This must be sent to the master
 //pic (the slave pic also if the interrupt
-//cam from the slave) after handling the
+//came from the slave) after handling the
 //interrupt or else the PIC will not 
 //trigger any interrupts.
 #define PIC_EOI 0x20
@@ -27,6 +27,7 @@
 #define PIC_MASTER_START 0x20
 #define PIC_SLAVE_START  0x28
 
+#define KEYBOARD_READ_PORT 0x64
 
 //Remap the PIC to non-handware
 //interrupt numbers

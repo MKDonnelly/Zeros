@@ -4,6 +4,7 @@
 #include "idt.h"
 #include "../drivers/vgatext/vgatext.h"
 #include "../drivers/portio.h"
+#include "../drivers/pic.h"
 
 #include "../lib/string.h"
 #include "../lib/types.h"

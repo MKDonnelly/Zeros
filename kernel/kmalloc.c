@@ -5,7 +5,7 @@ udword start_free_mem = 0x200000;
 //...and end at 2MB mark
 udword end_free_mem = 0x300000;
 
-void *kmalloc(int size, int align, unsigned short *phys){
+void *kmalloc(int size, int align, unsigned int *phys){
    if( start_free_mem + size < end_free_mem ){
       if( align ){
         start_free_mem &= 0xFFFFF000;  //Align the allocated memory

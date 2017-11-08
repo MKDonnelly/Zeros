@@ -1,8 +1,7 @@
 #pragma once
 
-/*
 #include "../drivers/vgatext/vgatext.h"
-#include "kmalloc.h"
+#include "../kernel/kmalloc.h"
 #include "../lib/memory.h"
 
 //Page entry bitmap
@@ -18,14 +17,14 @@ typedef struct page{
 
 //A page table is an array of page descriptors
 typedef struct page_table{
-   struct page_entry pages[1024];
+   page_t pages[1024];
 } page_table_t;
 
 //A page directory is an array of page tables
 //this is what two-level paging is.
 typedef struct page_directory{
    //Array of page tables
-   struct page_tables *tables[1024];
+   page_table_t *tables[1024];
 
    //This is the physical location of the 
    //page tables
@@ -35,7 +34,7 @@ typedef struct page_directory{
 } page_directory_t;
 
 //Initilized the paging structure
-void initilize_paging();
+void initialise_paging();
 
 //Creates the page directory and
 //loads it into CR3.
@@ -44,4 +43,3 @@ void switch_page_directory(page_directory_t *new);
 //Gets the specified page
 page_t *get_page(unsigned int addr, int make, page_directory_t *dir);
 
-*/

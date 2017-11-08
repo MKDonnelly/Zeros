@@ -65,11 +65,7 @@ void keyboard_handler(){
    ubyte kb_status;
    sbyte key;
 
-   //Write EOI, or else the PIC will not
-   //trigger again
-   portb_write( 0x20, 0x20 );
-
-   kb_status = portb_read( 0x64 );
+   kb_status = portb_read( KEYBOARD_READ_PORT );
 
    //Write the key to the screen and place it in
    //the buffer

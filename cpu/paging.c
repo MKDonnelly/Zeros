@@ -1,6 +1,7 @@
 #include "paging.h"
 
-/*
+
+
 //A bitset of frames
 unsigned int *frames;
 unsigned int nframes;
@@ -11,10 +12,11 @@ extern unsigned int start_free_mem;
 #define INDEX_FROM_BIT(a) (a/(8*4))
 #define OFFSET_FROM_BIT(a) (a%(8*4))
 
-static void set_frame(unsigned int frame_addr){
+
+void set_frame(unsigned int frame_addr){
    unsigned int frame = frame_addr/0x1000;
    unsigned int idx = INDEX_FROM_BIT(frame);
-   unsigned int off = OFSET_FROM_BIT(frame);
+   unsigned int off = OFFSET_FROM_BIT(frame);
    frames[idx] |= (0x1 << off);
 }
 
@@ -42,18 +44,19 @@ static unsigned int first_frame(){
       if( frames[i] != 0xFFFFFFFF ){
          for(j = 0; j < 32; j++){
             unsigned int toTest = 0x1 << j;
-	    if( !(frames[i] & toTest )
+	    if( !(frames[i] & toTest ) )
               return i*4*8+j;
 	 }
       }
    }
+   return -1;
 }
 
 
 //Allocate a frame
 void alloc_frame(page_t *page, int is_kernel, int is_writeable){
    if( page->frame != 0){
-      return 0;
+      return;
    }else{
       unsigned int idx = first_frame();
       if( idx == (unsigned int)-1){
@@ -81,17 +84,17 @@ void free_frame(page_t *page){
 }
 
 
-void initilize_paging(){
+void initialise_paging(){
    //Assume we have only 16MB of available memory
    unsigned int mem_end_page = 0x10000000;
 
    nframes = mem_end_page / 0x1000;
    frames = (unsigned int*)kmalloc( INDEX_FROM_BIT(nframes), 0, 0 );
-   memset(frames, INDEX_FROM_BIT(nframes), 0);
+   memset( (char*)frames, INDEX_FROM_BIT(nframes), 0);
 
    //Make a page directory
-   kernel_directory = (page_directory*)kmalloc(sizeof(page_directory), 1, 0);
-   memset(kernel_directory, sizeof(page_directory), 0);
+   page_directory_t *kernel_directory = (page_directory_t*)kmalloc(sizeof(page_directory_t), 1, 0);
+   memset( (char*)kernel_directory, sizeof(page_directory_t), 0);
    //current_directory = kernel_directory;
 
    int i = 0;
@@ -103,7 +106,7 @@ void initilize_paging(){
    switch_page_directory( kernel_directory );
 }
 
-void switch_page_directory(page_directory *dir){
+void switch_page_directory(page_directory_t *dir){
    asm volatile("mov %0, %%cr3" :: "r"(&dir->tablesPhysical));
    unsigned int cr0;
    asm volatile("mov %%cr0, %0" : "=r"(cr0));
@@ -111,7 +114,7 @@ void switch_page_directory(page_directory *dir){
    asm volatile("mov %0, %%cr0" :: "r"(cr0));
 }
 
-page_entry *get_page(unsigned int address, int make, page_directory *dir){
+page_t *get_page(unsigned int address, int make, page_directory_t *dir){
    //Turn the address into an index
    address /= 0x1000;
    //Find the page table containing this address
@@ -120,12 +123,12 @@ page_entry *get_page(unsigned int address, int make, page_directory *dir){
       return &dir->tables[table_idx]->pages[address%1024];
    }else if(make){
       unsigned int tmp;
-      dir->tables[table_idx] = (page_table*)kmalloc(sizeof(page_table), 1, &tmp);
-      memset(dir->tables[table_idx], 0x1000, 0);
+      dir->tables[table_idx] = (page_table_t*)kmalloc(sizeof(page_table_t), 1, &tmp);
+      memset((char*)dir->tables[table_idx], 0x1000, 0);
       dir->tablesPhysical[table_idx] = tmp | 0x7;
       return &dir->tables[table_idx]->pages[address%1024];
    }else{
       return 0;
    }
 }
-*/
+
