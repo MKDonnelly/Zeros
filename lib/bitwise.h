@@ -1,16 +1,13 @@
 
 #pragma once
 
+#include "types.h"
+
 //Routines to deal with bitfields.
-//Note that these can set an arbitrary
-//bit in a chunk of memory (regardless
-//of the char* type).
+//These can set an arbitrary bit in
+//an arbitrary piece of memory.
 
-//void setBit( char*, int );
-void setBit( void*, int );
-//void clearBit( char*, int );
-void clearBit( void*, int );
-//int getBit( char*, int );
-int getBit( void*, int );
-
+void bitSet(void*,int);
+void bitClear(void*,int);
+char bitGet(void*,int);
 

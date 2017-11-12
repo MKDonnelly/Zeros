@@ -1,112 +1,132 @@
 #include "paging.h"
 
+//These two global variables are used
+//to keep track of how the frames have been
+//allocated. nframes will keep track of how many
+//frames there are (i.e. how many 4k blocks of 
+//memory are available to map using paging).
+//*frames is a bitmap to determine if the page
+//is being used or not. Note that one unsigned
+//int equals 32 bits, so one unsigned int element
+//in the *frames array can manage 32 physical frames.
 
-
-//A bitset of frames
+//TODO change to char* instead
 unsigned int *frames;
+unsigned int framesSize; //The number of unsigned ints
+                         //we are using in *frames to 
+			 //keep track of the frames
 unsigned int nframes;
 
+//This is where the basic heap starts.
+//The page table is allocated on the stack
+//and we need this to tell the cpu where to
+//find the page table.
 extern unsigned int start_free_mem;
 
-//Macros for bitset
-#define INDEX_FROM_BIT(a) (a/(8*4))
-#define OFFSET_FROM_BIT(a) (a%(8*4))
+//The page table which will be visible to
+//the kernel.
+page_directory *sys_page_table;
 
+//Loop over *frames to find the first unset bit,
+//which will indicate a free frame. Return -1
+//if no frames are present.
+unsigned int first_free_frame(){
+   unsigned int index, offset;
 
-void set_frame(unsigned int frame_addr){
-   unsigned int frame = frame_addr/0x1000;
-   unsigned int idx = INDEX_FROM_BIT(frame);
-   unsigned int off = OFFSET_FROM_BIT(frame);
-   frames[idx] |= (0x1 << off);
-}
-
-//Clear a bit from the frame bitset
-static void clear_frame(unsigned int frame_addr){
-   unsigned int frame = frame_addr/0x1000;
-   unsigned int idx = INDEX_FROM_BIT(frame);
-   unsigned int off = OFFSET_FROM_BIT(frame);
-   frames[idx] &= ~(0x1 << off);
-}
-
-//Test if a bit frame is set
-static unsigned int test_frame(unsigned int frame_addr){
-   unsigned int frame = frame_addr/0x1000;
-   unsigned int idx = INDEX_FROM_BIT(frame);
-   unsigned int off = OFFSET_FROM_BIT(frame);
-   return (frames[idx] & (0x1 << off) );
-}
-
-//Find the first free frame
-static unsigned int first_frame(){
-   unsigned int i, j;
-
-   for(i = 0; i < INDEX_FROM_BIT(nframes); i++){
-      if( frames[i] != 0xFFFFFFFF ){
-         for(j = 0; j < 32; j++){
-            unsigned int toTest = 0x1 << j;
-	    if( !(frames[i] & toTest ) )
-              return i*4*8+j;
-	 }
+   //Loop over each unsigned int in *frames
+   for(index = 0; index < framesSize; index++){
+      //Loop over each bit in the individual element
+      //of *frames
+      for(offset = 0; offset < UINT_SIZE; offset++){
+         unsigned int mask = (0x1 << offset);
+	 if( ! (frames[index] & mask) )
+		 return UINT_SIZE * index + offset;
       }
    }
    return -1;
 }
 
 
-//Allocate a frame
-void alloc_frame(page_t *page, int is_kernel, int is_writeable){
-   if( page->frame != 0){
-      return;
-   }else{
-      unsigned int idx = first_frame();
-      if( idx == (unsigned int)-1){
-         k_print("No free frames!");
-         asm("hlt");	 
-      }
-      set_frame(idx * 0x1000 );
+//Allocate a frame. Returns -1 on invalid parameters.
+//Returns -2 if there are no available frames.
+int alloc_frame(page_entry *page, int is_kernel, int is_writeable){
+
+   //Validate parameters
+   if( (is_kernel != 0 && is_kernel != 1) ||
+       (is_writeable != 0 && is_writeable != 1) )
+	   return -1; 
+
+   //Only allocate a frame if the page 
+   //does not have one allocated.
+   if( ! page->frame ){
+      unsigned int firstFreeFrame = first_free_frame();
+      if( firstFreeFrame == -1 )
+	      return -2;
+
+      //Initilize the frame
+      //Set it as present in our bitmask
+      //set_frame( firstFreeFrame );
+      bitSet( frames, firstFreeFrame );
       page->present = 1;
-      page->rw = (is_writeable) ? 1 : 0; //Show the page be writeable
-      page->user = (is_kernel) ? 0 : 1;  //Should the page be user-mode
-      page->frame = idx;
+      page->rw = is_writeable;
+      page->user = is_kernel;
+      page->frame = firstFreeFrame;
    }
+   return 0;
 }
 
 
-void free_frame(page_t *page){
+void free_frame(page_entry *page){
    unsigned int frame;
    if( !(frame = page->frame) ){
 	   return; //The given page didn't actually
                    //have an allocated frame
    }else{
-      clear_frame(frame);
+      //clear_frame(frame);
+      //unset_frame(frame);
+      bitClear( frames, frame );
       page->frame = 0x0;
    }
 }
 
 
-void initialise_paging(){
+void init_paging(){
    //Assume we have only 16MB of available memory
-   unsigned int mem_end_page = 0x10000000;
+   unsigned int mem_end_page = 0x1000000;
 
-   nframes = mem_end_page / 0x1000;
-   frames = (unsigned int*)kmalloc( INDEX_FROM_BIT(nframes), 0, 0 );
-   memset( (char*)frames, INDEX_FROM_BIT(nframes), 0);
+   //Calculate the number of frames to keep track of
+   nframes = mem_end_page / PAGE_SIZE;
+
+   //Calculate the size of *frames as the
+   //number of unsigned ints it needs to hold.
+   framesSize = nframes / UINT_SIZE;
+
+   frames = (unsigned int*)kmalloc( framesSize, 0, 0 );
+
+   //Zero out the frame allocation table.
+   //We need to set the number of bits to set as 
+   //framesSize * 4 since each element in frames is
+   //an unsigned int (4 bytes)
+   memset( (char*)frames, framesSize * 4, 0);
 
    //Make a page directory
-   page_directory_t *kernel_directory = (page_directory_t*)kmalloc(sizeof(page_directory_t), 1, 0);
-   memset( (char*)kernel_directory, sizeof(page_directory_t), 0);
-   //current_directory = kernel_directory;
+   sys_page_table = (page_directory*)kmalloc(sizeof(page_directory), 1, 0);
+   //Zero out the page directory
+   memset( (char*)sys_page_table, sizeof(page_directory), 0);
 
+   //Allocate the lower part of memory for the kernel
    int i = 0;
    while( i < start_free_mem ){
-      alloc_frame( get_page(i, 1, kernel_directory), 0, 0);
+      alloc_frame( get_page(i, 1, sys_page_table), 0, 0);
       i += 0x1000;
    }
 
-   switch_page_directory( kernel_directory );
+   //Finally, let the processor know where our page table is
+   //and enable paging.
+   load_page_dir( sys_page_table );
 }
 
-void switch_page_directory(page_directory_t *dir){
+void load_page_dir(page_directory *dir){
    asm volatile("mov %0, %%cr3" :: "r"(&dir->tablesPhysical));
    unsigned int cr0;
    asm volatile("mov %%cr0, %0" : "=r"(cr0));
@@ -114,7 +134,7 @@ void switch_page_directory(page_directory_t *dir){
    asm volatile("mov %0, %%cr0" :: "r"(cr0));
 }
 
-page_t *get_page(unsigned int address, int make, page_directory_t *dir){
+page_entry *get_page(unsigned int address, int make, page_directory *dir){
    //Turn the address into an index
    address /= 0x1000;
    //Find the page table containing this address
@@ -123,7 +143,7 @@ page_t *get_page(unsigned int address, int make, page_directory_t *dir){
       return &dir->tables[table_idx]->pages[address%1024];
    }else if(make){
       unsigned int tmp;
-      dir->tables[table_idx] = (page_table_t*)kmalloc(sizeof(page_table_t), 1, &tmp);
+      dir->tables[table_idx] = (page_table*)kmalloc(sizeof(page_table), 1, &tmp);
       memset((char*)dir->tables[table_idx], 0x1000, 0);
       dir->tablesPhysical[table_idx] = tmp | 0x7;
       return &dir->tables[table_idx]->pages[address%1024];

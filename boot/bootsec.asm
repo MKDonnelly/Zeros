@@ -26,7 +26,6 @@ int 0x13
 
 call switch_to_PM  ;This never returns
 
-
 %include "boot/realMode.asm"
 %include "boot/32switch.asm"
 %include "boot/protectedMode.asm"
@@ -39,7 +38,7 @@ start_protected_mode:
    out 0x92, al
 
    call KERNEL_OFFSET
-;   jmp $
+
 ; Stop the cpu if the kernel
 ; ends its main loop
 kernel_trap:

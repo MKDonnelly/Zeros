@@ -6,33 +6,58 @@
 //bit in a chunk of memory (regardless
 //of the char* type).
 
-//Set the bit in the given integer
-void setBit( void *mem, int bitNum ){
-   *(char*)mem = (*(char*)mem | (1 << bitNum));
+void bitSet( void *mem, int bitNum ){
+   //Due to how dereferencing works, we
+   //need to find the index and offset
+   //of the bit in memory (with regard
+   //to a char type).
+   int index = bitNum / CHAR_SIZE;
+   int offset = bitNum % CHAR_SIZE;
+
+   //In this ugly expression, we are casting
+   //the void* of the first parameter into
+   //something that we can use, a char*.
+   //We then access that char* as an array
+   //and set the specified bit.
+   ( (char*)mem )[index] |= (0x1 << offset);
+
 }
 
-/*void setBit( char *mem, int bitNum ){
-   *mem = (*mem | (1 << bitNum));
-}*/
+void bitClear( void *mem, int bitNum ){
+   //Due to how dereferencing works, we
+   //need to find the index and offset
+   //of the bit in memory (with regard
+   //to a char type).
+   int index = bitNum / CHAR_SIZE;
+   int offset = bitNum % CHAR_SIZE;
 
-//Clear the bit at the given index
-void clearBit( void *mem, int bitNum ){
-   int mask = ~(1 << bitNum);
-   *(char*)mem = (*(char*)mem & mask);
+   //In this ugly expression, we are casting
+   //the void* of the first parameter into
+   //something that we can use, a char*.
+   //We then access that char* as an array
+   //and clear the specified bit.
+   //( (char*)mem )[index] |= (0x0 << offset);
+   ( (char*)mem )[index] &= ~( 0x1 << offset );
 }
-/*void clearBit( char *mem, int bitNum ){
-   int mask = ~(1 << bitNum);
-   *mem = (*mem & mask);
-}*/
 
-//Return the bit value at bitNum
-int getBit( void *mem, int bitNum ){
-   int mask = 1 << bitNum;
-   return (*(char*)mem & mask);
+//We will return a char as it is the smallest
+//natural data type. We really only get a
+//1 or 0.
+char bitGet( void *mem, int bitNum ){
+   //Due to how dereferencing works, we
+   //need to find the index and offset
+   //of the bit in memory (with regard
+   //to a char type).
+   int index = bitNum / CHAR_SIZE;
+   int offset = bitNum % CHAR_SIZE;
+
+   //In this ugly expression, we are casting
+   //the void* of the first parameter into
+   //something that we can use, a char*.
+   //We then get the specified char at the index
+   //and select the given bit using the &
+   return ( ((char*)mem)[index] & (0x1 << offset) );
 }
-/*int getBit( char *mem, int bitNum ){
-   int mask = 1 << bitNum;
-   return (*mem & mask);
-}*/
+
 
 

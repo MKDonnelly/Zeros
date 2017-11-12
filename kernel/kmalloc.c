@@ -1,8 +1,8 @@
 #include "kmalloc.h"
 
 //Heap will start at 1MB mark...
-udword start_free_mem = 0x200000;
-//...and end at 2MB mark
+udword start_free_mem = 0x100000;
+//...and end at 3MB mark
 udword end_free_mem = 0x300000;
 
 void *kmalloc(int size, int align, unsigned int *phys){

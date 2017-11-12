@@ -31,10 +31,17 @@ void kmain(){
   install_interrupts();
   enable_ints();
 
-  initialise_paging();
+  init_paging();
 
-  unsigned int *ptr = (unsigned int*)0xA0000000;
-  unsigned int do_page_fault = *ptr;
+  //alloc_frame( get_page( 0x200000, 1, sys_page_table), 0, 1 );
+
+  char alloc = bitGet( frames, 0x102000 / FRAME_SIZE);
+  char b[10];
+  itoa( alloc, b);
+  k_print( b );
+
+  unsigned int *ptr = (unsigned int*)0x102000;
+  unsigned int page_fault = *ptr;
 
   stop_cpu(); 
 

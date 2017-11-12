@@ -16,11 +16,13 @@ Add into pic.c a function to enable IRQ's by number
 Go through and clean up magic numbers
 Write a simple shell
 Implement hex to ascii
-Get amount of memory in real mode
- and pass it to the kernel
-   xor ax, ax
-   int 0x12
-   ;AX = amount of KB of RAM
+Impelement call gate
+   Add GDT descriptor w/ CPL = 3 and type of
+   trap gate to a function as the base and limit
+   call using 
+       jmp <GDT offset>:0x0
+Make function to get page_entry bits
+Use timer channel 2 to play sound on pc speaker
 
 Impelement:
    APIC
