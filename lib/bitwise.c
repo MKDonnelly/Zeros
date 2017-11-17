@@ -59,6 +59,3 @@ char bitGet( void *mem, int bitNum ){
    char val = ( ((char*)mem)[index] & (0x1 << offset) );
    return (val ? (char)1 : (char)0);
 }
-
-
-

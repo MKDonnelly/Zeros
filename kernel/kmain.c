@@ -25,25 +25,67 @@ asm("jmp kmain"); //The bootsector immedietelly jumps to the
 #include "kmalloc.h"
 #include "../cpu/paging.h"
 
-void paging_handler(struct registers r){
+void kmain(){
 
-   int present = !(r.error & 0x1);
-   int rw = r.error & 0x2;
-   int us = r.error & 0x4;
-   int id = r.error & 0x10;
+  //Initilize the PIC
+  remap_pic();
+  //Create the IDT and initilize
+  //the interrupt handlers
+  install_interrupts();
 
-   if( present )
-	   k_print("Failed due to page not present");
-   if(rw)
-	   k_print("Failed due to r-only");
-   if( id )
-	   k_print("Failed due to id");
-   if( us)
-	   k_print("Failed due to user page");
-   asm("hlt");
+  init_paging();
+
+  k_clear_screen();
+	
+  init_keyboard();
+  move_cursorl( k_xy_to_linear( 0, 0 ) );
+
+  init_timer();
+  k_newline();
+  k_newline();
+  k_print("Enter some text: ");
+
+  //Make sure to enable 
+  //the interrupts
+  enable_ints();
+
+  //Test mapping
+  page_map( get_page( 0x900000, 1, kernel_page_dir), 0, 1, 0x900000);
+
+  //Create a page fault for testing
+  char *ptr = (char*)0x900000;
+  char val = *ptr;
+
+  while(1);
 }
 
-/*
+//         Examples
+
+/*       Dynamic memory allocation
+  char *mystr = (char*)kmalloc(100, 0);
+  strcpy( mystr, "Testing..." );
+  k_print( mystr );
+*/
+
+/*       Using the keyboard
+  //Initilize the PIC
+  remap_pic();
+  //Create the IDT and initilize
+  //the interrupt handlers
+  install_interrupts();
+  
+  init_keyboard();
+  move_cursorl( k_xy_to_linear( 0, 0 ) );
+
+  //Make sure to enable 
+  //the interrupts
+  //enable_ints();
+  asm volatile("sti");
+  while(1);
+*/
+
+
+/*        TODO Switch to 13h mode from protected mode
 unsigned char mode13h[] = {
    //General registers
    0x63, 0x0, 0x70, 0x4,
@@ -103,58 +145,4 @@ void init13h(){
 }
 */
 
-void kmain(){
 
-  //Initilize the PIC
-  remap_pic();
-  //Create the IDT and initilize
-  //the interrupt handlers
-  install_interrupts();
-
-  init_paging();
-
-  k_clear_screen();
-	
-  init_keyboard();
-  move_cursorl( k_xy_to_linear( 0, 0 ) );
-
-  init_timer();
-  k_newline();
-  k_newline();
-  k_print("Enter some text: ");
-
-  //Make sure to enable 
-  //the interrupts
-  enable_ints();
-
-  //Create a page fault for testing
-  char *ptr = (char*)0xA1213459;
-  char val = *ptr;
-
-  while(1);
-}
-
-//         Examples
-
-/*       Dynamic memory allocation
-  char *mystr = (char*)kmalloc(100, 0);
-  strcpy( mystr, "Testing..." );
-  k_print( mystr );
-*/
-
-/*       Using the keyboard
-  //Initilize the PIC
-  remap_pic();
-  //Create the IDT and initilize
-  //the interrupt handlers
-  install_interrupts();
-  
-  init_keyboard();
-  move_cursorl( k_xy_to_linear( 0, 0 ) );
-
-  //Make sure to enable 
-  //the interrupts
-  //enable_ints();
-  asm volatile("sti");
-  while(1);
-*/

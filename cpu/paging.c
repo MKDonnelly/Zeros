@@ -6,55 +6,85 @@
 //frames there are (i.e. how many 4k blocks of 
 //memory are available to map using paging).
 //*frames is a bitmap to determine if the page
-//is being used or not. Note that one unsigned
-//int equals 32 bits, so one unsigned int element
-//in the *frames array can manage 32 physical frames.
+//is being used or not. Note that one char 
+//equals 8 bits, so one char element
+//in the *frames array can manage 8 physical frames.
 
-//TODO change to char* instead
-unsigned int *frames;
-unsigned int framesSize; //The number of unsigned ints
+char *frames;
+unsigned int framesSize; //The number of chars 
                          //we are using in *frames to 
 			 //keep track of the frames
-unsigned int nframes;
 
-//This is where the basic heap starts.
-//The page table is allocated on the stack
-//and we need this to tell the cpu where to
-//find the page table.
-extern unsigned int start_free_mem;
+unsigned int total_frames; //Number of total frames
+                           //available for use
+
+//We will need the end of the heap to determine
+//where to stop allocating kernel pages. It is assumed
+//that the heap is the highest point in kernel memory. 
+extern unsigned int kernel_end_heap;
 
 //The page table which will be visible to
-//the kernel.
-page_directory *sys_page_table;
+//the kernel. 
+page_directory *kernel_page_dir;
 
 //Loop over *frames to find the first unset bit,
 //which will indicate a free frame. Return -1
 //if no frames are present.
 unsigned int first_free_frame(){
-   unsigned int index, offset;
+   unsigned int index;
+   ubyte offset;
 
-   //Loop over each unsigned int in *frames
+   //Loop over each char in *frames
    for(index = 0; index < framesSize; index++){
-      //Loop over each bit in the individual element
-      //of *frames
-      for(offset = 0; offset < UINT_SIZE; offset++){
-         unsigned int mask = (0x1 << offset);
-	 if( ! (frames[index] & mask) )
-		 return UINT_SIZE * index + offset;
+
+      //Loop over each bit in each element of *frames
+      for( offset = 0; offset < CHAR_SIZE; offset++){
+         if( ! bitGet( &frames[index], offset ) ){
+             //We have found a bit not set, so return
+             //the index of the frame for use.
+             return CHAR_SIZE * index + offset;
+         }
       }
    }
+
+   //No free frames available!
    return -1;
+}
+
+//Let the caller specify the mapping between physical
+//and virtual addresses. Contrast this to page_map_auto
+//which allocates the first free frame with the given page_entry
+//is_kernel: 0 for kernel memory, 1 for user
+//is_wirteable: 1 for writeable, 0 for read-only
+int page_map(page_entry *page, ubyte is_kernel, ubyte is_writeable, int physical){
+   //We will assume that the parameters are valid.
+
+   //Make sure the physical address we are given
+   //is aligned to 4K. Note that we do not need to
+   //make sure the frame has already been allocated;
+   //we could implement shared memory later.
+   physical &= 0xFFFFF000;
+
+   //Only allocate a frame if the page 
+   //does not have one allocated.
+   if( ! page->frame ){
+      //Initilize the frame
+      //Set it as present in our bitmask
+      bitSet( frames, physical );
+      page->present = 1; //True, the page is present
+      page->rw = is_writeable;
+      page->user = is_kernel;
+      page->frame = physical;
+   }
+   return 0;
 }
 
 
 //Allocate a frame. Returns -1 on invalid parameters.
 //Returns -2 if there are no available frames.
-int alloc_frame(page_entry *page, int is_kernel, int is_writeable){
+int page_map_auto(page_entry *page, ubyte is_kernel, ubyte is_writeable){
 
-   //Validate parameters
-   if( (is_kernel != 0 && is_kernel != 1) ||
-       (is_writeable != 0 && is_writeable != 1) )
-	   return -1; 
+   //We will assume that the parameters are valid
 
    //Only allocate a frame if the page 
    //does not have one allocated.
@@ -75,59 +105,65 @@ int alloc_frame(page_entry *page, int is_kernel, int is_writeable){
 }
 
 
+//Given a page, decouple it from the page
 void free_frame(page_entry *page){
-   unsigned int frame;
-   if( !(frame = page->frame) ){
-	   return; //The given page didn't actually
-                   //have an allocated frame
+
+   //If the page never had a 
+   //frame allocated to it...
+   if( ! page->frame ){
+      return; //Then we shouldn't be here
    }else{
-      bitClear( frames, frame );
-      page->frame = 0x0;
+      //Free the frame for use by clearing
+      //its allocated bit in *frames.
+      bitClear( frames, page->frame );
+      page->frame = 0x0; //Zero out the frame member
+                         //to be neat.
    }
 }
 
 
 void init_paging(){
+
    //Assume we have only 16MB of available memory
+   //We will extend this later to use the BIOS RAM size
+   //returned when booting.
    unsigned int mem_end_page = 0x1000000;
 
-   //Calculate the number of frames to keep track of
-   nframes = mem_end_page / PAGE_SIZE;
+   //Calculate the number of frames in total
+   total_frames = mem_end_page / PAGE_SIZE;
 
    //Calculate the size of *frames as the
-   //number of unsigned ints it needs to hold.
-   framesSize = nframes / UINT_SIZE;
+   //number of chars it needs to hold. Add 1
+   //to catch any remainder.
+   framesSize = total_frames / CHAR_SIZE + 1;
 
-   frames = (unsigned int*)kmalloc( framesSize, 0, 0 );
+   //Allocate space for the bitset
+   frames = (char*)kmalloc( framesSize, 0, 0 );
 
    //Zero out the frame allocation table.
-   //We need to set the number of bits to set as 
-   //framesSize * 4 since each element in frames is
-   //an unsigned int (4 bytes)
-   memset( (char*)frames, framesSize * 4, 0);
+   memset( frames, framesSize, 0);
 
-   //Make a page directory
-   sys_page_table = (page_directory*)kmalloc(sizeof(page_directory), 1, 0);
+   //Make the page directory for the kernel
+   kernel_page_dir = (page_directory*)kmalloc(sizeof(page_directory), 1, 0);
    //Zero out the page directory
-   memset( (char*)sys_page_table, sizeof(page_directory), 0);
+   memset( (char*)kernel_page_dir, sizeof(page_directory), 0);
 
    //Allocate the lower part of memory for the kernel
    int i = 0;
-   int count = 0;
-   while( i < start_free_mem && count <= 256){
-      alloc_frame( get_page(i, 1, sys_page_table), 0, 0);
-      i += 0x1000;
-      count++;
+   while( i < kernel_end_heap){
+      page_map_auto( get_page(i, 1, kernel_page_dir), KERNEL_MEMORY, IS_WRITEABLE);
+      i += FRAME_SIZE;
    }
 
    //Let the processor know where our page table is
    //and enable paging.
-   load_page_dir( sys_page_table );
+   load_page_dir( kernel_page_dir );
 
    //Finally, setup the interrupt handler
    register_interrupt( PAGE_INTERRUPT, page_int_handler);
 }
 
+//Load the given page_directory into cr3
 void load_page_dir(page_directory *dir){
    asm volatile("mov %0, %%cr3" :: "r"(&dir->tablesPhysical));
    unsigned int cr0;
@@ -136,9 +172,11 @@ void load_page_dir(page_directory *dir){
    asm volatile("mov %0, %%cr0" :: "r"(cr0));
 }
 
+
+//Get a pointer to a page. given its physical address
 page_entry *get_page(unsigned int address, int make, page_directory *dir){
    //Turn the address into an index
-   address /= 0x1000;
+   address /= FRAME_SIZE;
    //Find the page table containing this address
    unsigned int table_idx = address / 1024;
    if( dir->tables[table_idx] ){

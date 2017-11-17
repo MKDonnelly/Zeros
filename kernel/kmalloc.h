@@ -1,9 +1,6 @@
-
 #pragma once
-
 #include "../lib/types.h"
 
-//udword start_free_mem = 0x1000;
-//udword kmalloc(udword size, int align, udword *phys_addr);
+extern unsigned int kernel_start_heap;
 void *kmalloc(int,int,unsigned int*);
 

@@ -10,6 +10,13 @@
 
 #define PAGE_SIZE  0x1000
 #define FRAME_SIZE 0x1000
+#define TABLE_SIZE 0x1000
+
+#define KERNEL_MEMORY 0
+#define USER_MEMORY   1
+#define IS_WRITEABLE  1
+#define NOT_WRITEABLE 0
+
 #define PAGE_INTERRUPT 14
 
 //This describes an individual page
@@ -48,12 +55,24 @@ typedef struct page_directory{
 
 //This will be visible to the kernel so
 //that is may allocate pages
-extern page_directory *sys_page_table;
-extern unsigned int *frames;
+extern page_directory *kernel_page_dir;
 
-//Allocate a frame
-int alloc_frame(page_entry*,int,int);
+//A bitset to determine which frames
+//have been allocated.
+extern char* frames;
+
+//Map a virtual to physical address using paging.
+//Contrast this to <next function> which maps the
+//given virtual address to the next free physcial
+//address. This allows greater control.
+int page_map(page_entry*,ubyte,ubyte,int);
+
+//Allocate a frame automatically to the page_entry
+int page_map_auto(page_entry*,ubyte,ubyte);
+
+//Un-associates a frame from a page_entry
 void free_frame(page_entry*);
+
 //Get a page from the page table
 page_entry *get_page(unsigned int, int, page_directory*);
 
