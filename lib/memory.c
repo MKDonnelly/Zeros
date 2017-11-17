@@ -1,14 +1,14 @@
 //Various generic functions to modify memory
 //
 
-void memcpy( char *dest, char *src, int amount){
+void memcpy( void *dest, void *src, int amount){
    for(int i = 0; i < amount; i++)
-      dest[i] = src[i];
+      ((char*)dest)[i] = ((char*)src)[i];
 }
 
-void memset( char *dest, int amount, int val){
+//Overwrite *dest with amount bytes of value val
+void memset( void *dest, int amount, int val){
    for(int i = 0; i < amount; i++)
-      dest[i] = val;
+      ((char*)dest)[i] = 0;
 }
-
 

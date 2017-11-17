@@ -146,7 +146,7 @@ void init_paging(){
    //Make the page directory for the kernel
    kernel_page_dir = (page_directory*)kmalloc(sizeof(page_directory), 1, 0);
    //Zero out the page directory
-   memset( (char*)kernel_page_dir, sizeof(page_directory), 0);
+   memset( kernel_page_dir, sizeof(page_directory), 0);
 
    //Allocate the lower part of memory for the kernel
    int i = 0;
@@ -184,7 +184,7 @@ page_entry *get_page(unsigned int address, int make, page_directory *dir){
    }else if(make){
       unsigned int tmp;
       dir->tables[table_idx] = (page_table*)kmalloc(sizeof(page_table), 1, &tmp);
-      memset((char*)dir->tables[table_idx], 0x1000, 0);
+      memset(dir->tables[table_idx], 0x1000, 0);
       dir->tablesPhysical[table_idx] = tmp | 0x7;
       return &dir->tables[table_idx]->pages[address%1024];
    }else{

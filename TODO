@@ -14,12 +14,7 @@ Impelement call gate
    call using 
        jmp <GDT offset>:0x0
 Use timer channel 2 to play sound on pc speaker
-change video mode from potected mode
 get memory size from bios
-Create paging function to allow explicit
-  mapping of virtual to physical memory
-Allow memset to use a void* param instead of
-  having to cast every parameter
 Implement APIC
 Implement HPET
 Implement multitasking

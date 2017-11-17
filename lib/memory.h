@@ -1,5 +1,5 @@
 
 #pragma once
 
-void memcpy(char*,char*,int);
-void memset(char*,int,int);
+void memcpy(void*,void*,int);
+void memset(void*,int,int);
