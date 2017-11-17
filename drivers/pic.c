@@ -24,29 +24,19 @@ void remap_pic(){
   portb_write( MASTER_PIC_DATA, PIC_ICW4_8086_MODE );
   portb_write( SLAVE_PIC_DATA, PIC_ICW4_8086_MODE );
 
-  //Mask all interrupts
+  //Mask all interrupts by setting every bit to 1
   portb_write( MASTER_PIC_DATA, 0xff );
   portb_write( SLAVE_PIC_DATA, 0xff );
 }
 
-/*
-//Initilize the PIC
-void remap_pic(){
-  portb_write( 0x20, 0x11 );
-  portb_write( 0xA0, 0x11 );
+void enable_irq(int num){
+   ubyte curPICMask = portb_read( MASTER_PIC_DATA );
+   ubyte mask = ~(0x1 << num);
+   portb_write( MASTER_PIC_DATA, curPICMask & mask );
+}
 
-  portb_write( 0x21, 0x20 );
-  portb_write( 0xA1, 0x28 );
-
-  portb_write( 0x21, 0x00 );
-  portb_write( 0xA1, 0x00 );
-
-  portb_write( 0x21, 0x01 );
-  portb_write( 0xA1, 0x01 );
-
-  //Mask all interrupts
-  portb_write( 0x21, 0xff );
-  portb_write( 0x21, 0xff );
-}*/
-
-
+void disable_irq(int num){
+   ubyte curPICMask = portb_read( MASTER_PIC_DATA );
+   ubyte mask = 0x1 << num;
+   portb_write( MASTER_PIC_DATA, curPICMask | mask);
+}

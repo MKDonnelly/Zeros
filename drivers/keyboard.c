@@ -8,14 +8,10 @@ int KEYBOARD_BUFFER_CHARS;
 //calling this.
 void init_keyboard(){
 
-   //Read the current value for the PIC 
-   //interrupt mask and set the keyboard
-   //bit
-   ubyte curPICMask = portb_read( 0x21 );
+   //Enable the keyboard irq
+   enable_irq( KEYBOARD_IRQ );
 
-   //Set bit 1 to zero so that the keyboard is enabled
-   portb_write( 0x21, curPICMask & KEYBOARD_PIC_MASK );
-
+   //And set the interrupt handler
    register_interrupt( 33, keyboard_handler );
 
    //Initilize the number of characters in the keyboard
@@ -65,12 +61,12 @@ void keyboard_handler(){
    ubyte kb_status;
    sbyte key;
 
-   kb_status = portb_read( KEYBOARD_READ_PORT );
+   kb_status = portb_read( KEYBOARD_STATUS_P );
 
    //Write the key to the screen and place it in
    //the buffer
    if( kb_status & 0x01 ){
-      key = portb_read( 0x60 );
+      key = portb_read( KEYBOARD_DATA_P );
       if( key < 0 )
 	      return;
       k_putchar( keyboard_map[(int)key] );

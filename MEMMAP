@@ -14,4 +14,5 @@ Memory map of kernel
 0xFFFFF Low memory end
 
 0x100000 Heap start (1MB mark)
-
+| <Paging structure>
+|

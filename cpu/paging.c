@@ -65,7 +65,6 @@ int alloc_frame(page_entry *page, int is_kernel, int is_writeable){
 
       //Initilize the frame
       //Set it as present in our bitmask
-      //set_frame( firstFreeFrame );
       bitSet( frames, firstFreeFrame );
       page->present = 1;
       page->rw = is_writeable;
@@ -82,8 +81,6 @@ void free_frame(page_entry *page){
 	   return; //The given page didn't actually
                    //have an allocated frame
    }else{
-      //clear_frame(frame);
-      //unset_frame(frame);
       bitClear( frames, frame );
       page->frame = 0x0;
    }
@@ -116,14 +113,19 @@ void init_paging(){
 
    //Allocate the lower part of memory for the kernel
    int i = 0;
-   while( i < start_free_mem ){
+   int count = 0;
+   while( i < start_free_mem && count <= 256){
       alloc_frame( get_page(i, 1, sys_page_table), 0, 0);
       i += 0x1000;
+      count++;
    }
 
-   //Finally, let the processor know where our page table is
+   //Let the processor know where our page table is
    //and enable paging.
    load_page_dir( sys_page_table );
+
+   //Finally, setup the interrupt handler
+   register_interrupt( PAGE_INTERRUPT, page_int_handler);
 }
 
 void load_page_dir(page_directory *dir){
@@ -152,3 +154,33 @@ page_entry *get_page(unsigned int address, int make, page_directory *dir){
    }
 }
 
+void page_int_handler(struct registers r){
+   int fault_addr;
+   asm volatile("mov %%cr2, %0" : "=r" (fault_addr));
+
+   ubyte present = !(r.error & 0x1);
+   ubyte rw = r.error & 0x2;
+   ubyte us = r.error & 0x4;
+   ubyte reserved = r.error & 0x8;
+   ubyte id = r.error & 0x10;
+
+   k_print("Page Fault: ");
+   if( present )
+      k_print("page not present at ");
+   else if(rw)
+      k_print("page read-only at ");
+   else if(us)
+      k_print("page ring-0 only at ");
+   else if(reserved)
+      k_print("reserved bits overwritten at ");
+   else if( id )
+      k_print("instruction fetch at ");
+   k_print( "0x" );
+   char buffer[17]; //16 chars + \0
+   itoh( fault_addr, buffer );
+   k_print( buffer );
+
+   //We currently cannot handle a fault, so
+   //halt the machine
+   asm("hlt");
+}

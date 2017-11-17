@@ -1,13 +1,16 @@
 #pragma once
 
 #include "../drivers/vgatext/vgatext.h"
+#include "../cpu/isr.h"
 #include "../kernel/kmalloc.h"
 #include "../lib/memory.h"
 #include "../lib/bitwise.h"
 #include "../lib/types.h"
+#include "../lib/string.h"
 
 #define PAGE_SIZE  0x1000
 #define FRAME_SIZE 0x1000
+#define PAGE_INTERRUPT 14
 
 //This describes an individual page
 //which maps virtual addresses to physical
@@ -50,6 +53,7 @@ extern unsigned int *frames;
 
 //Allocate a frame
 int alloc_frame(page_entry*,int,int);
+void free_frame(page_entry*);
 //Get a page from the page table
 page_entry *get_page(unsigned int, int, page_directory*);
 
@@ -63,3 +67,5 @@ void load_page_dir(page_directory*);
 //Gets the specified page
 page_entry *get_page(unsigned int, int, page_directory*);
 
+//Handles page interrupts
+void page_int_handler(struct registers);

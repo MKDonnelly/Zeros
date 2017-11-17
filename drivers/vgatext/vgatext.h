@@ -25,6 +25,7 @@ int k_xy_to_linear(int,int);
 void k_putchar(char);
 void k_newline();
 void k_print(char*);
+void k_print_at(char*,int,int);
 void k_clear_screen();
 
 //screencap.c functions

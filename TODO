@@ -1,30 +1,24 @@
-Learn how pic port programming works 
-Learn what task state segments and call gate descriptors are
-
-Enable A20 gate before IDT and GDT
 Work on VGA 13h mode driver 
   implement a frame buffer
 Scroll screen when text input reaches the end
    allow arrow keys to scroll through buffer
 Add cpuid functions
-Learn string asm commands and other useful commands
 Find out why keyboard_map.h is being double-included
 Manually create a keyboard map
+Work on keyboard input buffering and management
 Learn qemu to better debug the kernel
-Add into pic.c a function to enable IRQ's by number
-  also make a function to disable an IRQ
-Go through and clean up magic numbers
 Write a simple shell
-Implement hex to ascii
 Impelement call gate
    Add GDT descriptor w/ CPL = 3 and type of
    trap gate to a function as the base and limit
    call using 
        jmp <GDT offset>:0x0
-Make function to get page_entry bits
 Use timer channel 2 to play sound on pc speaker
-
-Impelement:
-   APIC
-   HPET
-   
+change video mode from potected mode
+get memory size from bios
+Create paging function to allow explicit
+  mapping of virtual to physical memory
+Implement APIC
+Implement HPET
+Implement multitasking
+Implement user mode

@@ -56,7 +56,8 @@ char bitGet( void *mem, int bitNum ){
    //something that we can use, a char*.
    //We then get the specified char at the index
    //and select the given bit using the &
-   return ( ((char*)mem)[index] & (0x1 << offset) );
+   char val = ( ((char*)mem)[index] & (0x1 << offset) );
+   return (val ? (char)1 : (char)0);
 }
 
 

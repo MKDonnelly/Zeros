@@ -49,4 +49,16 @@ void itoa(int n, char s[]){
    reverse(s);
 }
 
-
+void itoh(int num, char s[]){
+   for(int i = 0; i < 8; i++){
+      char val = num & 0xF;
+      if( val >= 10 ){
+         s[i] = (val - 10) + 'A';
+      }else{
+         s[i] = val + '0';
+      }
+      num = num >> 4;
+   }
+   s[8] = 0;
+   reverse(s);
+}

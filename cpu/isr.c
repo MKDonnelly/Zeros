@@ -65,5 +65,4 @@ void main_interrupt_handler(struct registers r){
       portb_write( MASTER_PIC_CTRL, PIC_EOI );
       portb_write( SLAVE_PIC_CTRL, PIC_EOI );
    }
-
 }

@@ -1,4 +1,3 @@
-
 #include "idt.h"
 
 void add_idt_entry( u8 intNumber, u32 handlerFunction) {
@@ -13,6 +12,6 @@ void add_idt_entry( u8 intNumber, u32 handlerFunction) {
 void load_idt(){
    //idt_des is the interrupt table descriptor
    idt_des.base_addr = (u32) &int_table;
-   idt_des.length = IDT_ENTRIES * sizeof(idt_entry) - 1;
+   idt_des.length = TOTAL_INTERRUPTS * sizeof(idt_entry) - 1;
    asm volatile("lidtl (%0)" : : "r" (&idt_des) );
 }

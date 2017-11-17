@@ -10,7 +10,7 @@
 #include "../lib/types.h"
 #include "../lib/bitwise.h"
 
-#define TOTAL_INTERRUPTS 256
+//#define TOTAL_INTERRUPTS 256
 
 extern void init_idt();
 
@@ -42,7 +42,6 @@ void (*int_handlers[TOTAL_INTERRUPTS])(struct registers);
 //handler of the given number is present. We will use
 //32 bytes since there are 256 interrupts (32 * 8)
 char int_present[ TOTAL_INTERRUPTS / 8 ];
-
 
 //This function handles the installation
 //of each interrupt handler

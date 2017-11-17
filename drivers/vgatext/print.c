@@ -52,3 +52,29 @@ void k_print(char *s){
       i++;
    }
 }
+
+//Skip the current index on the screen altogether.
+//Print at a certain (x,y) point on the screen
+void k_print_at(char *s, int x, int y){
+
+   int i = 0;
+
+   //To find the row, multiply the row number
+   //by the number of cells in a line (COLS * 2).
+   //To get the x offset, we need to remember that
+   //each character space visible on the screen represents
+   //two bytes of memory (one for the char and the other
+   //for the color). So we need to double the x offset given
+   //by a factor of 2.
+   int startIndex = y * COLS * 2 + x*2 ;
+   while( s[i] != 0 ){
+      if( s[i] == '\n' || s[i] == '\r' ){
+         int currentLine = (startIndex / 180);
+	 startIndex = (currentLine + 1) * COLS * 2;
+      }else{
+         VIDEO_MEMORY[startIndex] = s[i];
+	 startIndex += 2;
+      }
+      i++;
+   }
+}  

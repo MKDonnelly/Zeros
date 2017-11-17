@@ -9,7 +9,7 @@
 // by eight by the CPU to get an offset from the GDT.
 // This is actually a segment selector.
 #define KERNEL_CS 0x08
-#define IDT_ENTRIES 256
+#define TOTAL_INTERRUPTS 256
 
 //The main structure is the interrupt table (int_table)
 //and is composed of an array of 256 idt_entry's.
@@ -37,7 +37,7 @@ typedef struct{
 
 //The Interrupt descriptor table and 
 //interrupt descriptor
-idt_entry int_table[IDT_ENTRIES];
+idt_entry int_table[TOTAL_INTERRUPTS];
 idt_descriptor idt_des;
 
 //Given an interrupt number and a 
@@ -47,6 +47,3 @@ void add_idt_entry(u8, u32);
 //This does the job of actually
 //loading the IDT to the system.
 void load_idt();
-
-
-

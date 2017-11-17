@@ -27,8 +27,10 @@
 #define PIC_MASTER_START 0x20
 #define PIC_SLAVE_START  0x28
 
-#define KEYBOARD_READ_PORT 0x64
-
 //Remap the PIC to non-handware
 //interrupt numbers
 void remap_pic();
+
+//Enable/disable an IRQ by number
+void enable_irq(int);
+void disable_irq(int);

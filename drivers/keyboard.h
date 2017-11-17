@@ -3,8 +3,11 @@
 #include "../cpu/isr.h"
 #include "../lib/types.h"
 
-#define KEYBOARD_PIC_MASK 0xFD
 #define KEYBOARD_BUFFER_SIZE 128
+#define KEYBOARD_IRQ 1
+
+#define KEYBOARD_STATUS_P 0x64
+#define KEYBOARD_DATA_P 0x60
 
 extern unsigned char keyboard_map[];
 
@@ -16,8 +19,7 @@ extern char KEYBOARD_BUFFER[ KEYBOARD_BUFFER_SIZE ];
 extern int KEYBOARD_BUFFER_CHARS;
 
 void init_keyboard();
-//Called when interrupt #33 is
-//raised
+//Manages keyboard input
 void keyboard_handler();
 
 //Manages KEYBOARD_BUFFER
