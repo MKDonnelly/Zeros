@@ -12,6 +12,12 @@ int CUR_CURSOR_OFFSET = 0;
 void k_putchar( char input ){
    if( input == '\n' || input == '\r' ){
       k_newline();
+   }else if( input == '\b' ){
+      //Backspace handling
+      CUR_SCREEN_OFFSET -= 2;
+      CUR_CURSOR_OFFSET--;
+      move_cursorl( CUR_CURSOR_OFFSET );
+      VIDEO_MEMORY[CUR_SCREEN_OFFSET] = ' ';
    }else{
       VIDEO_MEMORY[CUR_SCREEN_OFFSET] = input;
       CUR_SCREEN_OFFSET += 2; //Skip 2 bytes since 

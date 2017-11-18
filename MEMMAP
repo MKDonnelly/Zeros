@@ -4,15 +4,19 @@ Memory map of kernel
 |BIOS
 |BIOS
 |BIOS
-0x1000 32-bit kernel load address
-|Kernel
-|Kernel
+0x1000 
+|
+|
 0x7c00 Bootsector Start
 |Bootsec
 |Bbootsec
 0x7e00 Bootsector End/
 0xFFFFF Low memory end
 
-0x100000 Heap start (1MB mark)
-| <Paging structure>
-|
+0x100000 Kernel load address (1MB mark)
+| Kernel
+| Kernel
+0x200000 Simple kernel heap start (2MB mark)
+| Heap
+| Heap
+0x300000 Simple Kernel heap end (3MB mark)

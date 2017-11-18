@@ -3,9 +3,6 @@ Work on VGA 13h mode driver
 Scroll screen when text input reaches the end
    allow arrow keys to scroll through buffer
 Add cpuid functions
-Find out why keyboard_map.h is being double-included
-Manually create a keyboard map
-Work on keyboard input buffering and management
 Learn qemu to better debug the kernel
 Write a simple shell
 Impelement call gate

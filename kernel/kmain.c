@@ -15,8 +15,8 @@ asm("jmp kmain"); //The bootsector immedietelly jumps to the
 #include "../lib/string.h"
 #include "../lib/bcd.h"
 #include "../lib/types.h"
-#include "../lib/keyboard_map.h"
 #include "../lib/bitwise.h"
+#include "../lib/delay.h"
 
 #include "../cpu/cpu.h"
 #include "../cpu/isr.h"
@@ -25,6 +25,8 @@ asm("jmp kmain"); //The bootsector immedietelly jumps to the
 #include "kmalloc.h"
 #include "../cpu/paging.h"
 
+//TODO add in struct multiboot* to 
+//get information about the system
 void kmain(){
 
 
@@ -38,21 +40,17 @@ void kmain(){
   k_print("All is fine");
   move_cursorl( k_xy_to_linear( 0, 0) );
   init_keyboard();
-  init_timer();
+  //init_timer();
 
   enable_ints();
-
-
   init_paging();
-
   k_clear_screen();
-	
   move_cursorl( k_xy_to_linear( 0, 0 ) );
 
   //init_timer();
-  k_newline();
-  k_newline();
-  k_print("Enter some text: ");
+  //k_newline();
+  //k_newline();
+  //k_print("Enter some text: ");
 
   //Make sure to enable 
   //the interrupts

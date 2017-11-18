@@ -26,6 +26,7 @@ void add_keyboard_buffer(char key){
    //The array has space, append the key.
    if( KEYBOARD_BUFFER_CHARS < KEYBOARD_BUFFER_SIZE ){
       KEYBOARD_BUFFER[ KEYBOARD_BUFFER_CHARS ] = key;
+      KEYBOARD_BUFFER_CHARS++;
    }else{
       //Keyboard buffer does not have space, shift the
       //first element out and all the other elements
@@ -37,31 +38,101 @@ void add_keyboard_buffer(char key){
           KEYBOARD_BUFFER[i] = KEYBOARD_BUFFER[i+1];
       }
       KEYBOARD_BUFFER[KEYBOARD_BUFFER_CHARS] = key;
-
    }
 }
 
 
-//Gets a line from the keyboard buffer and deletes it
-//from the buffer.
+//Grabs a line out of the keyboard buffer and removes
+//it from the buffer.
 void getline(char *buffer){
    int bufferIndex = 0;
-   while( bufferIndex < KEYBOARD_BUFFER_SIZE && \
-		   KEYBOARD_BUFFER[bufferIndex] != '\n' ){
+   while( bufferIndex < KEYBOARD_BUFFER_CHARS && 
+	  KEYBOARD_BUFFER[bufferIndex] != '\n' &&
+          KEYBOARD_BUFFER[bufferIndex] != 0    &&
+          KEYBOARD_BUFFER[bufferIndex] != '\r'   ){
       buffer[bufferIndex] = KEYBOARD_BUFFER[bufferIndex];
+      bufferIndex++;
    } 
-   buffer[bufferIndex+1] = 0;
+   buffer[bufferIndex] = 0; //Set the NULL bit
+   int temp = bufferIndex;
+
+   //Shift the keyboard buffer down to overwrite
+   //the line just read in.
+   for(int i = 0; bufferIndex < KEYBOARD_BUFFER_CHARS; i++, bufferIndex++){
+      KEYBOARD_BUFFER[i] = KEYBOARD_BUFFER[bufferIndex];
+   }
+   KEYBOARD_BUFFER_CHARS -= temp;
 }
+
+
+// '\0' = Not implemented
+// Ascii DC1 = Arrow up
+// Ascii DC2 = Arrow Down
+// Ascii DC3 = Arrow left
+// Ascii DC4 = Arrow Right
+// Insert = Start of Heading
+// Home = Start Of Text
+// Page Up = End Of Text
+// End = End Of Transmission
+// Page Down = Enquiry
+// CTRL = Acknowledge
+// Alt = Shift Out
+char keycode_to_char[256] = {
+   //Keys 0-9
+   '\0', '\0', '1', '2', '3', '4', '5', '6', '7', '8',
+   //Keys 10-19
+   '9', '0', '-', '=', '\b', '\0', 'q', 'w', 'e', 'r',
+   //Keys 20-29
+   't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\r', 14,
+   //Keys 30-39
+   'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';',
+   //Keys 40-49
+   '\'', '`', '\0', '\\', 'z', 'x', 'c', 'v', 'b', 'n',
+   //Keys 50-59
+   'm', ',', '.', '/', '\0', '\0', '\0', ' ', '\0', '\0',
+   //Keys 60-69
+   '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', 
+   //Keys 70-79
+   '\0', 2, 17, 3, '\0', 13, '\0', 14, '\0', 4, 
+   //Keys 80-89
+   12, 5, 1, 127, '\0', '\0', '\0', '\0', '\0', '\0', 
+   //Keys 90-99
+   6, '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', 
+};
+
+char shift_keycode_to_char[256] = {
+   //Keys 0-9
+   '\0', '\0', '!', '@', '#', '$', '%', '^', '&', '*',
+   //Keys 10-19
+   '(', ')', '_', '+', '\b', '\0', 'Q', 'W', 'E', 'R',
+   //Keys 20-29
+   'T', 'Y', 'U', 'I', 'O', 'P', '{', '}', '\r', 14,
+   //Keys 30-39
+   'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ':',
+   //Keys 40-49
+   '"', '~', '\0', '|', 'Z', 'X', 'C', 'V', 'B', 'N',
+   //Keys 50-59
+   'M', '<', '>', '?', '\0', '\0', '\0', ' ', '\0', '\0',
+   //Keys 60-69
+   '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', 
+   //Keys 70-79
+   '\0', 2, 17, 3, '\0', 13, '\0', 14, '\0', 4, 
+   //Keys 80-89
+   12, 5, 1, 127, '\0', '\0', '\0', '\0', '\0', '\0', 
+   //Keys 90-99
+   6, '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', 
+};
+
 
 //This is called whenever the keyboard generates
 //and interrupt through the PIC.
 //This is Interrupt #33
 void keyboard_handler(){
 
-   ubyte kb_status;
-   sbyte key;
+   static ubyte shift_activated = 0;
 
-   kb_status = portb_read( KEYBOARD_STATUS_P );
+   sbyte key;
+   ubyte kb_status = portb_read( KEYBOARD_STATUS_P );
 
    //Write the key to the screen and place it in
    //the buffer
@@ -69,9 +140,26 @@ void keyboard_handler(){
       key = portb_read( KEYBOARD_DATA_P );
       if( key < 0 )
 	      return;
-      k_putchar( keyboard_map[(int)key] );
-      add_keyboard_buffer( keyboard_map[(int)key]);
-   }
 
+      if( keycode_to_char[ (int)key] == 'z' ){
+          k_newline();
+          k_newline();
+          k_newline();
+          char buffer[100];
+          getline( buffer );
+          k_print( buffer );   
+      }
+
+      if( key == SHIFT_RIGHT_KEY || key == SHIFT_LEFT_KEY){
+         shift_activated = 1;
+      }else if( shift_activated ){
+         k_putchar( shift_keycode_to_char[ (int)key ]);
+         add_keyboard_buffer( shift_keycode_to_char[ (int)key ] );
+         shift_activated = 0;
+      }else{
+         k_putchar( keycode_to_char[ (int)key ] );
+         add_keyboard_buffer( keycode_to_char[ (int)key ] );
+      }
+   }
 }
 

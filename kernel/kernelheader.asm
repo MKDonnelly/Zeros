@@ -1,7 +1,10 @@
 [extern kmain]
 
+PAGE_ALIGN equ             1 << 0
+MEMORY_INFORMATION equ     1 << 1
+
 MULTIBOOT_HEADER_MAGIC equ 0x1BADB002
-MULTIBOOT_HEADER_FLAGS equ 0
+MULTIBOOT_HEADER_FLAGS equ PAGE_ALIGN | MEMORY_INFORMATION
 
 [bits 32]
 
@@ -14,6 +17,9 @@ multiboot_header:
 
 
 arch_start:
+    push ebx     ;Pass multiboot header
+
+    ;Setup the stack
     mov ebp, 0x90000
     mov esp, ebp
    
