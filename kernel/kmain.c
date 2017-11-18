@@ -27,20 +27,29 @@ asm("jmp kmain"); //The bootsector immedietelly jumps to the
 
 void kmain(){
 
+
   //Initilize the PIC
   remap_pic();
   //Create the IDT and initilize
   //the interrupt handlers
   install_interrupts();
 
+  k_clear_screen();
+  k_print("All is fine");
+  move_cursorl( k_xy_to_linear( 0, 0) );
+  init_keyboard();
+  init_timer();
+
+  enable_ints();
+
+
   init_paging();
 
   k_clear_screen();
 	
-  init_keyboard();
   move_cursorl( k_xy_to_linear( 0, 0 ) );
 
-  init_timer();
+  //init_timer();
   k_newline();
   k_newline();
   k_print("Enter some text: ");
@@ -50,11 +59,11 @@ void kmain(){
   enable_ints();
 
   //Test mapping
-  page_map( get_page( 0x900000, 1, kernel_page_dir), 0, 1, 0x900000);
+  //page_map( get_page( 0x900000, 1, kernel_page_dir), 0, 1, 0x900000);
 
   //Create a page fault for testing
-  char *ptr = (char*)0x900000;
-  char val = *ptr;
+  //char *ptr = (char*)0x900000;
+  //char val = *ptr;
 
   while(1);
 }

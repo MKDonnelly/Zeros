@@ -1,11 +1,9 @@
 #include "kmalloc.h"
 
-//Heap will start at 1MB mark...
-//udword start_free_mem = 0x100000;
-unsigned int kernel_start_heap = 0x100000;
-//...and end at 3MB mark
-//udword end_free_mem = 0x300000;
-unsigned int kernel_end_heap = 0x300000;
+//Heap will start at 4MB mark...
+unsigned int kernel_start_heap = 0x400000;
+//...and end at 6MB mark
+unsigned int kernel_end_heap = 0x600000;
 
 void *kmalloc(int size, int align, unsigned int *phys){
    if( kernel_start_heap + size < kernel_end_heap ){

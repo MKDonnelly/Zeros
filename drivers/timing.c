@@ -8,7 +8,7 @@ void init_timer(){
    //Enable the timer interrupt and 
    //set the interrupt handler
    enable_irq( 0 );
-   register_interrupt( 32, timer_int_handler );
+   register_interrupt( TIMER_INTERRUPT, timer_int_handler );
 
    //Zero out the members of the sys_time struct
    //to be safe

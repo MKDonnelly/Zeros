@@ -4,36 +4,36 @@ OBJECTS = ${CPROGS:.c=.o}
 
 CFLAGS = -fno-pie -m32 -ffreestanding -fno-stack-protector -nostdlib -nostdinc -fno-builtin  -Wall -g
 
-qemu: osimage
-	qemu-system-x86_64 -serial file:serial.log osimage.img
+#qemu: kernel/kmain.elf
+#	qemu-system-x86_64 -serial file:serial.log osimage.img
 
-debug: osimage
-	qemu-system-x86_64 -serial file:serial.log osimage.img -s -S &
-	gdb -q -x gdbdebug
+#debug: kernel/kmain.elf
+#	qemu-system-x86_64 -serial file:serial.log osimage.img -s -S &
+#	gdb -q -x gdbdebug
 
-osimage: boot/bootsec.bin kernel/kmain.bin 
-	@cat $^ > osimage.img
+default: kernel/kmain.elf
 
-kernel/kmain.bin: ${OBJECTS}
-	@nasm -f elf32 cpu/interrupt.asm
-	@ld -m elf_i386 -o kernel/kmain.elf -T link.ld ${OBJECTS} cpu/interrupt.o
-	@objcopy --only-keep-debug kernel/kmain.elf kernel/kmain.sym
-	@objcopy -O binary kernel/kmain.elf kernel/kmain.bin
+run: kernel/kmain.elf
+	@qemu-system-x86_64 -kernel kernel/kmain.elf
 
-%.o: %.asm
-	@nasm -f bin -o $@ $<
+debug: kernel/kmain.elf
+	@qemu-system-x86_64 -serial file:serial.log -kernel kernel/kmain.elf -S -s &
+	@gdb -q -x gdbdebug
+
+kernel/kmain.elf: ${OBJECTS} kernel/kernelheader.o cpu/interrupt.o
+	@ld -m elf_i386 -o kernel/kmain.elf -T link.ld kernel/kernelheader.o cpu/interrupt.o ${OBJECTS}
 
 %.o: %.c ${CHEADERS}
 	@gcc ${CFLAGS} -c $< -o $@
-%.bin: %.asm
-	@nasm $< -f bin -o $@
 
-clean:
+%.o: %.asm 
+	@nasm -f elf32 -o $@ $<
+
+c:
 	@find . -name '*\.o' -exec \rm -rf {} \;
 	@find . -name '*\.bin' -exec \rm -rf {} \;
 	@find . -name '*\.elf' -exec \rm -rf {} \;
 	@find ./kernel -name '*\.sym' -exec \rm {} \;
 	@\rm serial.log 2> /dev/null
-	@\rm osimage.img 2> /dev/null
 	
 

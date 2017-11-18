@@ -9,6 +9,7 @@
 //CH1 @ 0x41 is not implemented
 #define I8253_CH2_P   0x42 //This controls the PC speaker
 #define I8253_CTRL_P  0x43
+#define TIMER_INTERRUPT 32
 
 //Configuration bits for port 0x43:
 //(from wiki.osdev.or/Programmable_Interval_Timer)
