@@ -1,4 +1,3 @@
-
 #pragma once
 #include "../lib/types.h"
 
@@ -8,7 +7,7 @@
 // the kernel code segment. This index is also scaled
 // by eight by the CPU to get an offset from the GDT.
 // This is actually a segment selector.
-#define KERNEL_CS 0x08
+#define KERNEL_CS 0x08    //My kernel uses this
 #define TOTAL_INTERRUPTS 256
 
 //The main structure is the interrupt table (int_table)

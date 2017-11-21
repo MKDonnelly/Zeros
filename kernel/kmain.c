@@ -21,48 +21,39 @@ asm("jmp kmain"); //The bootsector immedietelly jumps to the
 #include "../cpu/cpu.h"
 #include "../cpu/isr.h"
 #include "../cpu/idt.h"
+#include "../cpu/gdt.h"
 
 #include "kmalloc.h"
 #include "../cpu/paging.h"
+
 
 //TODO add in struct multiboot* to 
 //get information about the system
 void kmain(){
 
+  init_gdt();
 
   //Initilize the PIC
   remap_pic();
   //Create the IDT and initilize
   //the interrupt handlers
   install_interrupts();
-
-  k_clear_screen();
-  k_print("All is fine");
-  move_cursorl( k_xy_to_linear( 0, 0) );
+  
   init_keyboard();
-  //init_timer();
-
-  enable_ints();
-  init_paging();
-  k_clear_screen();
+  init_timer();
   move_cursorl( k_xy_to_linear( 0, 0 ) );
-
-  //init_timer();
-  //k_newline();
-  //k_newline();
-  //k_print("Enter some text: ");
+  k_clear_screen();
 
   //Make sure to enable 
   //the interrupts
   enable_ints();
 
-  //Test mapping
-  //page_map( get_page( 0x900000, 1, kernel_page_dir), 0, 1, 0x900000);
+  k_newline();
+  k_newline();
+  k_print("Enter some text: ");
 
-  //Create a page fault for testing
-  //char *ptr = (char*)0x900000;
-  //char val = *ptr;
-
+  //ALWAYS have this, or else the PC
+  //will run wild
   while(1);
 }
 
@@ -90,6 +81,17 @@ void kmain(){
   asm volatile("sti");
   while(1);
 */
+
+/*	Paging
+  init_paging();
+  //Test mapping
+  //page_map( get_page( 0x900000, 1, kernel_page_dir), 0, 1, 0x900000);
+
+  //Create a page fault for testing
+  char *ptr = (char*)0x900000;
+  char val = *ptr;
+*/
+
 
 
 /*        TODO Switch to 13h mode from protected mode

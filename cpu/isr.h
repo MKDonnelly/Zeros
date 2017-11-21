@@ -1,7 +1,7 @@
-
 #pragma once
 
 #include "idt.h"
+#include "cpu.h"
 #include "../drivers/vgatext/vgatext.h"
 #include "../drivers/portio.h"
 #include "../drivers/pic.h"
@@ -9,8 +9,6 @@
 #include "../lib/string.h"
 #include "../lib/types.h"
 #include "../lib/bitwise.h"
-
-//#define TOTAL_INTERRUPTS 256
 
 extern void init_idt();
 
@@ -55,3 +53,4 @@ void unregister_interrupt( int );
 //All interrupts must pass through this to
 //be routed to the correct destination.
 void main_interrupt_handler(struct registers);
+

@@ -1,5 +1,6 @@
 #include "isr.h"
 
+
 //This function initilizes the
 //whole interrupt system. It creates
 //and populates interrupt service 
@@ -9,7 +10,6 @@ void install_interrupts(){
    //Zero out every interrupt in the
    //interrupt enabled array, just to
    //be safe
-   
    for(int i = 0; i < TOTAL_INTERRUPTS; i++){
       bitClear( &int_present, i);
    }
@@ -21,6 +21,7 @@ void install_interrupts(){
    //Load the idt
    load_idt();
 }
+
 
 //Places the handler function into the interrupt handler array 
 void register_interrupt( int int_number, void (*handler)(struct registers) ){

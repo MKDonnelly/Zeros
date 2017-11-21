@@ -13,5 +13,6 @@ void load_idt(){
    //idt_des is the interrupt table descriptor
    idt_des.base_addr = (u32) &int_table;
    idt_des.length = TOTAL_INTERRUPTS * sizeof(idt_entry) - 1;
+   asm volatile("cli");
    asm volatile("lidtl (%0)" : : "r" (&idt_des) );
 }

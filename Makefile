@@ -4,13 +4,6 @@ OBJECTS = ${CPROGS:.c=.o}
 
 CFLAGS = -fno-pie -m32 -ffreestanding -fno-stack-protector -nostdlib -nostdinc -fno-builtin  -Wall -g
 
-#qemu: kernel/kmain.elf
-#	qemu-system-x86_64 -serial file:serial.log osimage.img
-
-#debug: kernel/kmain.elf
-#	qemu-system-x86_64 -serial file:serial.log osimage.img -s -S &
-#	gdb -q -x gdbdebug
-
 default: kernel/kmain.elf
 
 run: kernel/kmain.elf
@@ -29,6 +22,7 @@ kernel/kmain.elf: ${OBJECTS} kernel/kernelheader.o cpu/interrupt.o
 %.o: %.asm 
 	@nasm -f elf32 -o $@ $<
 
+clean: c
 c:
 	@find . -name '*\.o' -exec \rm -rf {} \;
 	@find . -name '*\.bin' -exec \rm -rf {} \;

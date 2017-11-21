@@ -11,7 +11,9 @@ Impelement call gate
    call using 
        jmp <GDT offset>:0x0
 Use timer channel 2 to play sound on pc speaker
-get memory size from bios
+get memory size from multiboot header 
+Provide masks for i/o w/ ports
+Get a custom GDT up to fix booting problems w/ grub
 Implement APIC
 Implement HPET
 Implement multitasking

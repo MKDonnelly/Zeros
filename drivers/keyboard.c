@@ -136,18 +136,18 @@ void keyboard_handler(){
 
    //Write the key to the screen and place it in
    //the buffer
-   if( kb_status & 0x01 ){
+   if( kb_status & KCP_OUT_BUF_S ){
       key = portb_read( KEYBOARD_DATA_P );
       if( key < 0 )
 	      return;
 
-      if( keycode_to_char[ (int)key] == 'z' ){
-          k_newline();
-          k_newline();
+      //Simple test of using getline
+      if( keycode_to_char[ (int)key] == INSERT_KEY ){
           k_newline();
           char buffer[100];
           getline( buffer );
           k_print( buffer );   
+          return;
       }
 
       if( key == SHIFT_RIGHT_KEY || key == SHIFT_LEFT_KEY){
@@ -161,5 +161,11 @@ void keyboard_handler(){
          add_keyboard_buffer( keycode_to_char[ (int)key ] );
       }
    }
+}
+
+
+//Sets the LEDs on the keyboard
+void kb_set_leds(ubyte numLock, ubyte capLock, ubyte scroll){
+
 }
 

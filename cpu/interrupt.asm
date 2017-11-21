@@ -21,7 +21,7 @@ interrupt_common:
    pusha
    mov ax, ds  ;Save the data segment
    push eax    ;descriptor
-   mov ax, 0x10
+   mov ax, 0x10  
    mov ds, ax
    mov es, ax
    mov fs, ax
@@ -90,3 +90,18 @@ init_idt:
 
    leave
    ret
+
+global srupdate
+srupdate:
+   ;Update the segment regesters
+   ;after a GDT init
+   mov ax, 0x10
+   mov ds, ax
+   mov es, ax
+   mov fs, ax
+   mov gs, ax
+   mov ss, ax
+   jmp 0x8: flush
+flush:
+   ret
+
