@@ -40,6 +40,44 @@ void kmain(){
   install_interrupts();
   
   init_keyboard();
+  //init_timer();
+  move_cursorl( k_xy_to_linear( 0, 0 ) );
+  k_clear_screen();
+
+  //Make sure to enable 
+  //the interrupts
+  enable_ints();
+
+  //k_newline();
+  //k_newline();
+  //k_print("Enter some text: ");
+
+  //Paging
+  //init_paging();
+
+  //Experimental kmalloc
+  heap_init();
+  char *mymem = (char*)exp_kmalloc( 20 );
+  strcpy( mymem, "hello");
+  //
+
+  //ALWAYS have this, or else the program
+  //will run off the end of the world.
+  while(1);
+}
+
+//         Examples
+
+/*
+  //Initilize the GDT
+  init_gdt();
+  //Initilize the PIC
+  remap_pic();
+  //Create the IDT and initilize
+  //the interrupt handlers
+  install_interrupts();
+  
+  init_keyboard();
   init_timer();
   move_cursorl( k_xy_to_linear( 0, 0 ) );
   k_clear_screen();
@@ -52,13 +90,18 @@ void kmain(){
   k_newline();
   k_print("Enter some text: ");
 
-  //ALWAYS have this, or else the PC
-  //will run wild
-  while(1);
-}
+//Paging
+  init_paging();
 
-//         Examples
+  //Test mapping
+  page_map( get_page( 0xB8000, 1, kernel_page_dir), KERNEL_MEMORY, IS_WRITEABLE, 0xB8000);
 
+  //Create a page fault for testing
+  char *ptr = (char*)0xB8000;
+  *(ptr + 20) = 'Z';
+//End paging
+
+*/
 /*       Dynamic memory allocation
   char *mystr = (char*)kmalloc(100, 0);
   strcpy( mystr, "Testing..." );

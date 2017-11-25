@@ -3,21 +3,22 @@
 
 //Use the system clock to implement a delay
 void delay(int seconds){
-   int curHours = system_time.hours;
+
+   int curMinutes = system_time.minutes;
    int curSeconds = system_time.seconds;
    int curMilliseconds = system_time.milliseconds;
    
-   int endMilliseconds = curMilliseconds;
+   int endMinutes = curMinutes;
    int endSeconds = curSeconds + seconds;
-   int endHours = curHours;
+   int endMilliseconds = curMilliseconds;
+
    while( endSeconds >= 60){
-      endHours++;
-      endSeconds--;
+      endMinutes++;
+      endSeconds -= 60;
    }
    
    //This is the waiting part
-   while( system_time.milliseconds < endMilliseconds &&
-          system_time.seconds      < endSeconds      &&
-          system_time.hours        < endHours );
+   while( (system_time.seconds <= endSeconds) || 
+          (system_time.milliseconds <= endMilliseconds) ) ;
 }
 

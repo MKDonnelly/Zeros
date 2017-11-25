@@ -13,7 +13,24 @@ Impelement call gate
 Use timer channel 2 to play sound on pc speaker
 get memory size from multiboot header 
 Provide masks for i/o w/ ports
-Get a custom GDT up to fix booting problems w/ grub
+Heap allocater 
+   Model the heap as a linked list.
+   Initially, it will have one node
+   full of free space. As allocations come
+   in, it is split up and marked as allocated.
+   Upon freeing, the chunk of memory looks to
+   the last and next item to see if it can merge
+   with any other free space.
+   struct heapNode{
+      udword nextAddr;
+      uword size;
+      ubyte attributes; 
+   };
+   Attributes can contain information such as 
+   if the block is being used, 
+Add a how-to to explain how each subsystem works
+Add in "-I" flags to easily include header files
+Convert general input functions to use void*
 Implement APIC
 Implement HPET
 Implement multitasking

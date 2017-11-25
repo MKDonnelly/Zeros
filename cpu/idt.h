@@ -36,13 +36,14 @@ typedef struct{
 
 //The Interrupt descriptor table and 
 //interrupt descriptor
-idt_entry int_table[TOTAL_INTERRUPTS];
-idt_descriptor idt_des;
+idt_entry IDT_TABLE[ TOTAL_INTERRUPTS ];
+idt_descriptor IDT_DESCRIPTOR;
 
 //Given an interrupt number and a 
 //function handler, place it into
 //the IDT.
 void add_idt_entry(u8, u32);
+
 //This does the job of actually
 //loading the IDT to the system.
 void load_idt();

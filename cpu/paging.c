@@ -70,7 +70,10 @@ int page_map(page_entry *page, ubyte is_kernel, ubyte is_writeable, int physical
    if( ! page->frame ){
       //Initilize the frame
       //Set it as present in our bitmask
-      bitSet( frames, physical );
+      //We receive the physical address, not the offset
+      //in the frames pointer, so change it to an index
+      //by dividing by FRAME_SIZE
+      bitSet( frames, physical / FRAME_SIZE );
       page->present = 1; //True, the page is present
       page->rw = is_writeable;
       page->user = is_kernel;
