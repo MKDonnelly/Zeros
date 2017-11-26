@@ -50,22 +50,46 @@ void kmain(){
 
   k_newline();
   k_newline();
-  k_print("Enter some text: ");
+  //k_print("Enter some text: ");
 
   //Experimental kmalloc
   heap_init();
 
-/*
-  char *mem = (char*)kmalloc( 10, 0, 0);
-  strcpy( mem, "hello");
+  struct heapNode *heapHead = (struct heapNode*)kernel_start_heap;
+
+  //print out debug info
+  k_print("Beginning:");
   k_newline();
-  k_print( mem );   
+  char b[20];
+  itoh( (int)heapHead->nextChunk, b );
+  k_print( b );
+  k_newline();
+  itoa( (int)heapHead->size, b );
+  k_print( b );
+  k_newline();
+  itoa( (int)heapHead->isAllocated, b );
+  k_print( b );
   k_newline();
 
-  //Print out debug info
-  char b[20];
-  itoh( (int)mem, b );
-  k_print( b ) ;*/
+  char *mem = (char*)exp_kmalloc( 10, 1, 0);
+  exp_kfree( mem );
+
+  //print out debug info
+  k_print("End:");
+  k_newline();
+  itoh( (int)heapHead->nextChunk, b );
+  k_print( b );
+  k_newline();
+  itoa( (int)heapHead->size, b );
+  k_print( b );
+  k_newline();
+  itoa( (int)heapHead->isAllocated, b );
+  k_print( b );
+  k_newline();
+
+
+
+
 
   //Paging
   init_paging();
@@ -74,6 +98,7 @@ void kmain(){
   page_map(get_page( 0x2000000, 1, kernel_page_dir ), KERNEL_MEMORY, IS_WRITEABLE, 0xb8000);
   char *vid = (char*)0x2000000;
   *(vid + 20) = 'z';
+
 
   //ALWAYS have this, or else the program
   //will run off the end of the world.
