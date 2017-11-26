@@ -71,8 +71,8 @@ void kmain(){
   k_print( b );
   k_newline();
 
-  char *mem = (char*)exp_kmalloc( 10, 1, 0);
-  exp_kfree( mem );
+  char *mem = (char*)kmalloc( 10, 1, 0);
+  kfree( mem );
 
   //print out debug info
   k_print("End:");

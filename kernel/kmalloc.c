@@ -40,55 +40,62 @@ void *kmalloc(int size, int align, unsigned int *phys){
            head = head->nextChunk;
       }
 
+      //Make sure we are dealing with enough memory in this chunk
+      //i.e. The while loop above did not break out because we hit
+      //the end and head->size is not big enough.
+      if( ! head->nextChunk || (head->size >= (size + 0x1000) )){
 
-      //Information about where the free memory in the block will
-      //start, where the 4K ALIGNED memory will start within this
-      //block, and the total size needed after aligning to 4K.
-      int memBlockStart = (int)head + sizeof(struct heapNode);
-      int alignedStart = ((int)head + sizeof(struct heapNode) + 0x1000)
-                          & 0xFFFFF000;
-      int totalSize = size + (alignedStart - memBlockStart);
-      ///
+         //Information about where the free memory in the block will
+         //start, where the 4K ALIGNED memory will start within this
+         //block, and the total size needed after aligning to 4K.
+         int memBlockStart = (int)head + sizeof(struct heapNode);
+         int alignedStart = ((int)head + sizeof(struct heapNode) + 0x1000)
+                             & 0xFFFFF000;
+         int totalSize = size + (alignedStart - memBlockStart);
+         ///
 
-      struct heapNode *curItem = head;
-      struct heapNode *nextItem = (struct heapNode*)memBlockStart;      
+         struct heapNode *curItem = head;
+         struct heapNode *nextItem = (struct heapNode*)memBlockStart;      
 
-      nextItem->nextChunk = curItem->nextChunk;
-      nextItem->size = curItem->size - sizeof(struct heapNode) - totalSize;
-      nextItem->isAllocated = 0;
+         nextItem->nextChunk = curItem->nextChunk;
+         nextItem->size = curItem->size - sizeof(struct heapNode) - totalSize;
+         nextItem->isAllocated = 0;
+   
+         curItem->nextChunk = nextItem;
+         curItem->size = totalSize;
+         curItem->isAllocated = 1;
 
-      curItem->nextChunk = nextItem;
-      curItem->size = totalSize;
-      curItem->isAllocated = 1;
-
-      //This will find the first byte of usable memory in the chunk
-      //and align the free space to 4K boundaries.
-      retAddr = (memBlockStart + 0x1000) & 0xFFFFF000;
+         //This will find the first byte of usable memory in the chunk
+         //and align the free space to 4K boundaries.
+         retAddr = (memBlockStart + 0x1000) & 0xFFFFF000;
   
-      if( phys )
-         *phys = retAddr;
-
+         if( phys )
+            *phys = retAddr;
+      }
    //We do not need to align on 4K
    }else{
       while( head->size < size && head->nextChunk ){
            head = head->nextChunk;
       }
 
-      struct heapNode *curItem = head;
-      struct heapNode *nextItem = (struct heapNode*)( (int)head + sizeof( struct heapNode ) );
+      //Make sure we are dealing with a valid chunk of free memory
+      if( head->size >= size ){
+         struct heapNode *curItem = head;
+         struct heapNode *nextItem = (struct heapNode*)( (int)head + sizeof( struct heapNode ) );
       
-      nextItem->nextChunk = curItem->nextChunk;
-      nextItem->size = curItem->size - sizeof( struct heapNode ) - size;
-      nextItem->isAllocated = 0;
+         nextItem->nextChunk = curItem->nextChunk;
+         nextItem->size = curItem->size - sizeof( struct heapNode ) - size;
+         nextItem->isAllocated = 0;
 
-      curItem->nextChunk = nextItem;
-      curItem->size = size;
-      curItem->isAllocated = 1;
+         curItem->nextChunk = nextItem;
+         curItem->size = size;
+         curItem->isAllocated = 1;
 
-      if( phys )
-         *phys = retAddr;
+         if( phys )
+            *phys = retAddr;
 
-      retAddr = ((int)head + sizeof( struct heapNode ) );
+         retAddr = ((int)head + sizeof( struct heapNode ) );
+      }
    }
    
    return (void*)retAddr;

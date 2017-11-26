@@ -1,3 +1,4 @@
+Make a unit test for each major subsystem
 Work on VGA 13h mode driver
   implement a frame buffer
 Implement 13h modeset driver
