@@ -54,17 +54,26 @@ void kmain(){
 
   //Experimental kmalloc
   heap_init();
-  
-  unsigned int result;
-  char *ptr = (char*)kmalloc( 20, 1, &result);
 
+/*
+  char *mem = (char*)kmalloc( 10, 0, 0);
+  strcpy( mem, "hello");
+  k_newline();
+  k_print( mem );   
+  k_newline();
+
+  //Print out debug info
   char b[20];
-  itoh( result, b );
-  k_print( b );
+  itoh( (int)mem, b );
+  k_print( b ) ;*/
 
   //Paging
-  //init_paging();
+  init_paging();
 
+  //Paging testing
+  page_map(get_page( 0x2000000, 1, kernel_page_dir ), KERNEL_MEMORY, IS_WRITEABLE, 0xb8000);
+  char *vid = (char*)0x2000000;
+  *(vid + 20) = 'z';
 
   //ALWAYS have this, or else the program
   //will run off the end of the world.

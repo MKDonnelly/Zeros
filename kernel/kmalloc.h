@@ -19,8 +19,8 @@ struct heapNode{
    //memory is free or allocated.
    //ubyte attributes;
    ubyte isAllocated : 1; //Is this being used?
-   ubyte not_used : 7;
-};
+   ubyte not_used : 7; //For future information
+}__attribute__((packed));
 
 void heap_init();
 void *exp_kmalloc(int,int,unsigned int*);

@@ -30,6 +30,8 @@ typedef struct page{
    unsigned int dirty    : 1; //Has the page been written to?
    unsigned int unused   : 7; //Unused and reserved bits
    unsigned int frame    : 20; //Frame address w/ 12 bit shift
+   //!!IMPORTANT!! That 12 bit shift means that the frame
+   //              is now an INDEX
    //This is the physical address of memory mapped to this page.
    //Only 20 bits are used as every page must begin on 4K boundaries.
 } page_entry;

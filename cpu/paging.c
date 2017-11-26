@@ -77,7 +77,10 @@ int page_map(page_entry *page, ubyte is_kernel, ubyte is_writeable, int physical
       page->present = 1; //True, the page is present
       page->rw = is_writeable;
       page->user = is_kernel;
-      page->frame = physical;
+      //the frame member is the frame address, shifted
+      //up by 12 bits. To get the physical address in,
+      //we will pre-shift the address down 12 bits.
+      page->frame = physical / FRAME_SIZE;
    }
    return 0;
 }
@@ -154,7 +157,8 @@ void init_paging(){
    //Allocate the lower part of memory for the kernel
    int i = 0;
    while( i < kernel_end_heap){
-      page_map_auto( get_page(i, 1, kernel_page_dir), KERNEL_MEMORY, IS_WRITEABLE);
+      //Identity map each page upto the end of the heap.
+      page_map(get_page(i, 1, kernel_page_dir), KERNEL_MEMORY, IS_WRITEABLE, i);
       i += FRAME_SIZE;
    }
 

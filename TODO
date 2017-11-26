@@ -1,5 +1,6 @@
-Work on VGA 13h mode driver 
+Work on VGA 13h mode driver
   implement a frame buffer
+Implement 13h modeset driver
 Scroll screen when text input reaches the end
    allow arrow keys to scroll through buffer
 Add cpuid functions
@@ -31,6 +32,7 @@ Heap allocater
 Add a how-to to explain how each subsystem works
 Add in "-I" flags to easily include header files
 Convert general input functions to use void*
+Revise paging.c to use all offsets or all addresses
 Implement APIC
 Implement HPET
 Implement multitasking
