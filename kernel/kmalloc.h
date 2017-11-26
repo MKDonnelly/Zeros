@@ -23,4 +23,6 @@ struct heapNode{
 };
 
 void heap_init();
-void *exp_kmalloc(int);
+void *exp_kmalloc(int,int,unsigned int*);
+void exp_kfree(void*);
+void unify_heap();

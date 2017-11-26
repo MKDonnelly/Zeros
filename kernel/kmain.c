@@ -40,7 +40,7 @@ void kmain(){
   install_interrupts();
   
   init_keyboard();
-  //init_timer();
+  init_timer();
   move_cursorl( k_xy_to_linear( 0, 0 ) );
   k_clear_screen();
 
@@ -48,18 +48,23 @@ void kmain(){
   //the interrupts
   enable_ints();
 
-  //k_newline();
-  //k_newline();
-  //k_print("Enter some text: ");
+  k_newline();
+  k_newline();
+  k_print("Enter some text: ");
+
+  //Experimental kmalloc
+  heap_init();
+  
+  unsigned int result;
+  char *ptr = (char*)kmalloc( 20, 1, &result);
+
+  char b[20];
+  itoh( result, b );
+  k_print( b );
 
   //Paging
   //init_paging();
 
-  //Experimental kmalloc
-  heap_init();
-  char *mymem = (char*)exp_kmalloc( 20 );
-  strcpy( mymem, "hello");
-  //
 
   //ALWAYS have this, or else the program
   //will run off the end of the world.
