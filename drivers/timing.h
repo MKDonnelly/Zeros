@@ -53,9 +53,21 @@ struct sys_time{
    int milliseconds;
 } system_time;
 
+//Various pieces of information
+//about the timer.
+struct timer_info{
+   uint8_t enablePrint;
+   int x;
+   int y;
+} system_timer; //Default timer struct
+
 //Initilize the timer
 //Enable its IRQ and handler
-void init_timer();
+//Takes three parameters dictating
+//if the system clock should be printed,
+//and if so, the (x,y) coordinates of
+//where it should be printed
+void init_timer(uint8_t enable,int x, int y);
 
 //Handler function for the timer
 void set_timer_freq(int);

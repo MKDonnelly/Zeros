@@ -1,6 +1,13 @@
 #include "timing.h"
 
-void init_timer(){
+
+
+void init_timer(uint8_t enable, int x, int y){
+
+   //Set the received information in system_timer
+   system_timer.enablePrint = enable;
+   system_timer.x = x;
+   system_timer.y = y;
 
    //Set the timer to operate at 100HZ
    set_timer_freq( I8253_10MS_COUNTER );
@@ -36,8 +43,10 @@ void set_timer_freq(int freq){
 //This timer callback handles the system clock
 void timer_int_handler( struct registers r){
 
-   //This will be used if we should update
-   //time uptime on the screen
+   //This will be set if the seconds 
+   //have overflowed. We can then decide
+   //if we should print the system uptime
+   //to the screen.
    int8_t secondOverflow = 0;
 
    //This is hardcoded, so, for now, we will assume
@@ -47,28 +56,29 @@ void timer_int_handler( struct registers r){
 
    //Miliseconds overflowed
    if( system_time.milliseconds >= 1000 ){
-      system_time.seconds += 1;
       system_time.milliseconds -= 1000;
+      system_time.seconds += 1;
       secondOverflow = 1;
    }
    //Seconds overflowed
    if( system_time.seconds >= 60 ){
-      system_time.minutes++;
       system_time.seconds -= 60;
+      system_time.minutes++;
    }
    //Minutes overflowed
    if( system_time.minutes >= 60 ){
-      system_time.hours++;
       system_time.minutes -= 60;
+      system_time.hours++;
    }
 
+   //If hours overflowed
    if( system_time.hours >= 24 ){
       system_time.hours -= 24;
       system_time.days++;
    }
 
    //Update the clock if needed on the screen
-   if( secondOverflow ){
+   if( system_timer.enablePrint && secondOverflow ){
       char hours[9];
       char minutes[9];
       char seconds[9];
@@ -77,16 +87,16 @@ void timer_int_handler( struct registers r){
       itoa( system_time.minutes, minutes);
       itoa( system_time.seconds, seconds);
 
-      int clockx = 5;
-      int clocky = 1;
-      k_print_at( "System uptime: ", 0, 0);
-      k_print_at( hours, clockx+1, clocky);
-      k_print_at( ":", clockx+2, clocky);
-      k_print_at( minutes, clockx+4, clocky);
-      k_print_at( ":", clockx+5, clocky);
-      k_print_at( seconds, clockx+7, clocky);
+      int clockx = system_timer.x;
+      int clocky = system_timer.y;
+
+      k_print_at( "System uptime: ", clockx, clocky);
+      k_print_at( hours, clockx+1, clocky+1);
+      k_print_at( ":", clockx+2, clocky+1);
+      k_print_at( minutes, clockx+4, clocky+1);
+      k_print_at( ":", clockx+5, clocky+1);
+      k_print_at( seconds, clockx+7, clocky+1);
    }
-   
 }
 
 

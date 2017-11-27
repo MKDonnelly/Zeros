@@ -95,21 +95,16 @@ void write_regs(unsigned char *regs)
 
 void kmain(){
 
-  char *vidmem = (char*)0xA0000;
-  write_regs( g_320x200x256 );
+  init_gdt();
+  init_interrupts();
+  remap_pic();
+  init_timer(1, 0, 0);
+  enable_ints();
 
-  for( int i = 0; i < 320 * 200; i++){
-     vidmem[i] = 14;
-  }
-
-  for( int k = 0; k < 320 * 2; k++){
-     vidmem[k] = 5;
-  }
-
-
-  //struct point p1 = {0, 0};
-  //struct point p2 = {20,20};
-  //drawLine( p1, p2, LIGHT_GREEN );
+  k_delays( 5 );
+  k_newline();
+  k_newline();
+  k_print("Testing...");
 
   while(1);
 }
