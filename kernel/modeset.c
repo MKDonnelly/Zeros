@@ -1,30 +1,32 @@
 #include <modeset.h>
 
-//Much of this taken from 
+//Based on 
 //http://files.osdev.org/mirrors/geezer/osd/graphics/modes.c
+
+//                          VGA 3h mode
+unsigned char vga_3h_regs[] =
+{
+       // MISC 
+	0x67,
+       // SEQ 
+	0x03, 0x00, 0x03, 0x00, 0x02,
+       // CRTC 
+	0x5F, 0x4F, 0x50, 0x82, 0x55, 0x81, 0xBF, 0x1F,
+	0x00, 0x4F, 0x0D, 0x0E, 0x00, 0x00, 0x00, 0x50,
+	0x9C, 0x0E, 0x8F, 0x28, 0x1F, 0x96, 0xB9, 0xA3,
+	0xFF,
+       // GC 
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x0E, 0x00,
+	0xFF,
+       // AC 
+	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x14, 0x07,
+	0x38, 0x39, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F,
+	0x0C, 0x00, 0x0F, 0x08, 0x00
+};
+
 
 //                          VGA 13h mode
 //=========================================================
-
-/*
-#define   VGA13H_BLACK    0,
-#define   VGA13H_BLUE     1
-#define   VGA13H_GREEN    2
-#define   VGA13H_CYAN     3
-#define   VGA13H_RED      4
-#define   VGA13H_MAGENTA  5
-#define   VGA13H_BROWN    6
-#define   VGA13H_LGREY    7
-#define   VGA13H_DGREY    8
-#define   VGA13H_LBLUE    9
-#define   VGA13H_LGREEN   10
-#define   VGA13H_LCYAN    11
-#define   VGA13H_LRED     12
-#define   VGA13H_LMAGENTA 13
-#define   VGA13H_YELLOW   14
-#define   VGA13H_WHITE    15
-*/
-
 unsigned char vga_13h_regs[] =
 {
     // MISC 
@@ -46,7 +48,8 @@ unsigned char vga_13h_regs[] =
 };
 
 
-
+//Give this one of the arrays above and
+//it will set the given video mode.
 void write_regs(unsigned char *regs)
 {
   unsigned i;

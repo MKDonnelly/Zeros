@@ -24,6 +24,14 @@
 
 void kmain(){
 
+
+//VGA 3h mode
+  write_regs( vga_3h_regs );
+  k_print("Testing...");
+
+
+/*
+//VGA 13h mode
   char *vidmem = (char*)0xA0000;
   write_regs( vga_13h_regs );
 
@@ -36,6 +44,7 @@ void kmain(){
   for( int k = 0; k < 320 * 2; k++){
      vidmem[k] = 5;
   }
+*/
 
   while(1);
 }

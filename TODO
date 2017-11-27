@@ -4,6 +4,11 @@ Do more error checking in kmalloc.c
 get memory size from multiboot header 
 Add a getc function and add len to getline
 Add function to scroll.c to scroll both ways
+Abstract screen operations
+   i.e. have a generic k_print call
+   a mode-specific k_putchar, depending
+   on the current video mode
+Re-define characters in vga text mode
 Go through all of the code and clean up
    move files to more appropriate locations
    declare constants if possible
