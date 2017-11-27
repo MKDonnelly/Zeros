@@ -7,7 +7,6 @@
 #include <vga13h/vga13hmode.h>
 #include <keyboard.h>
 
-
 #include <string.h>
 #include <bcd.h>
 #include <types.h>
@@ -21,95 +20,22 @@
 #include <paging.h>
 #include <kmalloc.h>
 
-unsigned char g_320x200x256[] =
-{
-    // MISC 
-    0x63,
-    // SEQ 
-    0x03, 0x01, 0x0F, 0x00, 0x0E,
-    // CRTC 
-    0x5F, 0x4F, 0x50, 0x82, 0x54, 0x80, 0xBF, 0x1F,
-    0x00, 0x41, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x9C, 0x0E, 0x8F, 0x28,0x40, 0x96, 0xB9, 0xA3,
-    0xFF,
-    // GC 
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x40, 0x05, 0x0F,
-    0xFF,
-    // AC 
-    0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-    0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
-    0x41, 0x00, 0x0F, 0x00,0x00
-};
-
-void write_regs(unsigned char *regs)
-{
-  unsigned i;
-
-  /* write MISCELLANEOUS reg */
-  portb_write(0x3C2, *regs);
-  regs++;
-  /* write SEQUENCER regs */
-  for(i = 0; i < 5; i++)
-    {
-      portb_write(0x3C4, i);
-      portb_write(0x3C5, *regs);
-      regs++;
-    }
-  /* unlock CRTC registers */
-  portb_write(0x3C4, 0x03);
-  portb_write(0x3D5, portb_read(0x3D5) | 0x80);
-  portb_write(0x3D4, 0x11);
-  portb_write(0x3D5, portb_read(0x3D5) & ~0x80);
-
-  //regs[0x03] |= 0x80;
-  //regs[0x11] &= ~0x80;
-  /* write CRTC regs */
-  for(i = 0; i < 25; i++)
-    {
-      portb_write(0x3D4, i);
-      portb_write(0x3D5, *regs);
-      regs++;
-    }
-  /* write GRAPHICS CONTROLLER regs */
-  for(i = 0; i < 9; i++)
-    {
-      portb_write(0x3CE, i);
-      portb_write(0x3CF, *regs);
-      regs++;
-    }
-  /* write ATTRIBUTE CONTROLLER regs */
-  for(i = 0; i < 21; i++)
-    {
-      (void)portb_read(0x3DA);
-      portb_write(0x3C0, i);
-      portb_write(0x3C0, *regs);
-      regs++;
-    }
-  /* lock 16-color palette and unblank display */
-  (void)portb_read(0x3DA);
-  portb_write(0x3C0, 0x20);
-}
-
-#define video_start_mem 0xA0000
-#define video_end_mem   0xA0000 + 320 * 200
+#include <modeset.h>
 
 void kmain(){
 
   char *vidmem = (char*)0xA0000;
-  write_regs( g_320x200x256 );
+  write_regs( vga_13h_regs );
 
-  for( int i = 0; i < 320 * 200; i++){
-     vidmem[i] = 14;
+  for( int i = 0, j = 0; i < 320 * 200; i++, j++){
+     vidmem[i] = j;
+     if( j >= 255 )
+        j = 0;
   }
 
   for( int k = 0; k < 320 * 2; k++){
      vidmem[k] = 5;
   }
-
-
-  //struct point p1 = {0, 0};
-  //struct point p2 = {20,20};
-  //drawLine( p1, p2, LIGHT_GREEN );
 
   while(1);
 }
@@ -278,67 +204,79 @@ void kmain(){
   char val = *ptr;
 */
 
-
-
-/*        TODO Switch to 13h mode from protected mode
-unsigned char mode13h[] = {
-   //General registers
-   0x63, 0x0, 0x70, 0x4,
-   //Sequencer
-   0x3, 0x1, 0xF, 0x0, 0xE,
-   //CRTC
-   0x5F, 0x4F, 0x50, 0x82, 0x54, 0x80, 0xBF, 0x1F, 0x0, 0x41,
-   0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x9c, 0x8e, 0x8f, 0x28,
-   0x40, 0x96, 0xB9, 0xA3, 0xFF,
-   //Graphics
-   0x0, 0x0, 0x0, 0x0, 0x0, 0x40, 0x5, 0xF, 0xFF,
-   //attribute
-   0,1,2,3,4,5,6,7,8,9,0xA,0xB,0xC,0xD,0xE,0xF,0x11,0x12,0x13,0x14,0x15
+/*
+unsigned char g_320x200x256[] =
+{
+    // MISC 
+    0x63,
+    // SEQ 
+    0x03, 0x01, 0x0F, 0x00, 0x0E,
+    // CRTC 
+    0x5F, 0x4F, 0x50, 0x82, 0x54, 0x80, 0xBF, 0x1F,
+    0x00, 0x41, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x9C, 0x0E, 0x8F, 0x28,0x40, 0x96, 0xB9, 0xA3,
+    0xFF,
+    // GC 
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x40, 0x05, 0x0F,
+    0xFF,
+    // AC 
+    0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+    0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
+    0x41, 0x00, 0x0F, 0x00,0x00
 };
 
-void init13h(){
 
-   //Write the general registers
-   portb_write( 0x3C2, mode13h[0]);
-   portb_write( 0x3BA, mode13h[1]);
-   //portb_write( 0x3C2, mode13h[2]);
-   //portb_write( 0x3BA, mode13h[3]); 
+void write_regs(unsigned char *regs)
+{
+  unsigned i;
 
-   //Write to the sequencer
-   portb_write( 0x3C4, 0 );
-   portb_write( 0x3C5, mode13h[4]);
+  // write MISCELLANEOUS reg 
+  portb_write(0x3C2, *regs);
+  regs++;
+  // write SEQUENCER regs
+  for(i = 0; i < 5; i++)
+    {
+      portb_write(0x3C4, i);
+      portb_write(0x3C5, *regs);
+      regs++;
+    }
+  // unlock CRTC registers
+  portb_write(0x3C4, 0x03);
+  portb_write(0x3D5, portb_read(0x3D5) | 0x80);
+  portb_write(0x3D4, 0x11);
+  portb_write(0x3D5, portb_read(0x3D5) & ~0x80);
 
-   portb_write( 0x3C4, 1);
-   portb_write( 0x3C5, mode13h[5]);
-
-   portb_write( 0x3C4, 2);
-   portb_write( 0x3C5, mode13h[6]);
-
-   portb_write( 0x3C4, 3);
-   portb_write( 0x3C5, mode13h[7]);
-   
-   portb_write( 0x3C4, 4);
-   portb_write( 0x3C5, mode13h[8]);
-
-   //Write to the CRTC
-   for(int i = 0; i < 25; i++){
-      portb_write( 0x3D4, i);
-      portb_write( 0x3D5, mode13h[i+9]);
-   }
-   
-   //Write to the graphics registers
-   for(int i = 0; i < 9; i++){
-      portb_write( 0x3CE, i);
-      portb_write( 0x3CF, mode13h[i+34]);
-   }
-
-   //Write to the attribute registers
-   for(int i = 0; i < 21; i++){
-      portb_write( 0x3C0, i);
-      portb_write( 0x3C0, mode13h[i+43]);
-   }
+  //regs[0x03] |= 0x80;
+  //regs[0x11] &= ~0x80;
+  // write CRTC regs
+  for(i = 0; i < 25; i++)
+    {
+      portb_write(0x3D4, i);
+      portb_write(0x3D5, *regs);
+      regs++;
+    }
+  // write GRAPHICS CONTROLLER regs 
+  for(i = 0; i < 9; i++)
+    {
+      portb_write(0x3CE, i);
+      portb_write(0x3CF, *regs);
+      regs++;
+    }
+  // write ATTRIBUTE CONTROLLER regs 
+  for(i = 0; i < 21; i++)
+    {
+      (void)portb_read(0x3DA);
+      portb_write(0x3C0, i);
+      portb_write(0x3C0, *regs);
+      regs++;
+    }
+  // lock 16-color palette and unblank display 
+  (void)portb_read(0x3DA);
+  portb_write(0x3C0, 0x20);
 }
-*/
 
+#define video_start_mem 0xA0000
+#define video_end_mem   0xA0000 + 320 * 200
+*/
 
 
