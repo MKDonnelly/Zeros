@@ -5,7 +5,7 @@
 //whole interrupt system. It creates
 //and populates interrupt service 
 //routines in the IDT and loads the IDT.
-void install_interrupts(){
+void init_interrupts(){
 
    //Zero out every interrupt in the
    //interrupt enabled array, just to

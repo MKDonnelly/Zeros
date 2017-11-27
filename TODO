@@ -1,22 +1,4 @@
-Heap allocater 
-   Model the heap as a linked list.
-   Initially, it will have one node
-   full of free space. As allocations come
-   in, it is split up and marked as allocated.
-   Upon freeing, the chunk of memory looks to
-   the last and next item to see if it can merge
-   with any other free space.
-   struct heapNode{
-      udword nextAddr;
-      uword size;
-      ubyte attributes; 
-   };
-   Attributes can contain information such as 
-   if the block is being used, 
-Make a unit test for each major subsystem
 Add a how-to to explain how each subsystem works
-Add in "-I" flags to easily include header files
-Convert general input functions to use void*
 Revise paging.c to use all offsets or all addresses
 Do more error checking in kmalloc.c
 get memory size from multiboot header 
@@ -43,7 +25,7 @@ Impelement call gate
        jmp <GDT offset>:0x0
 Use timer channel 2 to play sound on pc speaker
 Provide masks for i/o w/ ports
-mplement APIC
+Implement APIC
 Implement HPET
 Implement multitasking
 Implement user mode

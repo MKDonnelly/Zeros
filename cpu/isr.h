@@ -43,7 +43,7 @@ uint8_t int_present[ TOTAL_INTERRUPTS / 8 ];
 
 //This function handles the installation
 //of each interrupt handler
-void install_interrupts();
+void init_interrupts();
 
 //This function registers the interrupt so that
 //main_interrupt_handler may use it
