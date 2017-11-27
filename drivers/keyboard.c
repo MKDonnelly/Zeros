@@ -21,7 +21,7 @@ void init_keyboard(){
 
 //Manages adding and maintaining the keyboard
 //buffer as new keys come in
-void add_keyboard_buffer(char key){
+void add_keyboard_buffer(int8_t key){
 
    //The array has space, append the key.
    if( KEYBOARD_BUFFER_CHARS < KEYBOARD_BUFFER_SIZE ){
@@ -44,7 +44,7 @@ void add_keyboard_buffer(char key){
 
 //Grabs a line out of the keyboard buffer and removes
 //it from the buffer.
-void getline(char *buffer){
+void getline(int8_t *buffer){
    int bufferIndex = 0;
    while( bufferIndex < KEYBOARD_BUFFER_CHARS && 
 	  KEYBOARD_BUFFER[bufferIndex] != '\n' &&
@@ -77,7 +77,7 @@ void getline(char *buffer){
 // Page Down = Enquiry
 // CTRL = Acknowledge
 // Alt = Shift Out
-char keycode_to_char[256] = {
+int8_t keycode_to_char[256] = {
    //Keys 0-9
    '\0', '\0', '1', '2', '3', '4', '5', '6', '7', '8',
    //Keys 10-19
@@ -100,7 +100,7 @@ char keycode_to_char[256] = {
    6, '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', 
 };
 
-char shift_keycode_to_char[256] = {
+int8_t shift_keycode_to_char[256] = {
    //Keys 0-9
    '\0', '\0', '!', '@', '#', '$', '%', '^', '&', '*',
    //Keys 10-19
@@ -129,10 +129,10 @@ char shift_keycode_to_char[256] = {
 //This is Interrupt #33
 void keyboard_handler(){
 
-   static ubyte shift_activated = 0;
+   static uint8_t shift_activated = 0;
 
-   sbyte key;
-   ubyte kb_status = portb_read( KEYBOARD_STATUS_P );
+   int8_t key;
+   uint8_t kb_status = portb_read( KEYBOARD_STATUS_P );
 
    //Write the key to the screen and place it in
    //the buffer
@@ -165,7 +165,7 @@ void keyboard_handler(){
 
 
 //Sets the LEDs on the keyboard
-void kb_set_leds(ubyte numLock, ubyte capLock, ubyte scroll){
+void kb_set_leds(uint8_t numLock, uint8_t capLock, uint8_t scroll){
 
 }
 

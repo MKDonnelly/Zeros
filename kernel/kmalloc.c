@@ -1,9 +1,9 @@
 #include "kmalloc.h"
 
 //Heap will start at 3MB mark...
-unsigned int kernel_start_heap = 0x300000;
+uint32_t kernel_start_heap = 0x300000;
 //...and end at 5MB mark
-unsigned int kernel_end_heap = 0x500000;
+uint32_t kernel_end_heap = 0x500000;
 
 //Initilize the first heapNode in the heap.
 void heap_init(){
@@ -22,7 +22,7 @@ void heap_init(){
 //      on 4K boundaries, this function will often 
 //      just add 4K as an overestimate instead of going through
 //      the calculation to get it perfect.
-void *kmalloc(int size, int align, unsigned int *phys){
+void *kmalloc(uint32_t size, uint8_t align, uint32_t *phys){
 
    struct heapNode* head = (struct heapNode*)kernel_start_heap;
    int retAddr = 0; //The address of free memory to allocate.

@@ -32,5 +32,5 @@
 void remap_pic();
 
 //Enable/disable an IRQ by number
-void enable_irq(int);
-void disable_irq(int);
+void enable_irq(uint8_t);
+void disable_irq(uint8_t);

@@ -18,7 +18,7 @@ void initCMOS(){
    portb_write( CMOS_IO_P, statusB | 0x4 );
 }
 
-unsigned short getCMOSReg(unsigned short reg){
+uint16_t getCMOSReg(uint16_t reg){
    //Read a value from the cmos. See the header file
    //for definitions of registers.
   
@@ -29,7 +29,7 @@ unsigned short getCMOSReg(unsigned short reg){
    return portb_read(CMOS_IO_P); 
 }
 
-int cmos_update(){
+int8_t cmos_update(){
    portb_write( CMOS_COMMAND_P, 0x0A);
    return portb_read( CMOS_IO_P & 0x80 );
 }

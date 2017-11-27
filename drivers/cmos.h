@@ -24,12 +24,12 @@ void initCMOS();
 
 //Get the designated cmos register 
 //(see the #define's above)
-unsigned short getCMOSReg(unsigned short);
+uint16_t getCMOSReg(uint16_t);
 
 //We need to check to make sure a CMOS
 //time update is not running when we get
 //a value
-int cmos_update();
+int8_t cmos_update();
 
 //Enable the RTC to generate a periodic
 //interrupt on IRQ 8. This can be used

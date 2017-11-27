@@ -38,7 +38,7 @@ void init_gdt(){
    //Initilize the GDT descriptor
    //Always subtract one.
    GDT_DES.length = sizeof( struct gdt_entry ) * GDT_ENTRIES - 1;
-   GDT_DES.address = (udword *)GDT;
+   GDT_DES.address = (uint32_t*)GDT;
 
    //Load the GDT
    asm volatile("lgdtl (%0)" : : "r" (&GDT_DES));

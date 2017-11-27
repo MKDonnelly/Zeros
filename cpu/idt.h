@@ -16,22 +16,22 @@
 //information about the specific interrupt.
 
 typedef struct{
-   u16 lower_offset;     //Lower 16 bits of memory offset for handler
-   u16 segment_sel;      //The kernel segment selector
-   u8 zeroed;
+   uint16_t lower_offset;     //Lower 16 bits of memory offset for handler
+   uint16_t segment_sel;      //The kernel segment selector
+   uint8_t  zeroed;
    /*Flags byte
     *Bit 7: Is interrupt present?
     *Bits 6-5: Privilege level of caller (0=ring 0, 3=ring 3)
     *Bit 4: Set to 0 for interrupt gate
     *Bits 3-0: 1110 = 14 = 32 bit interrupt gate
     * */   
-   u8 flags;
-   u16 higher_offset;    //higher 16 bits for offset of handler
+   uint8_t flags;
+   uint16_t higher_offset;    //higher 16 bits for offset of handler
 }__attribute__((packed)) idt_entry;
 
 typedef struct{
-   u16 length;
-   u32 base_addr;
+   uint16_t length;
+   uint32_t base_addr;
 }__attribute__((packed)) idt_descriptor;
 
 //The Interrupt descriptor table and 
@@ -42,7 +42,7 @@ idt_descriptor IDT_DESCRIPTOR;
 //Given an interrupt number and a 
 //function handler, place it into
 //the IDT.
-void add_idt_entry(u8, u32);
+void add_idt_entry(uint8_t, uint32_t);
 
 //This does the job of actually
 //loading the IDT to the system.

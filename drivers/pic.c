@@ -29,14 +29,14 @@ void remap_pic(){
   portb_write( SLAVE_PIC_DATA, 0xff );
 }
 
-void enable_irq(int num){
-   ubyte curPICMask = portb_read( MASTER_PIC_DATA );
-   ubyte mask = ~(0x1 << num);
+void enable_irq(uint8_t num){
+   int8_t curPICMask = portb_read( MASTER_PIC_DATA );
+   int8_t mask = ~(0x1 << num);
    portb_write( MASTER_PIC_DATA, curPICMask & mask );
 }
 
-void disable_irq(int num){
-   ubyte curPICMask = portb_read( MASTER_PIC_DATA );
-   ubyte mask = 0x1 << num;
+void disable_irq(uint8_t num){
+   int8_t curPICMask = portb_read( MASTER_PIC_DATA );
+   int8_t mask = 0x1 << num;
    portb_write( MASTER_PIC_DATA, curPICMask | mask);
 }

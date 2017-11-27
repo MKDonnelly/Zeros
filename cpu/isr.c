@@ -24,13 +24,13 @@ void install_interrupts(){
 
 
 //Places the handler function into the interrupt handler array 
-void register_interrupt( int int_number, void (*handler)(struct registers) ){
+void register_interrupt( uint8_t int_number, void (*handler)(struct registers) ){
   //Mark the interrupt as present
   bitSet( &int_present, int_number );
   int_handlers[int_number] = handler;
 }
 
-void unregister_interrupt( int int_number ){
+void unregister_interrupt( uint8_t int_number ){
    //Mark the interrupt as not present
    //and null out the function pointer
    bitClear( &int_present, int_number);

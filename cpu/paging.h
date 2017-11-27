@@ -23,13 +23,13 @@
 //which maps virtual addresses to physical
 //addresses.
 typedef struct page{
-   unsigned int present  : 1; //Present in memory
-   unsigned int rw       : 1; //Read-write if set
-   unsigned int user     : 1; //Ring 0 if clear
-   unsigned int accessed : 1; //Has page been accessed?
-   unsigned int dirty    : 1; //Has the page been written to?
-   unsigned int unused   : 7; //Unused and reserved bits
-   unsigned int frame    : 20; //Frame address w/ 12 bit shift
+   uint32_t present  : 1; //Present in memory
+   uint32_t rw       : 1; //Read-write if set
+   uint32_t user     : 1; //Ring 0 if clear
+   uint32_t accessed : 1; //Has page been accessed?
+   uint32_t dirty    : 1; //Has the page been written to?
+   uint32_t unused   : 7; //Unused and reserved bits
+   uint32_t frame    : 20; //Frame address w/ 12 bit shift
    //!!IMPORTANT!! That 12 bit shift means that the frame
    //              is now an INDEX
    //This is the physical address of memory mapped to this page.
@@ -49,10 +49,10 @@ typedef struct page_directory{
 
    //Physical address of the page tables
    //above.
-   unsigned int tablesPhysical[1024];
+   uint32_t tablesPhysical[1024];
 
    //The physical address of tablesPhysical
-   unsigned int physicalAddr;
+   uint32_t physicalAddr;
 } page_directory;
 
 //This will be visible to the kernel so
@@ -61,22 +61,22 @@ extern page_directory *kernel_page_dir;
 
 //A bitset to determine which frames
 //have been allocated.
-extern char* frames;
+extern int8_t* frames;
 
 //Map a virtual to physical address using paging.
 //Contrast this to <next function> which maps the
 //given virtual address to the next free physcial
 //address. This allows greater control.
-int page_map(page_entry*,ubyte,ubyte,int);
+uint8_t page_map(page_entry*,uint8_t,uint8_t,uint32_t);
 
 //Allocate a frame automatically to the page_entry
-int page_map_auto(page_entry*,ubyte,ubyte);
+uint8_t page_map_auto(page_entry*,uint8_t,uint8_t);
 
 //Un-associates a frame from a page_entry
 void free_frame(page_entry*);
 
 //Get a page from the page table
-page_entry *get_page(unsigned int, int, page_directory*);
+page_entry *get_page(uint32_t, uint8_t, page_directory*);
 
 //Initilized the paging structure
 void init_paging();
@@ -84,9 +84,6 @@ void init_paging();
 //Creates the page directory and
 //loads it into CR3.
 void load_page_dir(page_directory*);
-
-//Gets the specified page
-page_entry *get_page(unsigned int, int, page_directory*);
 
 //Handles page interrupts
 void page_int_handler(struct registers);

@@ -9,5 +9,5 @@
 
 void bitSet(void*,int);
 void bitClear(void*,int);
-char bitGet(void*,int);
+uint8_t bitGet(void*,int);
 

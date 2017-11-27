@@ -3,7 +3,7 @@
 
 //Every 4 binary digits of the bcd number
 //equal the corresponding digit in decimal.
-int bcdtobin( s8 bcdNumber ){
+int8_t bcdtobin( int8_t bcdNumber ){
    char lowerBits = bcdNumber & 0x0F;
    char upperBits = bcdNumber >> 4;
 

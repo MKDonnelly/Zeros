@@ -6,8 +6,7 @@
 
 #define HEAPNODE_SIZE sizeof( struct heapNode )
 
-extern unsigned int kernel_start_heap, kernel_end_heap;
-void *kmalloc(int,int,unsigned int*);
+extern uint32_t kernel_start_heap, kernel_end_heap;
 
 //Experimental heap allocator
 struct heapNode{
@@ -16,16 +15,16 @@ struct heapNode{
    struct heapNode *nextChunk;
    //The size of the chunk of memory,
    //not including this header.
-   udword size;
+   uint32_t size;
    //Various attributes such as if the
    //memory is free or allocated.
    //ubyte attributes;
-   ubyte isAllocated : 1; //Is this being used?
-   ubyte not_used : 7; //For future information
+   int8_t isAllocated : 1; //Is this being used?
+   int8_t not_used : 7; //For future information
 }__attribute__((packed));
 
 
 void heap_init();
-void *kmalloc(int,int,unsigned int*);
+void *kmalloc(uint32_t,uint8_t,uint32_t*);
 void kfree(void*);
 void unify_heap();

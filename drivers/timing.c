@@ -20,14 +20,14 @@ void init_timer(){
 }
 
 void set_timer_freq(int freq){
-   udword opFreq = freq;
+   uint32_t opFreq = freq;
 
    //Tell the timer we are going to initilize it
    portb_write( I8253_CTRL_P, I8253_LOAD_C );
 
    //Write the frequency to the timer
-   ubyte lowerByte = (ubyte)(opFreq & 0xFF );
-   ubyte higherByte = (ubyte)( (opFreq >> 8) & 0xFF );
+   int8_t lowerByte = (uint8_t)(opFreq & 0xFF );
+   int8_t higherByte = (uint8_t)( (opFreq >> 8) & 0xFF );
    portb_write( I8253_CH0_P, lowerByte );
    portb_write( I8253_CH0_P, higherByte );
 }
@@ -38,7 +38,7 @@ void timer_int_handler( struct registers r){
 
    //This will be used if we should update
    //time uptime on the screen
-   ubyte secondOverflow = 0;
+   int8_t secondOverflow = 0;
 
    //This is hardcoded, so, for now, we will assume
    //that we have set the clock to use .01 second

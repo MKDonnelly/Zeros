@@ -26,11 +26,11 @@ extern void init_idt();
 //eflags, then returnCS, then returnEIP, then error, then
 //int_number ...
 struct registers{
-   udword dataSegment;
-   udword edi, esi, ebp, esp, ebx, edx, ecx, eax;
-   ubyte int_number, error;
+   uint32_t dataSegment;
+   uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax;
+   uint8_t int_number, error;
    //automatically pushed by cpu
-   udword returnEIP, returnCS, eflags;
+   uint32_t returnEIP, returnCS, eflags;
 }__attribute__((packed));
 
 //This is where each handler is held when registered
@@ -39,7 +39,7 @@ void (*int_handlers[TOTAL_INTERRUPTS])(struct registers);
 //This is a boolean array to signify that the interrupt
 //handler of the given number is present. We will use
 //32 bytes since there are 256 interrupts (32 * 8)
-char int_present[ TOTAL_INTERRUPTS / 8 ];
+uint8_t int_present[ TOTAL_INTERRUPTS / 8 ];
 
 //This function handles the installation
 //of each interrupt handler
@@ -47,8 +47,8 @@ void install_interrupts();
 
 //This function registers the interrupt so that
 //main_interrupt_handler may use it
-void register_interrupt( int number, void (*handler)(struct registers));
-void unregister_interrupt( int );
+void register_interrupt( uint8_t number, void (*handler)(struct registers));
+void unregister_interrupt( uint8_t );
 
 //All interrupts must pass through this to
 //be routed to the correct destination.

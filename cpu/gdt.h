@@ -20,17 +20,17 @@ extern void srupdate();
 // 2nd flags: (granularity 4K (1) or 1 byte (0))1 (32-bit)1 
 //            (64-bit)0 (AVL)0 -> 0b1100 
 struct gdt_entry{
-   uword limit;        //Limit bits 015
-   uword baseLower;    //Base bits 0-15
-   ubyte baseMiddle;    //Base bits 16-23
-   ubyte flags;         //1st flags and type flags
-   ubyte flagsAndLimit; //2nd flags, limit bits 16-19
-   ubyte baseUpper;     //Base bits 24-31
+   int16_t limit;        //Limit bits 015
+   int16_t baseLower;    //Base bits 0-15
+   int8_t  baseMiddle;    //Base bits 16-23
+   int8_t  flags;         //1st flags and type flags
+   int8_t  flagsAndLimit; //2nd flags, limit bits 16-19
+   int8_t  baseUpper;     //Base bits 24-31
 } __attribute__((packed));
 
 struct gdt_descriptor{
-   uword length;
-   udword *address;
+   uint16_t length;
+   uint32_t *address;
 } __attribute__((packed));
 
 extern struct gdt_entry GDT[GDT_ENTRIES];

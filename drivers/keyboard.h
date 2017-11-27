@@ -40,7 +40,7 @@
 #define SHIFT_LEFT_KEY  42 
 #define INSERT_KEY      1
 
-extern unsigned char keyboard_map[];
+extern char keyboard_map[];
 
 //Characters are appended to the end of the array
 //When the array is full, characters are shifted
@@ -54,9 +54,8 @@ void init_keyboard();
 void keyboard_handler();
 
 //Manages KEYBOARD_BUFFER
-void add_keyboard_buffer(char);
-void getline(char*);
-
+void add_keyboard_buffer(int8_t);
+void getline(int8_t*);
 
 // '\0' = Not implemented
 // Ascii DC1 = Arrow up
@@ -70,5 +69,5 @@ void getline(char*);
 // Page Down = Enquiry
 // CTRL = Acknowledge
 // Alt = Shift Out
-extern char keycode_to_char[256];
-extern char shift_keycode_to_char[256];
+extern int8_t keycode_to_char[256];
+extern int8_t shift_keycode_to_char[256];

@@ -3,4 +3,4 @@
 
 #include <types.h>
 
-int bcdtobin( sbyte bcdNumber );
+int8_t bcdtobin( int8_t bcdNumber );

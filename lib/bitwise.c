@@ -11,8 +11,8 @@ void bitSet( void *mem, int bitNum ){
    //need to find the index and offset
    //of the bit in memory (with regard
    //to a char type).
-   int index = bitNum / CHAR_SIZE;
-   int offset = bitNum % CHAR_SIZE;
+   int index = bitNum / 8;
+   int offset = bitNum % 8;
 
    //In this ugly expression, we are casting
    //the void* of the first parameter into
@@ -28,8 +28,8 @@ void bitClear( void *mem, int bitNum ){
    //need to find the index and offset
    //of the bit in memory (with regard
    //to a char type).
-   int index = bitNum / CHAR_SIZE;
-   int offset = bitNum % CHAR_SIZE;
+   int index = bitNum / 8;
+   int offset = bitNum % 8;
 
    //In this ugly expression, we are casting
    //the void* of the first parameter into
@@ -43,13 +43,13 @@ void bitClear( void *mem, int bitNum ){
 //We will return a char as it is the smallest
 //natural data type. We really only get a
 //1 or 0.
-char bitGet( void *mem, int bitNum ){
+uint8_t bitGet( void *mem, int bitNum ){
    //Due to how dereferencing works, we
    //need to find the index and offset
    //of the bit in memory (with regard
    //to a char type).
-   int index = bitNum / CHAR_SIZE;
-   int offset = bitNum % CHAR_SIZE;
+   int index = bitNum / 8;
+   int offset = bitNum % 8;
 
    //In this ugly expression, we are casting
    //the void* of the first parameter into
