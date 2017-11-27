@@ -1,8 +1,8 @@
 
 #pragma once
 
-#include "../lib/types.h"
-#include "portio.h"
+#include <types.h>
+#include <portio.h>
 
 //Sending this bit to port 0x70 disables
 //non-maskable interrupts

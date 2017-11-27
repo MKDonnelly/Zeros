@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../drivers/portio.h"
+#include <portio.h>
 
 #define NEWLINE 10
 #define ROWS 25

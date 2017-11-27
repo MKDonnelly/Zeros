@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../cpu/isr.h"
-#include "../lib/types.h"
+#include <isr.h>
+#include <types.h>
 
 #define KEYBOARD_BUFFER_SIZE 128
 #define KEYBOARD_IRQ 1

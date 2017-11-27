@@ -1,12 +1,12 @@
 #pragma once
 
-#include "../drivers/vgatext/vgatext.h"
-#include "../cpu/isr.h"
-#include "../kernel/kmalloc.h"
-#include "../lib/memory.h"
-#include "../lib/bitwise.h"
-#include "../lib/types.h"
-#include "../lib/string.h"
+#include <vgatext/vgatext.h>
+#include <isr.h>
+#include <kmalloc.h>
+#include <memory.h>
+#include <bitwise.h>
+#include <types.h>
+#include <string.h>
 
 #define PAGE_SIZE  0x1000
 #define FRAME_SIZE 0x1000

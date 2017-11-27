@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../lib/types.h"
+#include <types.h>
 
 #define GDT_ENTRIES 3
 //Our specific GDT (initilized in init_gdt()

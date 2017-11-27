@@ -1,20 +1,3 @@
-Make a unit test for each major subsystem
-Work on VGA 13h mode driver
-  implement a frame buffer
-Implement 13h modeset driver
-Scroll screen when text input reaches the end
-   allow arrow keys to scroll through buffer
-Add cpuid functions
-Learn qemu to better debug the kernel
-Write a simple shell
-Impelement call gate
-   Add GDT descriptor w/ CPL = 3 and type of
-   trap gate to a function as the base and limit
-   call using 
-       jmp <GDT offset>:0x0
-Use timer channel 2 to play sound on pc speaker
-get memory size from multiboot header 
-Provide masks for i/o w/ ports
 Heap allocater 
    Model the heap as a linked list.
    Initially, it will have one node
@@ -30,11 +13,37 @@ Heap allocater
    };
    Attributes can contain information such as 
    if the block is being used, 
+Make a unit test for each major subsystem
 Add a how-to to explain how each subsystem works
 Add in "-I" flags to easily include header files
 Convert general input functions to use void*
 Revise paging.c to use all offsets or all addresses
-Implement APIC
+Do more error checking in kmalloc.c
+get memory size from multiboot header 
+Add a getc function and add len to getline
+Add function to scroll.c to scroll both ways
+Go through all of the code and clean up
+   move files to more appropriate locations
+   declare constants if possible
+
+=================================================I
+
+Work on VGA 13h mode driver
+  implement a frame buffer
+Implement 13h modeset driver
+Scroll screen when text input reaches the end
+   allow arrow keys to scroll through buffer
+Add cpuid functions
+Learn qemu to better debug the kernel
+Write a simple shell
+Impelement call gate
+   Add GDT descriptor w/ CPL = 3 and type of
+   trap gate to a function as the base and limit
+   call using 
+       jmp <GDT offset>:0x0
+Use timer channel 2 to play sound on pc speaker
+Provide masks for i/o w/ ports
+mplement APIC
 Implement HPET
 Implement multitasking
 Implement user mode

@@ -1,14 +1,14 @@
 #pragma once
 
-#include "idt.h"
-#include "cpu.h"
-#include "../drivers/vgatext/vgatext.h"
-#include "../drivers/portio.h"
-#include "../drivers/pic.h"
+#include <idt.h>
+#include <cpu.h>
+#include <vgatext/vgatext.h>
+#include <portio.h>
+#include <pic.h>
 
-#include "../lib/string.h"
-#include "../lib/types.h"
-#include "../lib/bitwise.h"
+#include <string.h>
+#include <types.h>
+#include <bitwise.h>
 
 extern void init_idt();
 

@@ -1,8 +1,10 @@
 #pragma once
 
-#include "../lib/types.h"
-#include "../lib/string.h"
-#include "../drivers/vgatext/vgatext.h"
+#include <types.h>
+#include <string.h>
+#include <vgatext/vgatext.h>
+
+#define HEAPNODE_SIZE sizeof( struct heapNode )
 
 extern unsigned int kernel_start_heap, kernel_end_heap;
 void *kmalloc(int,int,unsigned int*);
@@ -21,6 +23,7 @@ struct heapNode{
    ubyte isAllocated : 1; //Is this being used?
    ubyte not_used : 7; //For future information
 }__attribute__((packed));
+
 
 void heap_init();
 void *kmalloc(int,int,unsigned int*);

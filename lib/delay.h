@@ -1,9 +1,9 @@
 
 #pragma once
 
-#include "../drivers/timing.h"
-#include "../drivers/vgatext/vgatext.h"
-#include "../cpu/cpu.h"
+#include <timing.h>
+#include <vgatext/vgatext.h>
+#include <cpu.h>
 
 //Use the system clock to implement a delay
 void delay(int);

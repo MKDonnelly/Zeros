@@ -3,28 +3,28 @@ asm("jmp kmain"); //The bootsector immedietelly jumps to the
 		  //undesirable if there is a function above kmain.
 		  //add this so that kmain is always called.
 
-#include "../drivers/portio.h"
-#include "../drivers/timing.h"
-#include "../drivers/serial/serial.h"
-#include "../drivers/cmos.h"
-#include "../drivers/pic.h"
-#include "../drivers/vgatext/vgatext.h"
-#include "../drivers/vga13h/vga13hmode.h"
-#include "../drivers/keyboard.h"
+#include <portio.h>
+#include <timing.h>
+#include <serial/serial.h>
+#include <cmos.h>
+#include <pic.h>
+#include <vgatext/vgatext.h>
+#include <vga13h/vga13hmode.h>
+#include <keyboard.h>
 
-#include "../lib/string.h"
-#include "../lib/bcd.h"
-#include "../lib/types.h"
-#include "../lib/bitwise.h"
-#include "../lib/delay.h"
 
-#include "../cpu/cpu.h"
-#include "../cpu/isr.h"
-#include "../cpu/idt.h"
-#include "../cpu/gdt.h"
+#include <string.h>
+#include <bcd.h>
+#include <types.h>
+#include <bitwise.h>
+#include <delay.h>
 
-#include "kmalloc.h"
-#include "../cpu/paging.h"
+#include <cpu.h>
+#include <isr.h>
+#include <idt.h>
+#include <gdt.h>
+#include <paging.h>
+#include <kmalloc.h>
 
 
 //TODO add in struct multiboot* to 

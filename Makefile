@@ -1,8 +1,10 @@
 CPROGS = $(wildcard kernel/*.c drivers/*.c drivers/vgatext/*.c drivers/serial/*.c lib/*.c cpu/*.c drivers/vga13h/*.c)
 CHEADERS = $(wildcard kernel/*.h drivers/*.h)
 OBJECTS = ${CPROGS:.c=.o}
+#CFLAGS = -fno-pie -m32 -ffreestanding -fno-stack-protector -nostdlib -nostdinc -fno-builtin -Wall -g 
+CFLAGS = -fno-pie -m32 -ffreestanding -fno-stack-protector -nostdlib -nostdinc -fno-builtin -Wall -g -Icpu/ -Idrivers/ -Ikernel/ -Ilib/
 
-CFLAGS = -fno-pie -m32 -ffreestanding -fno-stack-protector -nostdlib -nostdinc -fno-builtin  -Wall -g
+
 
 default: kernel/kmain.elf
 

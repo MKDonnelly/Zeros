@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "../../drivers/portio.h"
+#include <portio.h>
 
 #define COM1_IOPORT 0x3F8
 #define COM2_IOPORT 0x2F8
