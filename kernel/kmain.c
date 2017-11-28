@@ -3,8 +3,8 @@
 #include <serial/serial.h>
 #include <cmos.h>
 #include <pic.h>
-#include <vgatext/vgatext.h>
-#include <vga13h/vga13hmode.h>
+#include <vga3h/vga3h.h>
+#include <vga13h/vga13h.h>
 #include <keyboard.h>
 
 #include <string.h>
@@ -21,13 +21,28 @@
 #include <kmalloc.h>
 
 #include <modeset.h>
+#include <vgacommon.h>
 
 void kmain(){
 
+  init_vga(0);
+
+  init_gdt();
+  remap_pic();
+  init_interrupts();
+  init_timer(1, 0, 0);
+  init_keyboard();
+  enable_ints();
+
+  k_clear_screen();
+  k_newline();
+  k_newline();
+  k_printf("Enter some text: ");
+
 
 //VGA 3h mode
-  write_regs( vga_3h_regs );
-  k_print("Testing...");
+//  write_regs( vga_3h_regs );
+//  k_print("Testing...");
 
 
 /*

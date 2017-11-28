@@ -1,6 +1,6 @@
-#include "vgatext.h"
+#include "vga3h.h"
 
-void scroll(){
+void vga3h_scroll(){
    unsigned int max = ROWS * COLS * 2;
 
    //Since each character is 80 spaces (160 slots)
@@ -13,8 +13,8 @@ void scroll(){
 }
 
 //Just call scroll n times
-void scroll_by(int n){
+void vga3h_scroll_by(int n){
    for(int i = 0; i < n; i++)
-      scroll();
+      vga3h_scroll();
 }
 

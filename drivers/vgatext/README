@@ -1,6 +1,0 @@
-
-This directory contains functions relevant to
-manipulating the screen in the standard VGA
-text mode. These programs will ONLY work for
-text mode.
-

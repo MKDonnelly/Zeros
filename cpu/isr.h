@@ -2,7 +2,7 @@
 
 #include <idt.h>
 #include <cpu.h>
-#include <vgatext/vgatext.h>
+#include <vgacommon/vgacommon.h>
 #include <portio.h>
 #include <pic.h>
 

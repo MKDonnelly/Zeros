@@ -2,7 +2,6 @@
 
 #include <types.h>
 #include <string.h>
-#include <vgatext/vgatext.h>
 
 #define HEAPNODE_SIZE sizeof( struct heapNode )
 

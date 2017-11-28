@@ -2,6 +2,7 @@
 
 #include <isr.h>
 #include <types.h>
+#include <vgacommon/vgacommon.h>
 
 #define KEYBOARD_BUFFER_SIZE 128
 #define KEYBOARD_IRQ 1

@@ -44,10 +44,10 @@ void main_interrupt_handler(struct registers r){
       //If there is, call the function handler
       int_handlers[ r.int_number ]( r );
    }else{
-      k_print("Caught unregistered interrupt: ");
+      k_printf("Caught unregistered interrupt: ");
       char number[4];
       itoa( r.int_number, number );
-      k_print( number );
+      k_printf( number );
       k_newline();
 
       //Make sure to halt if this is a processor error

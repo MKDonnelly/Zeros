@@ -15,31 +15,31 @@ extern char *VIDEO_MEMORY;
 extern int CUR_SCREEN_OFFSET;
 
 //cursor.c functions
-int get_cursor();
-void move_cursor(int,int);
-void move_cursorl(int);
+int vga3h_get_cursor();
+void vga3h_move_cursor(int,int);
+void vga3h_move_cursorl(int);
 int k_xy_to_linear(int,int);
 
 
 //print.c functions
-void k_putchar(char);
-void k_newline();
-void k_print(char*);
-void k_print_at(char*,int,int);
-void k_clear_screen();
+void vga3h_putchar(char);
+void vga3h_newline();
+void vga3h_print(char*);
+void vga3h_print_at(char*,int,int);
+void vga3h_clear_screen();
 
 //screencap.c functions
-void k_screen_cap(int captureArray[][160]);
-void k_screen_res(int restoreArray[][160]);
+void vga3h_screen_cap(int captureArray[][160]);
+void vga3h_screen_res(int restoreArray[][160]);
 
 //scroll.c functions
-void scroll();
-void scroll_by(int);
+void vga3h_scroll();
+void vga3h_scroll_by(int);
 
 
 //vgaentry.c functions
 //The colors capable of being printed
-enum vga_color{
+enum vga3h_color{
     COLOR_BLACK = 0,
     COLOR_BLUE = 1,
     COLOR_GREEN = 2,
@@ -58,5 +58,5 @@ enum vga_color{
     COLOR_WHITE = 15,
 };
 
-unsigned char make_color(enum vga_color , enum vga_color );
-unsigned short int make_vgaentry(char , unsigned char );
+unsigned char vga3h_make_color(enum vga3h_color , enum vga3h_color );
+unsigned short int vga3h_make_vgaentry(char , unsigned char );

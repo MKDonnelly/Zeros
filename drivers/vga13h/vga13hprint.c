@@ -1,5 +1,5 @@
 
-#include "vga13hmode.h"
+#include "vga13h.h"
 
 char *VGA13H_MEMORY = (char*)0xA0000;
 

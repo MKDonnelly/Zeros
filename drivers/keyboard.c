@@ -146,7 +146,7 @@ void keyboard_handler(){
           k_newline();
           char buffer[100];
           getline( buffer );
-          k_print( buffer );   
+          k_printf( buffer );   
           return;
       }
 

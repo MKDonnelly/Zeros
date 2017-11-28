@@ -1,5 +1,4 @@
-
-The files in this directory contain
-functions to handle the screen in VGA
-13h mode (320x200)
-
+These c program are designed to
+handle screen function in VGA
+13h mode, which is 320x200
+graphics mode.
