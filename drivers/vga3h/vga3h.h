@@ -2,17 +2,17 @@
 
 #include <portio.h>
 
-#define NEWLINE 10
-#define ROWS 25
-#define COLS 80
+#define VGA3H_NEWLINE 10
+#define VGA3H_ROWS 25
+#define VGA3H_COLS 80
 
 #define SCREEN_CTRL_PORT 0x3D4
 #define SCREEN_DATA_PORT 0x3D5
 
 
 //Initilized in print.c
-extern char *VIDEO_MEMORY;
-extern int CUR_SCREEN_OFFSET;
+extern char *VGA3H_VIDEO_MEMORY;
+extern int VGA3H_CUR_SCREEN_OFFSET;
 
 //cursor.c functions
 int vga3h_get_cursor();

@@ -1,7 +1,7 @@
 
 #include "vga13h.h"
 
-char *VGA13H_MEMORY = (char*)0xA0000;
+char *VGA13H_VIDEO_MEMORY = (char*)0xA0000;
 
 /*
 //Use the drawLine function to draw a square
@@ -33,7 +33,7 @@ void drawLine(struct point p1, struct point p2, int color){
 
      for(int i = lowesty; i < highesty; i++){
        int linearAddress = (int)(i * VGA13H_COLS + p1.x);
-       VGA13H_MEMORY[ linearAddress ] = color;
+       VGA13H_VIDEO_MEMORY[ linearAddress ] = color;
      }
      return;
    }
@@ -62,7 +62,7 @@ void drawLine(struct point p1, struct point p2, int color){
       int ycoord = (int)(m * i + b);
       //int linearAddress = i * VGA13H_COLS + ycoord;
       int linearAddress = (int)(ycoord * VGA13H_COLS + i);
-      VGA13H_MEMORY[ linearAddress ] = color;
+      VGA13H_VIDEO_MEMORY[ linearAddress ] = color;
    }
 }
 

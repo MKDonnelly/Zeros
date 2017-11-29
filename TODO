@@ -3,6 +3,8 @@ Revise paging.c to use all offsets or all addresses
 Do more error checking in kmalloc.c
 get memory size from multiboot header 
    and add a multiboot header
+Revise screen_cap in vga3h mode to take a int
+   pointer instead of a 2d array
 Add a getc function and add max length to getline
 Add function to scroll.c to scroll both ways
 Use structures to hold more information in devices

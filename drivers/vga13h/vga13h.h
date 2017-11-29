@@ -14,7 +14,7 @@ struct point{
 };
 
 //Initilized in vga13hprint.c
-extern char *VGA13H_MEMORY;
+extern char *VGA13H_VIDEO_MEMORY;
 
 void drawLine( struct point, struct point, int color);
 void drawLinePoint(int x1,int y1,int x2,int y2,int color);

@@ -40,8 +40,9 @@ void init_vga(uint8_t mode){
       kernel_vga_screen.k_printf = vga3h_print;
       kernel_vga_screen.k_print_at = vga3h_print_at;
 
-      kernel_vga_screen.k_screen_cap = vga3h_screen_cap;
-      kernel_vga_screen.k_screen_res = vga3h_screen_res;
+      //TODO
+      //kernel_vga_screen.k_screen_cap = vga3h_screen_cap;
+      //kernel_vga_screen.k_screen_res = vga3h_screen_res;
 
       kernel_vga_screen.k_scroll = vga3h_scroll;
    }else if( mode == 1){

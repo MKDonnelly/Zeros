@@ -37,13 +37,13 @@
 
 //This array defines the register state
 //for vga mode 3h (80x25 text)
-extern unsigned char vga_3h_regs[];
+extern unsigned char vga_3h_mode[];
 
 //This array defines the register state
 //for vga mode 13h (320x200 graphics)
-extern unsigned char vga_13h_regs[];
+extern unsigned char vga_13h_mode[];
 
 //This function takes an array of registers
 //and implements the given mode.
-void write_regs(unsigned char*);
+void set_vga_mode(unsigned char*);
 
