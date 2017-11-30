@@ -1,0 +1,3 @@
+The c programs in this directory
+are designed to manipulate the screen
+in VGA 3h mode, which is 80x25 text mode.

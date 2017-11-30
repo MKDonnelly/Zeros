@@ -3,8 +3,8 @@
 #include <serial/serial.h>
 #include <cmos.h>
 #include <pic.h>
-#include <vgatext/vgatext.h>
-#include <vga13h/vga13hmode.h>
+#include <vga3h/vga3h.h>
+#include <vga13h/vga13h.h>
 #include <keyboard.h>
 
 #include <string.h>
@@ -21,54 +21,56 @@
 #include <kmalloc.h>
 
 #include <modeset.h>
+#include <vgacommon.h>
+
 
 //TODO add in struct multiboot* to 
 //get information about the system
 void kmain(){
 
+  set_vga_mode( vga_3h_mode );
+  init_vga(0);
+
   init_gdt();
-
-  //Initilize the PIC
   remap_pic();
-  //Create the IDT and initilize
-  //the interrupt handlers
   init_interrupts();
-  
-  init_keyboard();
   init_timer(1, 0, 0);
-
-  //Make sure to enable 
-  //the interrupts
+  init_keyboard();
   enable_ints();
 
-
-  move_cursorl( k_xy_to_linear( 0, 0 ) );
   k_clear_screen();
   k_newline();
   k_newline();
-  k_print("Enter some text: ");
+  k_printf("Enter some text: ");
 
-  //Experimental kmalloc
-  //heap_init();
+  init_heap();
+  init_paging();
 
-  //char *mem = (char*)kmalloc( 10, 1, 0);
-  //kfree( mem );
-
-  //Paging
-  //init_paging();
-
-  //Paging testing
-  //page_map(get_page( 0x2000000, 1, kernel_page_dir ), KERNEL_MEMORY, IS_WRITEABLE, 0xb8000);
-  //char *vid = (char*)0x2000000;
-  // *(vid + 20) = 'z';
-
-
-  //ALWAYS have this, or else the program
-  //will run off the end of the world.
   while(1);
 }
 
+
 //         Examples
+
+/*
+//VGA 13h mode
+
+  char *vidmem = (char*)0xA0000;
+  set_vga_mode( vga_13h_mode );
+
+
+  for( int i = 0, j = 0; i < 320 * 200; i++, j++){
+     vidmem[i] = j;
+     if( j >= 255 )
+        j = 0;
+  }
+
+  for( int k = 0; k < 320 * 2; k++){
+     vidmem[k] = 5;
+  }
+*/
+
+
 
 /*
   //Initilize the GDT
@@ -136,80 +138,3 @@ void kmain(){
   char *ptr = (char*)0x900000;
   char val = *ptr;
 */
-
-/*
-unsigned char g_320x200x256[] =
-{
-    // MISC 
-    0x63,
-    // SEQ 
-    0x03, 0x01, 0x0F, 0x00, 0x0E,
-    // CRTC 
-    0x5F, 0x4F, 0x50, 0x82, 0x54, 0x80, 0xBF, 0x1F,
-    0x00, 0x41, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x9C, 0x0E, 0x8F, 0x28,0x40, 0x96, 0xB9, 0xA3,
-    0xFF,
-    // GC 
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x40, 0x05, 0x0F,
-    0xFF,
-    // AC 
-    0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-    0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
-    0x41, 0x00, 0x0F, 0x00,0x00
-};
-
-
-void write_regs(unsigned char *regs)
-{
-  unsigned i;
-
-  // write MISCELLANEOUS reg 
-  portb_write(0x3C2, *regs);
-  regs++;
-  // write SEQUENCER regs
-  for(i = 0; i < 5; i++)
-    {
-      portb_write(0x3C4, i);
-      portb_write(0x3C5, *regs);
-      regs++;
-    }
-  // unlock CRTC registers
-  portb_write(0x3C4, 0x03);
-  portb_write(0x3D5, portb_read(0x3D5) | 0x80);
-  portb_write(0x3D4, 0x11);
-  portb_write(0x3D5, portb_read(0x3D5) & ~0x80);
-
-  //regs[0x03] |= 0x80;
-  //regs[0x11] &= ~0x80;
-  // write CRTC regs
-  for(i = 0; i < 25; i++)
-    {
-      portb_write(0x3D4, i);
-      portb_write(0x3D5, *regs);
-      regs++;
-    }
-  // write GRAPHICS CONTROLLER regs 
-  for(i = 0; i < 9; i++)
-    {
-      portb_write(0x3CE, i);
-      portb_write(0x3CF, *regs);
-      regs++;
-    }
-  // write ATTRIBUTE CONTROLLER regs 
-  for(i = 0; i < 21; i++)
-    {
-      (void)portb_read(0x3DA);
-      portb_write(0x3C0, i);
-      portb_write(0x3C0, *regs);
-      regs++;
-    }
-  // lock 16-color palette and unblank display 
-  (void)portb_read(0x3DA);
-  portb_write(0x3C0, 0x20);
-}
-
-#define video_start_mem 0xA0000
-#define video_end_mem   0xA0000 + 320 * 200
-*/
-
-

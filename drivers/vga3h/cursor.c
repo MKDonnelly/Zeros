@@ -1,6 +1,6 @@
-#include "vgatext.h" 
+#include "vga3h.h" 
 
-int get_cursor(){
+int vga3h_get_cursor(){
 
    //Get the position of the cursor
 
@@ -18,12 +18,12 @@ int get_cursor(){
 
 //Given an x and y value, move the
 //cursor to that location
-void move_cursor(int x, int y){
-   move_cursorl( k_xy_to_linear( x, y ) );
+void vga3h_move_cursor(int x, int y){
+   vga3h_move_cursorl( k_xy_to_linear( x, y ) );
 }
 
 //Move cursor using a linear offset
-void move_cursorl(int position){
+void vga3h_move_cursorl(int position){
    //Send a command to the vga controller
    //with registers 14 and 15
    //with the high and low bytes to set.

@@ -2,13 +2,12 @@ Add a how-to to explain how each subsystem works
 Revise paging.c to use all offsets or all addresses
 Do more error checking in kmalloc.c
 get memory size from multiboot header 
-Add a getc function and add len to getline
+   and add a multiboot header
+Revise screen_cap in vga3h mode to take a int
+   pointer instead of a 2d array
+Add a getc function and add max length to getline
 Add function to scroll.c to scroll both ways
 Use structures to hold more information in devices
-Abstract screen operations
-   i.e. have a generic k_print call
-   a mode-specific k_putchar, depending
-   on the current video mode
 Re-define characters in vga text mode
 Go through all of the code and clean up
    move files to more appropriate locations
@@ -18,7 +17,6 @@ Go through all of the code and clean up
 
 Work on VGA 13h mode driver
   implement a frame buffer
-Implement 13h modeset driver
 Scroll screen when text input reaches the end
    allow arrow keys to scroll through buffer
 Add cpuid functions

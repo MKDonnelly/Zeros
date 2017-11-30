@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vgatext/vgatext.h>
+#include <vgacommon/vgacommon.h>
 #include <isr.h>
 #include <kmalloc.h>
 #include <memory.h>

@@ -2,7 +2,6 @@
 
 #include <types.h>
 #include <string.h>
-#include <vgatext/vgatext.h>
 
 #define HEAPNODE_SIZE sizeof( struct heapNode )
 
@@ -24,7 +23,7 @@ struct heapNode{
 }__attribute__((packed));
 
 
-void heap_init();
+void init_heap();
 void *kmalloc(uint32_t,uint8_t,uint32_t*);
 void kfree(void*);
 void unify_heap();

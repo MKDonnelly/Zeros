@@ -3,6 +3,7 @@
 #include <types.h>
 
 #define GDT_ENTRIES 3
+
 //Our specific GDT (initilized in init_gdt()
 //will be layed out with the code segment first
 //and the data segment second.

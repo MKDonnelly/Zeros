@@ -209,21 +209,21 @@ void page_int_handler(struct registers r){
    uint8_t reserved = r.error & 0x8;
    uint8_t id = r.error & 0x10;
 
-   k_print("Page Fault: ");
+   k_printf("Page Fault: ");
    if( present )
-      k_print("page not present at ");
+      k_printf("page not present at ");
    else if(rw)
-      k_print("page read-only at ");
+      k_printf("page read-only at ");
    else if(us)
-      k_print("page ring-0 only at ");
+      k_printf("page ring-0 only at ");
    else if(reserved)
-      k_print("reserved bits overwritten at ");
+      k_printf("reserved bits overwritten at ");
    else if( id )
-      k_print("instruction fetch at ");
-   k_print( "0x" );
+      k_printf("instruction fetch at ");
+   k_printf( "0x" );
    char buffer[17]; //16 chars + \0
    itoh( fault_addr, buffer );
-   k_print( buffer );
+   k_printf( buffer );
 
    //We currently cannot handle a fault, so
    //halt the machine
