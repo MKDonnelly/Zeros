@@ -40,6 +40,9 @@ void kmain(){
   k_newline();
   k_printf("Enter some text: ");
 
+  init_heap();
+  init_paging();
+
   while(1);
 }
 

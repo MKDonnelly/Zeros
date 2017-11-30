@@ -6,7 +6,7 @@ uint32_t kernel_start_heap = 0x300000;
 uint32_t kernel_end_heap = 0x500000;
 
 //Initilize the first heapNode in the heap.
-void heap_init(){
+void init_heap(){
     //Initilize the heap by creating the first
     //linked list node at the start of the heap
     ((struct heapNode*)kernel_start_heap)->nextChunk = 0; //Null it out

@@ -1,3 +1,12 @@
+Release numbers
+   The general release number is <major>.<minor>
+   <major> indicates a radical change in the 
+   underlying kernel. <minor> indicates incremental
+   features and testing. NOTE: Any tagged version
+   has undergone reasonably extensive testing to
+   ensure that it boots in both the emulator and
+   real hardware. It is meant to be a fallback in
+   the case where something is going wrong.
 
 Directory structure
    -> boot
