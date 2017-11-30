@@ -21,7 +21,7 @@ interrupt_common:
    pusha
    mov ax, ds  ;Save the data segment
    push eax    ;descriptor
-   mov ax, 0x8  
+   mov ax, 0x10
    mov ds, ax
    mov es, ax
    mov fs, ax
@@ -101,7 +101,7 @@ srupdate:
    mov fs, ax
    mov gs, ax
    mov ss, ax
-   jmp 0x8: flush
+   jmp 0x8:flush
 flush:
    ret
 

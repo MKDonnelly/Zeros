@@ -22,99 +22,9 @@
 
 #include <modeset.h>
 
-void kmain(){
-
-
-//VGA 3h mode
-  write_regs( vga_3h_regs );
-  k_print("Testing...");
-
-
-/*
-  init_gdt();
-  init_interrupts();
-  remap_pic();
-  init_timer(1, 0, 0);
-  enable_ints();
-
-  k_delays( 5 );
-  k_newline();
-  k_newline();
-  k_print("Testing...");
-*/
-
-/*
-//VGA 13h mode
-  char *vidmem = (char*)0xA0000;
-  write_regs( vga_13h_regs );
-
-  for( int i = 0, j = 0; i < 320 * 200; i++, j++){
-     vidmem[i] = j;
-     if( j >= 255 )
-        j = 0;
-  }
-
-  for( int k = 0; k < 320 * 2; k++){
-     vidmem[k] = 5;
-  }
-*/
-
-  while(1);
-}
-
-
-/*
-void init13h(){
-
-   //Write the general registers
-   portb_write( 0x3C2, mode13h[0]);
-   portb_write( 0x3BA, mode13h[1]);
-   //portb_write( 0x3C2, mode13h[2]);
-   //portb_write( 0x3BA, mode13h[3]); 
-
-   //Write to the sequencer
-   portb_write( 0x3C4, 0 );
-   portb_write( 0x3C5, mode13h[4]);
-
-   portb_write( 0x3C4, 1);
-   portb_write( 0x3C5, mode13h[5]);
-
-   portb_write( 0x3C4, 2);
-   portb_write( 0x3C5, mode13h[6]);
-
-   portb_write( 0x3C4, 3);
-   portb_write( 0x3C5, mode13h[7]);
-   
-   portb_write( 0x3C4, 4);
-   portb_write( 0x3C5, mode13h[8]);
-
-   //Write to the CRTC
-   for(int i = 0; i < 25; i++){
-      portb_write( 0x3D4, i);
-      portb_write( 0x3D5, mode13h[i+9]);
-   }
-   
-   //Write to the graphics registers
-   for(int i = 0; i < 9; i++){
-      portb_write( 0x3CE, i);
-      portb_write( 0x3CF, mode13h[i+34]);
-   }
-
-   //Write to the attribute registers
-   for(int i = 0; i < 21; i++){
-      portb_write( 0x3C0, i);
-      portb_write( 0x3C0, mode13h[i+43]);
-   }
-}
-*/
-
-
-/*
 //TODO add in struct multiboot* to 
 //get information about the system
 void kmain(){
-
-
 
   init_gdt();
 
@@ -125,26 +35,27 @@ void kmain(){
   init_interrupts();
   
   init_keyboard();
-  init_timer();
-  move_cursorl( k_xy_to_linear( 0, 0 ) );
-  k_clear_screen();
+  init_timer(1, 0, 0);
 
   //Make sure to enable 
   //the interrupts
   enable_ints();
 
+
+  move_cursorl( k_xy_to_linear( 0, 0 ) );
+  k_clear_screen();
   k_newline();
   k_newline();
   k_print("Enter some text: ");
 
   //Experimental kmalloc
-  heap_init();
+  //heap_init();
 
-  char *mem = (char*)kmalloc( 10, 1, 0);
-  kfree( mem );
+  //char *mem = (char*)kmalloc( 10, 1, 0);
+  //kfree( mem );
 
   //Paging
-  init_paging();
+  //init_paging();
 
   //Paging testing
   //page_map(get_page( 0x2000000, 1, kernel_page_dir ), KERNEL_MEMORY, IS_WRITEABLE, 0xb8000);
@@ -155,7 +66,7 @@ void kmain(){
   //ALWAYS have this, or else the program
   //will run off the end of the world.
   while(1);
-}*/
+}
 
 //         Examples
 
