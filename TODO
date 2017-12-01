@@ -1,10 +1,11 @@
 Add a how-to to explain how each subsystem works
-Revise paging.c to use all offsets or all addresses
 Do more error checking in kmalloc.c
 get memory size from multiboot header 
    and add a multiboot header
+Add alarms to timer subsystem
 Revise screen_cap in vga3h mode to take a int
    pointer instead of a 2d array
+Add random number generator
 Add a getc function and add max length to getline
 Add function to scroll.c to scroll both ways
 Use structures to hold more information in devices
@@ -12,11 +13,11 @@ Re-define characters in vga text mode
 Go through all of the code and clean up
    move files to more appropriate locations
    declare constants if possible
-
-=============================================
+   Provide masks for i/o w/ ports
+   Export GDT constants from gdt.c/h to interrupt.asm
 
 Work on VGA 13h mode driver
-  implement a frame buffer
+implement a frame buffer in both 3h and 13h mode
 Scroll screen when text input reaches the end
    allow arrow keys to scroll through buffer
 Add cpuid functions
@@ -28,7 +29,6 @@ Impelement call gate
    call using 
        jmp <GDT offset>:0x0
 Use timer channel 2 to play sound on pc speaker
-Provide masks for i/o w/ ports
 Implement APIC
 Implement HPET
 Implement multitasking

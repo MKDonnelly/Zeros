@@ -46,7 +46,7 @@ void kmain(){
 
   kb_set_leds( 1, 1, 1);
 
-  heap_init();
+  init_heap();
   init_paging();
 
   init_heap();
