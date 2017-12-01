@@ -1,3 +1,5 @@
+asm("jmp kmain");
+
 #include <portio.h>
 #include <timing.h>
 #include <serial/serial.h>
@@ -25,7 +27,7 @@
 
 void kmain(){
 
-  set_vga_mode( vga_3h_mode );
+  //set_vga_mode( vga_3h_mode );
   init_vga(0);
 
   init_gdt();
@@ -33,12 +35,19 @@ void kmain(){
   init_interrupts();
   init_timer(1, 0, 0);
   init_keyboard();
+  kbd_enc_send_command( KE_ALL_MAKEBREAK_C );
   enable_ints();
 
   k_clear_screen();
   k_newline();
   k_newline();
   k_printf("Enter some text: ");
+  enable_ints();
+
+  kb_set_leds( 1, 1, 1);
+
+  heap_init();
+  init_paging();
 
   init_heap();
   init_paging();
@@ -51,9 +60,6 @@ void kmain(){
 //TODO add in struct multiboot* to 
 //get information about the system
 void kmain(){
-
-
-
   init_gdt();
 
   //Initilize the PIC
