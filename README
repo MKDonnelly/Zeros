@@ -29,6 +29,7 @@ Directory structure
 Notation:
    -> #define <something>_P = This is a port
    -> #define <something>_C = This is a command
+   -> #define <something>_M = This is a bit mask
    Underscores preceeding data or function means that
    that should only be used within the file. Using a 
    function with this notation without knowing how

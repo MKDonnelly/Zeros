@@ -64,7 +64,7 @@ void getline(int8_t *buffer){
    KEYBOARD_BUFFER_CHARS -= temp;
 }
 
-
+//               Scan Code Set 1
 // '\0' = Not implemented
 // Ascii DC1 = Arrow up
 // Ascii DC2 = Arrow Down
@@ -132,12 +132,12 @@ void keyboard_handler(){
    static uint8_t shift_activated = 0;
 
    int8_t key;
-   uint8_t kb_status = portb_read( KEYBOARD_STATUS_P );
+   uint8_t kb_status = portb_read( KEYBOARD_CONTROLLER_P );
 
    //Write the key to the screen and place it in
    //the buffer
-   if( kb_status & KCP_OUT_BUF_S ){
-      key = portb_read( KEYBOARD_DATA_P );
+   if( kb_status & KC_OUTPUTBUF_M ){
+      key = portb_read( KEYBOARD_ENCODER_P );
       if( key < 0 )
 	      return;
 
@@ -163,9 +163,37 @@ void keyboard_handler(){
    }
 }
 
+//Send a command to the keyboard controller
+void kbd_ctrl_send_command(uint8_t command){
+   //Spin while the keyboard is busy
+   while( (portb_read( KEYBOARD_CONTROLLER_P ) & 
+          KC_INPUTBUF_M ) != 0);
+
+   //Now that the keyboard is free, send 
+   //the command
+   portb_write( KEYBOARD_CONTROLLER_P, command );
+}
+
+//Send a command to the keyboard encoder 
+void kbd_enc_send_command(uint8_t command){
+   while( (portb_read( KEYBOARD_CONTROLLER_P ) &
+           KC_INPUTBUF_M) != 0);
+   portb_write( KEYBOARD_ENCODER_P, command);
+}
+
 
 //Sets the LEDs on the keyboard
 void kb_set_leds(uint8_t numLock, uint8_t capLock, uint8_t scroll){
+   uint8_t leds = 0;
+   if( numLock )
+      leds |= KE_NUMLOCK_M;
+   if( capLock )
+      leds |= KE_CAPLOCK_M;
+   if( scroll )
+      leds |= KE_SCROLL_M;
 
+   //Send the command to the encoder
+   kbd_enc_send_command( KE_SET_LEDS_C );
+   kbd_enc_send_command( leds );
 }
 
