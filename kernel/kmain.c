@@ -24,8 +24,10 @@ asm("jmp kmain");
 
 #include <modeset.h>
 #include <vgacommon.h>
+#include <multiboot.h>
 
-void kmain(){
+//void kmain(struct multiboot_header_s *h){
+void kmain(struct multiboot_info *h){
 
   //set_vga_mode( vga_3h_mode );
   init_vga(0);
@@ -44,10 +46,10 @@ void kmain(){
   k_printf("Enter some text: ");
   enable_ints();
 
-  kb_set_leds( 1, 1, 1);
+  if( h->num_mods )
+     k_printf( (char*)(h->mods->start) );
 
-  init_heap();
-  init_paging();
+  kb_set_leds( 1, 1, 1);
 
   init_heap();
   init_paging();
