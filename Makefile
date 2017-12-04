@@ -7,10 +7,10 @@ CFLAGS = -fno-pie -m32 -ffreestanding -fno-stack-protector -nostdlib -nostdinc -
 default: kernel/kmain.elf
 
 run: kernel/kmain.elf
-	@qemu-system-x86_64 -kernel kernel/kmain.elf
+	@qemu-system-x86_64 -kernel kernel/kmain.elf -append arg1 -initrd ./testinitrd 
 
 debug: kernel/kmain.elf
-	@qemu-system-x86_64 -serial file:serial.log -kernel kernel/kmain.elf -S -s &
+	@qemu-system-x86_64 -serial file:serial.log -kernel kernel/kmain.elf  -append arg1 -initrd ./testinitrd -S -s &
 	@gdb -q -x gdbdebug
 
 kernel/kmain.elf: ${OBJECTS} kernel/kernelheader.o cpu/interrupt.o
