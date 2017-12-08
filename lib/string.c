@@ -17,7 +17,25 @@ void strcpy( char *str1, char *str2 ){
       i++;
    }
    //Make sure to set the null byte
-   str1[i] = '\0';
+   str1[i] = 0;
+}
+
+//Copies str2 into str1, copying no
+//more than num bytes
+void strncpy( char *str1, char *str2, int num){
+   int i = 0;
+   while( str2[i] != 0 && i < num){
+      str1[i] = str2[i];
+      i++;
+   }
+   str1[i] = 0;
+}
+
+int strcmp(char *str1, char *str2){
+   int i = 0;
+   while( ! (str1[i] - str2[i]) && str1[i] != 0 && str2[i] != 0)
+      i++;
+   return (str1[i] - str2[i]);
 }
 
 //Reverse the given string
