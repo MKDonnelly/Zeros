@@ -1,5 +1,3 @@
-asm("jmp kmain");
-
 #include <portio.h>
 #include <timing.h>
 #include <serial/serial.h>
@@ -26,6 +24,9 @@ asm("jmp kmain");
 #include <vgacommon.h>
 #include <multiboot.h>
 
+#include <fs.h>
+#include <initrd.h>
+
 //void kmain(struct multiboot_header_s *h){
 void kmain(struct multiboot_info *h){
 
@@ -46,12 +47,34 @@ void kmain(struct multiboot_info *h){
   k_printf("Enter some text: ");
   enable_ints();
 
+  init_heap();
+
+  fs_node_t *initrd = init_initrd( (uint32_t*)(h->mods->start) );
+  fs_node_t *file = initrd->finddir( initrd, "first");
+  
+  if( file ){
+     char buf[20];
+     read_fs( file, 0, 20, buf );
+     k_printf( buf );
+  }
+
+/*
+  fs_node_t *firstFile = initrd->readdir( initrd, 0 );  
+
+  char testStr[] = "Wrote to this";
+  write_fs(firstFile, 0, 20, testStr);
+
+  char b[20];
+  read_fs( firstFile, 0, 20, b );
+  k_printf( b );
+*/  
+
+/*
   if( h->num_mods )
      k_printf( (char*)(h->mods->start) );
-
+*/
   kb_set_leds( 1, 1, 1);
 
-  init_heap();
   init_paging();
 
   while(1);

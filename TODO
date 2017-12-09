@@ -1,37 +1,65 @@
-Add a how-to to explain how each subsystem works
-Do more error checking in kmalloc.c
-Add alarms to timer subsystem
-Work on multiboot header and understand
-   what each field is doing
-Revise screen_cap in vga3h mode to take a int
-   pointer instead of a 2d array
-Add random number generator
-Add a getc function and add max length to getline
-Add function to scroll.c to scroll both ways
-Use structures to hold more information in devices
-Re-define characters in vga text mode
-Try to boot UEFI with grub-efi
-Better utilize vga colors in 3h mode
-Go through all of the code and clean up
+printing/screen manipulation:
+   Revise screen_cap in vga3h mode to take a int
+     pointer instead of a 2d array
+   implement a frame buffer in both 3h and 13h mode
+  Better utilize vga colors in 3h mode
+      (see https://github.com/JonathanSalwan/Kaminou-Kernel/blob/master/kernel/includes/sys/video.h)
+   Create better print output (BUG,LOG,etc)
+      and catch errors by using __FILE__
+   Get a proper printf working
+      use system va_args if all else fails
+   Add function to scroll.c to scroll both ways
+   Work on VGA 13h mode driver
+   Scroll screen when text input reaches the end
+      allow arrow keys to scroll through buffer 
+   Get a dump of the vga font   
+
+utils:
+   Create a basic file editor by dumping a file into the
+      frame buffer and copying it back once done.
+   List files in initrd
+   Write a simple shell
+
+clean up:
    move files to more appropriate locations
    declare constants if possible
    Provide masks for i/o w/ ports
    Export GDT constants from gdt.c/h to interrupt.asm
+   Clean up structure defs (struct this_struct -> this_struct_t)
+  
 
-Work on VGA 13h mode driver
-implement a frame buffer in both 3h and 13h mode
-Scroll screen when text input reaches the end
-   allow arrow keys to scroll through buffer
-Add cpuid functions
-Learn qemu to better debug the kernel
-Write a simple shell
-Impelement call gate
-   Add GDT descriptor w/ CPL = 3 and type of
-   trap gate to a function as the base and limit
-   call using 
-       jmp <GDT offset>:0x0
-Use timer channel 2 to play sound on pc speaker
-Implement APIC
-Implement HPET
-Implement multitasking
-Implement user mode
+misc:   
+   Add parameter to itoh to allow the number
+      of hex digits made
+   Add a how-to to explain how each subsystem works
+      Also add a dependency chart for the functions
+      (i.e. we can't use kmalloc unless we call init_heap())
+   Do more error checking in kmalloc.c
+      Currently, kmalloc is broken
+      Stress-test kmalloc
+   Add alarms to timer subsystem
+   Work on multiboot header and understand
+      what each field is doing
+   Copy the initrd over to some space of memory
+      so that it is not overwritten. Or at least
+      page-protect it.
+   create function to invalidate a page
+      asm volatile ("invlpg (%0)" : : "b" (page_addr) : "memory")
+   Add string functions (strncat, strappend, strcpy, etc)
+   Add random number generator
+   Add a getc function and add max length to getline
+   Use structures to hold more information in devices
+   Re-define characters in vga text mode
+   Try to boot UEFI with grub-efi
+   Add cpuid functions
+   Learn qemu to better debug the kernel
+   Impelement call gate
+      Add GDT descriptor w/ CPL = 3 and type of
+      trap gate to a function as the base and limit
+      call using 
+          jmp <GDT offset>:0x0
+   Use timer channel 2 to play sound on pc speaker
+   Implement APIC
+   Implement HPET
+   Implement multitasking
+   Implement user mode
