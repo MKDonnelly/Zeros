@@ -47,3 +47,5 @@ extern unsigned char vga_13h_mode[];
 //and implements the given mode.
 void set_vga_mode(unsigned char*);
 
+//Set the given vga plane
+void set_plane(uint8_t);
