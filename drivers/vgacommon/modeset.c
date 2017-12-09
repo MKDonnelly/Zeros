@@ -112,55 +112,21 @@ void set_vga_mode(unsigned char *regs)
   portb_write(0x3C0, 0x20);
 }
 
+//Sets the given VGA plane
+//Taken from http://files.osdev.org/mirrors/geezer/osd/graphics/modes.c
+void set_plane(uint8_t plane){
+   uint8_t plane_mask;
+   
+   plane &= 3;
+   plane_mask = 1 << plane;
+
+   //Set read plane
+   portb_write( VGA_GRAPHICSC_IDX_R, 4 );
+   portb_write( VGA_GRAPHICSC_DATA_R, plane);
+
+   //Set write plane
+   portb_write( VGA_SEQ_IDX_R, 2);
+   portb_write( VGA_SEQ_DATA_R, plane_mask );
+}
 
 
-/*
-//Give this one of the arrays above and
-//it will set the given video mode.
-void set_vga_mode(unsigned char *regs)
-{
-  unsigned i;
-
-  // write MISCELLANEOUS reg 
-  portb_write(0x3C2, *regs);
-  regs++;
-
-  // write SEQUENCER regs 
-  for(i = 0; i < 5; i++){
-      portb_write(0x3C4, i);
-      portb_write(0x3C5, *regs);
-      regs++;
-  }
-
-  // unlock CRTC registers
-  portb_write(0x3C4, 0x03);
-  portb_write(0x3D5, portb_read(0x3D5) | 0x80);
-  portb_write(0x3D4, 0x11);
-  portb_write(0x3D5, portb_read(0x3D5) & ~0x80);
-
-  // write CRTC regs 
-  for(i = 0; i < 25; i++){
-      portb_write(0x3D4, i);
-      portb_write(0x3D5, *regs);
-      regs++;
-  }
-
-  // write GRAPHICS CONTROLLER regs
-  for(i = 0; i < 9; i++){
-      portb_write(0x3CE, i);
-      portb_write(0x3CF, *regs);
-      regs++;
-  }
-  
-  // write ATTRIBUTE CONTROLLER regs 
-  for(i = 0; i < 21; i++){
-      (void)portb_read(0x3DA);
-      portb_write(0x3C0, i);
-      portb_write(0x3C0, *regs);
-      regs++;
-  }
-  
-  // lock 16-color palette and unblank display
-  (void)portb_read(0x3DA);
-  portb_write(0x3C0, 0x20);
-}*/
