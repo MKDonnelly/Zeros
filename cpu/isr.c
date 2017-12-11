@@ -37,6 +37,7 @@ void unregister_interrupt( uint8_t int_number ){
    int_handlers[int_number] = 0;
 }
 
+
 void main_interrupt_handler(struct registers r){
 
    //check to see if there is a registered interrupt
@@ -52,7 +53,7 @@ void main_interrupt_handler(struct registers r){
 
       //Make sure to halt if this is a processor error
       if( r.int_number < 33 )
-	      asm("hlt");
+         asm("hlt");
    }
 
    //Check to see if this interrupt came from a PIC.

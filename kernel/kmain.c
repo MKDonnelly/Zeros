@@ -36,22 +36,13 @@ void kmain(struct multiboot_info *h){
   //write_font( g_8x16_font, 16 );
   init_vga(0);
 
-
   init_gdt();
   remap_pic();
   init_interrupts();
   init_timer(1, 0, 0);
   init_keyboard();
-  kbd_enc_send_command( KE_ALL_MAKEBREAK_C );
+  //kbd_enc_send_command( KE_ALL_MAKEBREAK_C );
   enable_ints();
-
-
-  char *vidmem = (char*)0xb8000;
-  set_plane( 2 );
-  for(int i = 0; i < 2048; i++){
-     vidmem[i] = 0;
-  }
-  set_plane( 0 );
 
   k_clear_screen();
   k_newline();
@@ -59,30 +50,41 @@ void kmain(struct multiboot_info *h){
   k_printf("Enter some text: ");
   enable_ints();
 
+
   kb_set_leds( 1, 1, 1);
   init_heap();
 
+
+  k_newline();
+  k_printf("Kernel command line: ");
+  k_printf( h->cmdline );
+  k_newline();
+
   fs_node_t *initrd = init_initrd( (uint32_t*)(h->mods->start) );
   fs_node_t *file = initrd->finddir( initrd, "first");
-  
+
+  k_printf("Contents of \"first\": ");
   if( file ){
      char buf[20];
      read_fs( file, 0, 20, buf );
      k_printf( buf );
+  } else {
+     k_printf("File not found");
   }
 
-/*
-  fs_node_t *firstFile = initrd->readdir( initrd, 0 );  
+  k_newline();
+  k_printf("Writing to \"first\"");
 
   char testStr[] = "Wrote to this";
-  write_fs(firstFile, 0, 20, testStr);
+  write_fs(file, 0, 20, testStr);
 
   char b[20];
-  read_fs( firstFile, 0, 20, b );
+  read_fs( file, 0, 20, b );
+  k_newline();
+  k_printf("Content of \"first\" is now: ");
   k_printf( b );
-*/  
-  kb_set_leds( 1, 1, 1);
 
+  kb_set_leds( 1, 1, 1);
   init_paging();
 
   while(1);

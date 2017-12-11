@@ -38,8 +38,12 @@ misc:
       Currently, kmalloc is broken
       Stress-test kmalloc
    Add alarms to timer subsystem
+   Timer on screen is currently broken
+      when going into the minutes range
    Work on multiboot header and understand
       what each field is doing
+   Add directory support to initrd and improve
+      initrd code
    Copy the initrd over to some space of memory
       so that it is not overwritten. Or at least
       page-protect it.
