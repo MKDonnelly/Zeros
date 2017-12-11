@@ -6,6 +6,7 @@ printing/screen manipulation:
       (see https://github.com/JonathanSalwan/Kaminou-Kernel/blob/master/kernel/includes/sys/video.h)
    Create better print output (BUG,LOG,etc)
       and catch errors by using __FILE__
+      Use macros to create debug print info
    Add function to scroll.c to scroll both ways
    Work on VGA 13h mode driver
    Scroll screen when text input reaches the end
@@ -27,13 +28,16 @@ clean up:
   
 
 misc:   
+   Unit tests for various subsystems
+   Abstract the heap so that multiple 
+      heaps can coexist
    Add parameter to itoh to allow the number
       of hex digits made
    Add a how-to to explain how each subsystem works
       Also add a dependency chart for the functions
       (i.e. we can't use kmalloc unless we call init_heap())
-   Do more error checking in kmalloc.c
-      Currently, kmalloc is broken
+   Work on kmalloc
+      Create a slab allocator (have fixed size block ready)
       Stress-test kmalloc
    Add alarms to timer subsystem
    Timer on screen is currently broken

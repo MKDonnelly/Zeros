@@ -49,10 +49,9 @@ void kmain(struct multiboot_info *h){
   k_printf("Enter some text: ");
   enable_ints();
 
-  k_printf("int: %d hex: %x", 2, 20 );
-
   kb_set_leds( 1, 1, 1);
   init_heap();
+
 
 /*
   k_newline();
@@ -84,8 +83,7 @@ void kmain(struct multiboot_info *h){
   k_printf("Content of \"first\" is now: ");
   k_printf( b );
 */
-  kb_set_leds( 1, 1, 1);
-  init_paging();
+  //init_paging();
 
   while(1);
 }

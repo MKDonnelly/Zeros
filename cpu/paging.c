@@ -137,11 +137,13 @@ void init_paging(){
 
    //Calculate the number of frames in total
    total_frames = mem_end_page / PAGE_SIZE;
+   k_printf("Total frames: %d\n", total_frames);
 
    //Calculate the size of *frames as the
    //number of chars it needs to hold. Add 1
-   //to catch any remainder.
-   framesSize = total_frames / sizeof(char)*8 + 1;
+   //to catch any remainder. Divide by 8 since a
+   //char has 8 bits
+   framesSize = (total_frames / 8) + 1;
 
    //Allocate space for the bitset
    frames = (char*)kmalloc( framesSize, 0, 0 );
