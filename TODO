@@ -1,6 +1,4 @@
 printing/screen manipulation:
-  Revise screen_cap in vga3h mode to take a int
-     pointer instead of a 2d array
   Implement a frame buffer in both 3h and 13h mode
   Better utilize vga colors in 3h mode
       (see https://github.com/JonathanSalwan/Kaminou-Kernel/blob/master/kernel/includes/sys/video.h)
@@ -11,7 +9,8 @@ printing/screen manipulation:
    Work on VGA 13h mode driver
    Scroll screen when text input reaches the end
       allow arrow keys to scroll through buffer 
-   Get a dump of the vga font   
+   Get a dump of the vga font and create custom font 
+   Improve format capabilities of k_printf
 
 utils:
    Create a basic file editor by dumping a file into the
@@ -25,17 +24,13 @@ clean up:
    Provide masks for i/o w/ ports
    Export GDT constants from gdt.c/h to interrupt.asm
    Clean up structure defs (struct this_struct -> this_struct_t)
-  
 
 misc:   
    Unit tests for various subsystems
    Abstract the heap so that multiple 
       heaps can coexist
-   Add parameter to itoh to allow the number
-      of hex digits made
    Add a how-to to explain how each subsystem works
-      Also add a dependency chart for the functions
-      (i.e. we can't use kmalloc unless we call init_heap())
+      Add examples for each subsystem for reference
    Work on kmalloc
       Create a slab allocator (have fixed size block ready)
       Stress-test kmalloc
@@ -51,11 +46,9 @@ misc:
       page-protect it.
    create function to invalidate a page
       asm volatile ("invlpg (%0)" : : "b" (page_addr) : "memory")
-   Add string functions (strncat, strappend, strcpy, etc)
    Add random number generator
    Add a getc function and add max length to getline
    Use structures to hold more information in devices
-   Re-define characters in vga text mode
    Try to boot UEFI with grub-efi
    Add cpuid functions
    Learn qemu to better debug the kernel

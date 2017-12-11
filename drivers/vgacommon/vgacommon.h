@@ -53,10 +53,10 @@ struct vga_screen{
    //Capture the screen to the given
    //array. Make sure the array is
    //large enough
-   void (*k_screen_cap)(int[]);
+   void (*k_screen_cap)(char*);
 
    //Restore the screenshot 
-   void (*k_screen_res)(int[]);
+   void (*k_screen_res)(char*);
 
 ///////////////////////////////////////
 
@@ -75,6 +75,9 @@ void k_newline();
 void k_puts(char*);
 void k_printf(char*, ...);
 void k_print_at(char*,int,int);
+
+void k_vga_capture(char*);
+void k_vga_restore(char*);
 
 //This does the job of binding
 //the specific function to the

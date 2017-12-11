@@ -6,18 +6,21 @@ Release numbers
    has undergone reasonably extensive testing to
    ensure that it boots in both the emulator and
    real hardware. It is meant to be a fallback in
-   the case where something is going wrong.
+   the case where something is going wrong in the
+   testing branch.
 
 Directory structure
-   -> boot
-      Anything related to booting the system 
-      is placed in the boot directory.
+   -> bootfiles
+      Files related to booting with grub are here
+      (such as grub.cfg and the custom initrd)
    -> cpu
       Anything related to how the cpu operates,
       such as interrupts and halting, goes here.
    -> drivers
       Anything related to controlling a piece of 
       hardware that is not the cpu goes here.
+   -> fs
+      Anything related to a filesystem goes here
    -> kernel
       Anything related to the basic kernel 
       functionality, such as scheduling or memory
@@ -25,12 +28,36 @@ Directory structure
    -> lib
       Any useful routines that are not hardware
       specific or core kernel functions.
-      
+   -> tools
+      External programs that are not linked into 
+      the final kernel image. For example, a custom
+      initrd generator.      
+
 Notation:
    -> #define <something>_P = This is a port
    -> #define <something>_C = This is a command
    -> #define <something>_M = This is a bit mask
-   Underscores preceeding data or function means that
-   that should only be used within the file. Using a 
-   function with this notation without knowing how
-   it works is a bad idea.
+
+Dependencies:
+   Certain subsystems in the kernel require other
+   parts to be working before it can be fully used.
+   
+k_printf,k_print,screen functions:
+   Requires init_vga()
+
+init_gdt
+remap_pic
+init_heap
+   Requires nothing
+
+init_interrupts:
+   Requires remap_pic and init_gdt
+
+init_timer:
+   requires init_interrupts
+
+init_keyboard:
+   requires initrd_interrupts
+
+init_paging:
+   requires init_heap

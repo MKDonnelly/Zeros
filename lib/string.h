@@ -5,7 +5,9 @@ int strlen(char[]);
 void strcpy(char*,char*);
 void strncpy(char*,char*,int);
 int strcmp(char*,char*);
-
+void strcat(char*,char*);
+//TODO
+//char *strstr(char*,char*);
 void reverse(char[]);
 void itoa(int, char[]);
 void itoh(int, char[]);

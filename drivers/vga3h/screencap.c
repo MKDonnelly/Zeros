@@ -1,22 +1,16 @@
 #include "vga3h.h"
 
-//Array is assumed to be 24x160
-void vga3h_screen_cap(int captureArray[][160]){
-
-   for(int row = 0; row < VGA3H_ROWS; row++){
-      for(int col = 0; col < VGA3H_COLS; col++){
-         captureArray[row][col] = VGA3H_VIDEO_MEMORY[160 * row + col];
-      }
+//Array is assumed to be at least VGA3H_ROWS * VGA3H_COLS
+void vga3h_screen_cap(char *captureArray){
+   for(int i = 0; i < VGA3H_ROWS * VGA3H_COLS; i++){
+      captureArray[i] = VGA3H_VIDEO_MEMORY[i];
    }
 }
 
 
-void vga3h_screen_res(int restoreArray[][160]){
-
-   for(int row = 0; row < VGA3H_ROWS; row++){
-      for(int col = 0; col < VGA3H_COLS; col++){
-         VGA3H_VIDEO_MEMORY[160 * row + col] = restoreArray[row][col];
-      }
+void vga3h_screen_res(char *restoreArray){
+   for(int i = 0; i < VGA3H_ROWS * VGA3H_COLS; i++){
+      VGA3H_VIDEO_MEMORY[i] = restoreArray[i];
    }
 }
 

@@ -25,11 +25,6 @@ void k_puts(char *string){
    kernel_vga_screen.k_puts( string );
 }
 
-/*
-void k_printf(char *string){
-   kernel_vga_screen.k_puts( string );
-}*/
-
 void k_printf(char *str, ...){
 
    va_arg args = va_start( str );
@@ -65,6 +60,14 @@ void k_print_at(char *string, int x, int y){
    kernel_vga_screen.k_print_at( string, x, y );
 }
 
+void k_vga_capture(char *captureArray){
+   kernel_vga_screen.k_screen_cap( captureArray );
+}
+
+void k_vga_restore(char *restoreArray){
+   kernel_vga_screen.k_screen_res( restoreArray );
+}
+
 void init_vga(uint8_t mode){
 
    if( mode == 0 ){
@@ -84,9 +87,8 @@ void init_vga(uint8_t mode){
 
       kernel_vga_screen.k_print_at = vga3h_print_at;
 
-      //TODO
-      //kernel_vga_screen.k_screen_cap = vga3h_screen_cap;
-      //kernel_vga_screen.k_screen_res = vga3h_screen_res;
+      kernel_vga_screen.k_screen_cap = vga3h_screen_cap;
+      kernel_vga_screen.k_screen_res = vga3h_screen_res;
 
       kernel_vga_screen.k_scroll = vga3h_scroll;
    }else if( mode == 1){

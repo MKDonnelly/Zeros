@@ -52,6 +52,13 @@ void kmain(struct multiboot_info *h){
   kb_set_leds( 1, 1, 1);
   init_heap();
 
+  char *screen = (char*)kmalloc( VGA3H_ROWS * VGA3H_COLS, 0, 0 );
+  k_vga_capture( screen );
+
+  k_printf("Captured screen!");
+  k_delays( 3 );
+  k_vga_restore( screen );
+  kfree( screen );
 
 /*
   k_newline();

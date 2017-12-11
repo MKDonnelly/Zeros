@@ -29,8 +29,8 @@ void vga3h_print_at(char*,int,int);
 void vga3h_clear_screen();
 
 //screencap.c functions
-void vga3h_screen_cap(int captureArray[][160]);
-void vga3h_screen_res(int restoreArray[][160]);
+void vga3h_screen_cap(char *captureArray);
+void vga3h_screen_res(char *restoreArray);
 
 //scroll.c functions
 void vga3h_scroll();
