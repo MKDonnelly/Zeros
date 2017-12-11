@@ -1,0 +1,30 @@
+
+Initrd format:
+   struct initrdFile{
+      uint32_t offset;
+      uint32_t length;
+      char name[32];
+   };
+
+   # OF FILES, MAGIC NUMBER
+   struct initrdFile.offset = 20
+   struct initrdFile.offset = 50
+   struct initrdFile.offset = 60
+   struct initrdFile.offset = 90
+   END OF INITRDFILE STRUCTURES
+      FIXED AT CERTAIN OFFSET
+          .
+          .
+          .
+offset 20:
+   This is the first file
+offset 50:
+   Second file
+offset 60:
+   Third File
+offset 90:
+   Fourth
+
+   EOF 
+
+

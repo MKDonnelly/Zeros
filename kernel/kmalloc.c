@@ -29,6 +29,12 @@ void *kmalloc(uint32_t size, uint8_t align, uint32_t *phys){
                     //This will not be changed if free memory
                     //could not be found
 
+   //TODO: This align code is all messed up.
+   //We need to change the uint32_t types of the
+   //start address, or else adding sizeof something
+   //will not work. We also need to add a check to
+   //ensure that the current chunk of memory being considered
+   //is not already allocated
    if( align ){
       //NOTE: We will simply overestimate the space
       //needed by adding 4K (0x1000). The most space
@@ -36,7 +42,7 @@ void *kmalloc(uint32_t size, uint8_t align, uint32_t *phys){
       //to 4K boundaries is 0x1000 - 1 bytes. 
       //Loop while the current chunk is not large enough and
       //we have not hit the end.
-      while( head->size < ( size + 0x1000 ) && head->nextChunk ){
+      while( head->size < ( size + 0x1000 ) && head->nextChunk){
            head = head->nextChunk;
       }
 
@@ -74,14 +80,15 @@ void *kmalloc(uint32_t size, uint8_t align, uint32_t *phys){
       }
    //We do not need to align on 4K
    }else{
-      while( head->size < size && head->nextChunk ){
+
+      while( head->isAllocated || (head->size < size && head->nextChunk)){
            head = head->nextChunk;
       }
 
       //Make sure we are dealing with a valid chunk of free memory
       if( head->size >= size ){
          struct heapNode *curItem = head;
-         struct heapNode *nextItem = (struct heapNode*)( (int)head + sizeof( struct heapNode ) );
+         struct heapNode *nextItem = (struct heapNode*)( (uint8_t*)head + sizeof( struct heapNode ) + size);
       
          nextItem->nextChunk = curItem->nextChunk;
          nextItem->size = curItem->size - sizeof( struct heapNode ) - size;
@@ -94,7 +101,7 @@ void *kmalloc(uint32_t size, uint8_t align, uint32_t *phys){
          if( phys )
             *phys = retAddr;
 
-         retAddr = ((int)head + sizeof( struct heapNode ) );
+         retAddr = ((int)curItem + sizeof( struct heapNode ) );
       }
    }
    

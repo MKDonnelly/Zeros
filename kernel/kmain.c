@@ -12,6 +12,7 @@
 #include <types.h>
 #include <bitwise.h>
 #include <delay.h>
+#include <portio.h>
 
 #include <cpu.h>
 #include <isr.h>
@@ -19,16 +20,19 @@
 #include <gdt.h>
 #include <paging.h>
 #include <kmalloc.h>
+#include <multiboot.h>
 
 #include <modeset.h>
 #include <vgacommon.h>
+#include <vgafont.h>
 
+#include <fs.h>
+#include <initrd.h>
 
-//TODO add in struct multiboot* to 
-//get information about the system
-void kmain(){
+void kmain(struct multiboot_info *h){
 
-  set_vga_mode( vga_3h_mode );
+  //set_vga_mode( vga_3h_mode );
+  //write_font( g_8x16_font, 16 );
   init_vga(0);
 
   init_gdt();
@@ -36,105 +40,50 @@ void kmain(){
   init_interrupts();
   init_timer(1, 0, 0);
   init_keyboard();
+  //kbd_enc_send_command( KE_ALL_MAKEBREAK_C );
   enable_ints();
 
   k_clear_screen();
   k_newline();
   k_newline();
   k_printf("Enter some text: ");
+  enable_ints();
 
+  kb_set_leds( 1, 1, 1);
   init_heap();
+
+
+  k_newline();
+  k_printf("Kernel command line: ");
+  k_printf( h->cmdline );
+  k_newline();
+
+  fs_node_t *initrd = init_initrd( (uint32_t*)(h->mods->start) );
+  fs_node_t *file = initrd->finddir( initrd, "first");
+
+  k_printf("Contents of \"first\": ");
+  if( file ){
+     char buf[20];
+     read_fs( file, 0, 20, buf );
+     k_printf( buf );
+  } else {
+     k_printf("File not found");
+  }
+
+  k_newline();
+  k_printf("Writing to \"first\"");
+
+  char testStr[] = "Wrote to this";
+  write_fs(file, 0, 20, testStr);
+
+  char b[20];
+  read_fs( file, 0, 20, b );
+  k_newline();
+  k_printf("Content of \"first\" is now: ");
+  k_printf( b );
+
+  kb_set_leds( 1, 1, 1);
   init_paging();
 
   while(1);
 }
-
-
-//         Examples
-
-/*
-//VGA 13h mode
-
-  char *vidmem = (char*)0xA0000;
-  set_vga_mode( vga_13h_mode );
-
-
-  for( int i = 0, j = 0; i < 320 * 200; i++, j++){
-     vidmem[i] = j;
-     if( j >= 255 )
-        j = 0;
-  }
-
-  for( int k = 0; k < 320 * 2; k++){
-     vidmem[k] = 5;
-  }
-*/
-
-
-
-/*
-  //Initilize the GDT
-  init_gdt();
-  //Initilize the PIC
-  remap_pic();
-  //Create the IDT and initilize
-  //the interrupt handlers
-  install_interrupts();
-  
-  init_keyboard();
-  init_timer();
-  move_cursorl( k_xy_to_linear( 0, 0 ) );
-  k_clear_screen();
-
-  //Make sure to enable 
-  //the interrupts
-  enable_ints();
-
-  k_newline();
-  k_newline();
-  k_print("Enter some text: ");
-
-//Paging
-  init_paging();
-
-  //Test mapping
-  page_map( get_page( 0xB8000, 1, kernel_page_dir), KERNEL_MEMORY, IS_WRITEABLE, 0xB8000);
-
-  //Create a page fault for testing
-  char *ptr = (char*)0xB8000;
-  *(ptr + 20) = 'Z';
-//End paging
-
-*/
-/*       Dynamic memory allocation
-  char *mystr = (char*)kmalloc(100, 0);
-  strcpy( mystr, "Testing..." );
-  k_print( mystr );
-*/
-
-/*       Using the keyboard
-  //Initilize the PIC
-  remap_pic();
-  //Create the IDT and initilize
-  //the interrupt handlers
-  install_interrupts();
-  
-  init_keyboard();
-  move_cursorl( k_xy_to_linear( 0, 0 ) );
-
-  //Make sure to enable 
-  //the interrupts
-  //enable_ints();
-  asm volatile("sti");
-  while(1);
-*/
-
-/*	Paging
-  init_paging();
-  //Test mapping
-  //page_map( get_page( 0x900000, 1, kernel_page_dir), 0, 1, 0x900000);
-
-  //Create a page fault for testing
-  char *ptr = (char*)0x900000;
-  char val = *ptr;
-*/

@@ -2,6 +2,8 @@
 
 #include <types.h>
 #include <string.h>
+#include <vgacommon.h>
+#include <cpu.h>
 
 #define HEAPNODE_SIZE sizeof( struct heapNode )
 
