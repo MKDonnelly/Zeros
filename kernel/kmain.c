@@ -29,7 +29,6 @@
 #include <fs.h>
 #include <initrd.h>
 
-//void kmain(struct multiboot_header_s *h){
 void kmain(struct multiboot_info *h){
 
   //set_vga_mode( vga_3h_mode );
@@ -50,11 +49,12 @@ void kmain(struct multiboot_info *h){
   k_printf("Enter some text: ");
   enable_ints();
 
+  k_printf("int: %d hex: %x", 2, 20 );
 
   kb_set_leds( 1, 1, 1);
   init_heap();
 
-
+/*
   k_newline();
   k_printf("Kernel command line: ");
   k_printf( h->cmdline );
@@ -83,7 +83,7 @@ void kmain(struct multiboot_info *h){
   k_newline();
   k_printf("Content of \"first\" is now: ");
   k_printf( b );
-
+*/
   kb_set_leds( 1, 1, 1);
   init_paging();
 

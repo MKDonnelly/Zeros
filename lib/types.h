@@ -8,3 +8,8 @@ typedef short int          int16_t;
 typedef unsigned short int uint16_t;
 typedef int                int32_t;
 typedef unsigned int       uint32_t;
+
+//va_args type and macro
+typedef char* va_arg;
+#define va_start( arg ) ( (char*)&arg + sizeof(arg) )
+#define va_get( args, type ) ( *((type*)args) ) ; (args += sizeof(type))

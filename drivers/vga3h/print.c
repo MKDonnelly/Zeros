@@ -51,7 +51,7 @@ void vga3h_newline(){
   VGA3H_CUR_CURSOR_OFFSET = k_xy_to_linear( 0, current_line + 1 );
 }
 
-void vga3h_print(char *s){
+void vga3h_puts(char *s){
    int i = 0;
    while( s[i] != 0 ){
       vga3h_putchar( s[i] );

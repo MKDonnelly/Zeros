@@ -24,7 +24,7 @@ int k_xy_to_linear(int,int);
 //print.c functions
 void vga3h_putchar(char);
 void vga3h_newline();
-void vga3h_print(char*);
+void vga3h_puts(char*);
 void vga3h_print_at(char*,int,int);
 void vga3h_clear_screen();
 

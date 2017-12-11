@@ -1,13 +1,11 @@
 printing/screen manipulation:
-   Revise screen_cap in vga3h mode to take a int
+  Revise screen_cap in vga3h mode to take a int
      pointer instead of a 2d array
-   implement a frame buffer in both 3h and 13h mode
+  Implement a frame buffer in both 3h and 13h mode
   Better utilize vga colors in 3h mode
       (see https://github.com/JonathanSalwan/Kaminou-Kernel/blob/master/kernel/includes/sys/video.h)
    Create better print output (BUG,LOG,etc)
       and catch errors by using __FILE__
-   Get a proper printf working
-      use system va_args if all else fails
    Add function to scroll.c to scroll both ways
    Work on VGA 13h mode driver
    Scroll screen when text input reaches the end
