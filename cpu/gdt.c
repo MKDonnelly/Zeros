@@ -1,6 +1,9 @@
 
 #include "gdt.h"
 
+const int16_t gdt_kernel_code = 0x8;
+const int16_t gdt_kernel_data = 0x10;
+
 //Our global descriptor table
 struct gdt_entry GDT[GDT_ENTRIES];
 //The GDT descriptor

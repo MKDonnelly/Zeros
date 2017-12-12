@@ -1,10 +1,8 @@
-
 #pragma once
 
 #include <types.h>
 #include <fs.h>
 #include <kmalloc.h>
-#include <string.h>
 #include <vgacommon.h>
 
 #define INITRD_MAGIC 0x12345678
@@ -20,7 +18,7 @@ struct initrd_header{
 //By design, inode will also be the offset in the
 //array of initrd_object's in the initrd.
 struct initrd_object{
-   char name[32];
+   char name[FILENAME_MAX_LEN];
    uint32_t inode;
    uint32_t offset;
    uint32_t length;

@@ -6,9 +6,12 @@
 #define VGA3H_ROWS 25
 #define VGA3H_COLS 80
 
-#define SCREEN_CTRL_PORT 0x3D4
-#define SCREEN_DATA_PORT 0x3D5
+#define SCREEN_CTRL_P 0x3D4
+#define SCREEN_DATA_P 0x3D5
 
+//Cursor ports
+#define VGA3H_CURSOR_HIGH_P 14
+#define VGA3H_CURSOR_LOW_P  15
 
 //Initilized in print.c
 extern char *VGA3H_VIDEO_MEMORY;

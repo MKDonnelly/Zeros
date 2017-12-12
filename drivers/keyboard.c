@@ -12,7 +12,7 @@ void init_keyboard(){
    enable_irq( KEYBOARD_IRQ );
 
    //And set the interrupt handler
-   register_interrupt( 33, keyboard_handler );
+   register_interrupt( KEYBOARD_INTERRUPT, keyboard_handler );
 
    //Initilize the number of characters in the keyboard
    //buffer
@@ -141,24 +141,15 @@ void keyboard_handler(){
       if( key < 0 )
 	      return;
 
-      //Simple test of using getline
-      if( keycode_to_char[ (int)key] == INSERT_KEY ){
-          k_newline();
-          char buffer[100];
-          getline( buffer );
-          k_printf( buffer );   
-          return;
-      }
-
       if( key == SHIFT_RIGHT_KEY || key == SHIFT_LEFT_KEY){
          shift_activated = 1;
       }else if( shift_activated ){
-         k_putchar( shift_keycode_to_char[ (int)key ]);
-         add_keyboard_buffer( shift_keycode_to_char[ (int)key ] );
+         k_putchar( shift_keycode_to_char[(int)key]);
+         add_keyboard_buffer( shift_keycode_to_char[(int)key] );
          shift_activated = 0;
       }else{
-         k_putchar( keycode_to_char[ (int)key ] );
-         add_keyboard_buffer( keycode_to_char[ (int)key ] );
+         k_putchar( keycode_to_char[(int)key] );
+         add_keyboard_buffer( keycode_to_char[(int)key] );
       }
    }
 }

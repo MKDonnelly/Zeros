@@ -12,6 +12,15 @@
 //and color byte associated with it.
 #define VGA3H_MEM_END 0xB8000 + VGA3H_ROWS * VGA3H_COLS * 2
 
+//VGA ports
+#define VGA_MISC_P             0x3C2
+#define VGA_SEQ_IDX_P          0x3C4
+#define VGA_SEQ_DATA_P         0x3C5
+#define VGA_CRTC_IDX_P         0x3D4
+#define VGA_CRTC_DATA_P        0x3D5
+#define VGA_GRAPHICSC_IDX_P    0X3CE
+#define VGA_GRAPHICSC_DATA_P   0X3CF
+#define VGA_ATTRC_DATA_P 0x3C0
 
 //                          VGA 13h mode
 //=========================================================
@@ -49,3 +58,5 @@ void set_vga_mode(unsigned char*);
 
 //Set the given vga plane
 void set_plane(uint8_t);
+
+

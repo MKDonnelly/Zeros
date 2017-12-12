@@ -14,7 +14,7 @@ void init_timer(uint8_t enable, int x, int y){
 
    //Enable the timer interrupt and 
    //set the interrupt handler
-   enable_irq( 0 );
+   enable_irq( TIMER_IRQ );
    register_interrupt( TIMER_INTERRUPT, timer_int_handler );
 
    //Zero out the members of the sys_time struct
@@ -41,7 +41,7 @@ void set_timer_freq(int freq){
 
 
 //This timer callback handles the system clock
-void timer_int_handler( struct registers r){
+void timer_int_handler( registers_t r){
 
    //This will be set if the seconds 
    //have overflowed. We can then decide
@@ -98,28 +98,3 @@ void timer_int_handler( struct registers r){
       k_print_at( seconds, clockx+7, clocky+1);
    }
 }
-
-
-/*
-unsigned int i8253_get(){
-
-   unsigned int lower_byte, higher_byte;
-
-   portb_write( I8253_CMD, I8253_CMD_LATCH );
-   lower_byte = portb_read( I8253_CH0 );
-   higher_byte = portb_read( I8253_CH0 );
-
-   return lower_byte + (higher_byte << 8);
-}
-void i8253_set( unsigned int c ){
-
-   unsigned char counter;
-
-   portb_write( I8253_CMD, I8253_CMD_LOAD );
-
-   counter = (unsigned char) ( c & 0x00ff );
-   portb_write( I8253_CH0, counter );
-
-   counter = (unsigned char) ( ( c >> 8 ) & 0x00ff );
-   portb_write( I8253_CH0, counter);
-}*/

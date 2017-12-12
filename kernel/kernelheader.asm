@@ -19,11 +19,9 @@ multiboot_header:
 
 arch_start:
     push ebx     ;Pass multiboot header
-  
     call kmain
 
 stop:
     cli
     hlt
     jmp stop
-

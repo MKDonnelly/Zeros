@@ -1,11 +1,14 @@
 #pragma once
 
 #include <types.h>
-#include <string.h>
-#include <vgacommon.h>
-#include <cpu.h>
 
 #define HEAPNODE_SIZE sizeof(struct heapNode)
+
+//When splitting a piece of free memory in the
+//heap, this is the minimum amount of free memory
+//that we need left over to make a split. Anything less
+//and kmalloc will just merge it into the called memory.
+#define MIN_SPLIT 20
 
 extern uint32_t kernel_start_heap, kernel_end_heap;
 

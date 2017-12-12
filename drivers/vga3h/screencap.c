@@ -7,7 +7,6 @@ void vga3h_screen_cap(char *captureArray){
    }
 }
 
-
 void vga3h_screen_res(char *restoreArray){
    for(int i = 0; i < VGA3H_ROWS * VGA3H_COLS; i++){
       VGA3H_VIDEO_MEMORY[i] = restoreArray[i];

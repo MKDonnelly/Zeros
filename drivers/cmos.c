@@ -30,6 +30,6 @@ uint16_t getCMOSReg(uint16_t reg){
 }
 
 int8_t cmos_update(){
-   portb_write( CMOS_COMMAND_P, 0x0A);
+   portb_write( CMOS_COMMAND_P, 0xA);
    return portb_read( CMOS_IO_P & 0x80 );
 }

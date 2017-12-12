@@ -6,10 +6,10 @@ int vga3h_get_cursor(){
 
    //reg 14 is high byte of cursor offset
    //reg 15 is low byte of cursor offset
-   portb_write(SCREEN_CTRL_PORT, 14);
-   int offset = portb_read(SCREEN_DATA_PORT) << 8;
-   portb_write(SCREEN_CTRL_PORT, 15);
-   offset += portb_read(SCREEN_DATA_PORT);
+   portb_write(SCREEN_CTRL_P, VGA3H_CURSOR_HIGH_P);
+   int offset = portb_read(SCREEN_DATA_P) << 8;
+   portb_write(SCREEN_CTRL_P, VGA3H_CURSOR_LOW_P);
+   offset += portb_read(SCREEN_DATA_P);
 
    //Number of chars is returned, so multiply by 2
    return offset * 2;
@@ -27,15 +27,15 @@ void vga3h_move_cursorl(int position){
    //Send a command to the vga controller
    //with registers 14 and 15
    //with the high and low bytes to set.
-   portb_write(SCREEN_CTRL_PORT, 14);
-   portb_write(SCREEN_DATA_PORT, position >> 8); //send upper bits
-   portb_write(SCREEN_CTRL_PORT, 15);
-   portb_write(SCREEN_DATA_PORT, position);      //send lower bits
+   portb_write(SCREEN_CTRL_P, VGA3H_CURSOR_HIGH_P);
+   portb_write(SCREEN_DATA_P, position >> 8); //send upper bits
+   portb_write(SCREEN_CTRL_P, VGA3H_CURSOR_LOW_P);
+   portb_write(SCREEN_DATA_P, position);      //send lower bits
 }
 
 //Convert a x,y pair of coordinates on the screen
 //to a linear address in video memory
 int k_xy_to_linear(int x, int y){
-   return y * 80 + x;
+   return y * VGA3H_COLS + x;
 }
 

@@ -1,4 +1,3 @@
-
 #pragma once
 
 //A structure describing a module

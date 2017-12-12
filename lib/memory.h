@@ -1,4 +1,3 @@
-
 #pragma once
 
 void memcpy(void*,void*,int);

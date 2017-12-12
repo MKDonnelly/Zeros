@@ -12,7 +12,7 @@ void init_heap(){
     //Initilize the first element by setting its size to
     //the amount of memory, the next node to 0, and 
     //is allocated to 0.
-    head->nextNode = 0; //No next node, this is the first and only
+    head->nextNode = 0; //No next node, this is the first 
     head->size = kernel_end_heap - kernel_start_heap - HEAPNODE_SIZE;
     head->freeMem = ( (uint8_t*)head + HEAPNODE_SIZE);
     head->isAllocated = 0;
@@ -54,7 +54,7 @@ void *kmalloc(uint32_t size, uint8_t align, uint32_t *phys){
          //and still have free space left over. In the case where we
          //have less than 20 bytes to work with (excluding the heapNode
          //header), it is easier to just merge this will the current node
-         if( curNode->size - size - HEAPNODE_SIZE < 20 ){
+         if( curNode->size - size - HEAPNODE_SIZE < MIN_SPLIT ){
             //No extra heapnode needed
             curNode->isAllocated = 1;
             curNode->freeMem = (void*)((uint8_t*)curNode + HEAPNODE_SIZE);
@@ -101,7 +101,7 @@ void *kmalloc(uint32_t size, uint8_t align, uint32_t *phys){
 
          //It only makes sense to split the free space into two 
          //heapnodes if we have enough space. See above
-         if( head->size - size - HEAPNODE_SIZE < 20 ){
+         if( head->size - size - HEAPNODE_SIZE < MIN_SPLIT ){
             //No heapnode required
             head->freeMem = (void*)( (uint8_t*)head + HEAPNODE_SIZE );
             head->isAllocated = 1;

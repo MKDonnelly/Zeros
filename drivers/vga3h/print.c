@@ -41,8 +41,8 @@ void vga3h_clear_screen( ){
 //move it to the next line. There is a new
 //line every 160 positions.
 void vga3h_newline(){
-  int current_line = (int)( VGA3H_CUR_SCREEN_OFFSET / 160 );
-  VGA3H_CUR_SCREEN_OFFSET = ( (current_line + 1) * 160); 
+  int current_line = (int)( VGA3H_CUR_SCREEN_OFFSET / (VGA3H_COLS*2) );
+  VGA3H_CUR_SCREEN_OFFSET = ( (current_line + 1) * (VGA3H_COLS*2)); 
 
   //Also modify the current cursor location
   //Add 1 to the y value since we want to go
@@ -75,7 +75,7 @@ void vga3h_print_at(char *s, int x, int y){
    int startIndex = y * VGA3H_COLS * 2 + x*2 ;
    while( s[i] != 0 ){
       if( s[i] == '\n' || s[i] == '\r' ){
-         int currentLine = (startIndex / 180);
+         int currentLine = (startIndex / (VGA3H_COLS*2));
 	 startIndex = (currentLine + 1) * VGA3H_COLS * 2;
       }else{
          VGA3H_VIDEO_MEMORY[startIndex] = s[i];

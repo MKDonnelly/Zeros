@@ -10,6 +10,7 @@
 #define I8253_CH2_P   0x42 //This controls the PC speaker
 #define I8253_CTRL_P  0x43
 #define TIMER_INTERRUPT 32
+#define TIMER_IRQ        0
 
 //Configuration bits for port 0x43:
 //(from wiki.osdev.or/Programmable_Interval_Timer)
@@ -71,7 +72,7 @@ void init_timer(uint8_t enable,int x, int y);
 
 //Handler function for the timer
 void set_timer_freq(int);
-void timer_int_handler( struct registers);
+void timer_int_handler( registers_t );
 
 //TODO
 //set_timer_mode();

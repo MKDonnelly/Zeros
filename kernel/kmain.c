@@ -31,8 +31,8 @@
 
 void kmain(struct multiboot_info *h){
 
-  //set_vga_mode( vga_3h_mode );
-  //write_font( g_8x16_font, 16 );
+  set_vga_mode( vga_3h_mode );
+  write_font( g_8x16_font, 16 );
   init_vga(0);
 
   init_gdt();
@@ -90,7 +90,7 @@ void kmain(struct multiboot_info *h){
   k_printf("Content of \"first\" is now: ");
   k_printf( b );
 */
-  //init_paging();
+  init_paging();
 
   while(1);
 }

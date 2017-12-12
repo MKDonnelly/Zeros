@@ -47,37 +47,28 @@ unsigned char vga_13h_mode[] =
     0x41, 0x00, 0x0F, 0x00,0x00
 };
 
-#define VGA_MISC_R 0x3C2
-#define VGA_SEQ_IDX_R 0x3C4
-#define VGA_SEQ_DATA_R 0x3C5
-#define VGA_CRTC_IDX_R 0x3D4
-#define VGA_CRTC_DATA_R 0x3D5
-#define VGA_GRAPHICSC_IDX_R 0X3CE
-#define VGA_GRAPHICSC_DATA_R 0X3CF
-#define VGA_ATTRC_DATA_R 0x3C0
-
 //Give this one of the arrays above and
 //it will set the given video mode.
 void set_vga_mode(unsigned char *regs)
 {
   uint8_t i;
   // write MISCELLANEOUS reg 
-  portb_write(VGA_MISC_R, *regs);
+  portb_write(VGA_MISC_P, *regs);
   regs++;
 
   // Set the sequencer registers 
   for(i = 0; i < 5; i++){
-      portb_write( VGA_SEQ_IDX_R, i);
-      portb_write( VGA_SEQ_DATA_R, *regs);
+      portb_write( VGA_SEQ_IDX_P, i);
+      portb_write( VGA_SEQ_DATA_P, *regs);
       regs++;
   }
 
   // Unlock the crtc registers 
   // so we may write the register values 
-  portb_write(VGA_SEQ_IDX_R, 0x03);
-  portb_write(VGA_CRTC_DATA_R, portb_read(VGA_CRTC_DATA_R) | 0x80);
-  portb_write(VGA_CRTC_IDX_R, 0x11);
-  portb_write(VGA_CRTC_DATA_R, portb_read(VGA_CRTC_DATA_R) & ~0x80);
+  portb_write(VGA_SEQ_IDX_P, 0x03);
+  portb_write(VGA_CRTC_DATA_P, portb_read(VGA_CRTC_DATA_P) | 0x80);
+  portb_write(VGA_CRTC_IDX_P, 0x11);
+  portb_write(VGA_CRTC_DATA_P, portb_read(VGA_CRTC_DATA_P) & ~0x80);
 
   //Make sure the registers remain unlocked
   regs[0x03] |= 0x80;
@@ -86,30 +77,30 @@ void set_vga_mode(unsigned char *regs)
   // Set the crtc regiseters, now that 
   // we have unlocked them 
   for(i = 0; i < 25; i++){
-      portb_write(VGA_CRTC_IDX_R, i);
-      portb_write(VGA_CRTC_DATA_R, *regs);
+      portb_write(VGA_CRTC_IDX_P, i);
+      portb_write(VGA_CRTC_DATA_P, *regs);
       regs++;
   }
 
 
   // Set the graphics controller registers
   for(i = 0; i < 9; i++){
-      portb_write(VGA_GRAPHICSC_IDX_R, i);
-      portb_write(VGA_GRAPHICSC_DATA_R, *regs);
+      portb_write(VGA_GRAPHICSC_IDX_P, i);
+      portb_write(VGA_GRAPHICSC_DATA_P, *regs);
       regs++;
   }
   
   // Set the attribute controller registers 
   for(i = 0; i < 21; i++){
       (void)portb_read(0x3DA);
-      portb_write(VGA_ATTRC_DATA_R, i);
-      portb_write(VGA_ATTRC_DATA_R, *regs);
+      portb_write(VGA_ATTRC_DATA_P, i);
+      portb_write(VGA_ATTRC_DATA_P, *regs);
       regs++;
   }
   
   // lock 16-color palette and unblank display
   (void)portb_read(0x3DA);
-  portb_write(0x3C0, 0x20);
+  portb_write(VGA_ATTRC_DATA_P, 0x20);
 }
 
 //Sets the given VGA plane
@@ -121,12 +112,10 @@ void set_plane(uint8_t plane){
    plane_mask = 1 << plane;
 
    //Set read plane
-   portb_write( VGA_GRAPHICSC_IDX_R, 4 );
-   portb_write( VGA_GRAPHICSC_DATA_R, plane);
+   portb_write( VGA_GRAPHICSC_IDX_P, 4 );
+   portb_write( VGA_GRAPHICSC_DATA_P, plane);
 
    //Set write plane
-   portb_write( VGA_SEQ_IDX_R, 2);
-   portb_write( VGA_SEQ_DATA_R, plane_mask );
+   portb_write( VGA_SEQ_IDX_P, 2);
+   portb_write( VGA_SEQ_DATA_P, plane_mask );
 }
-
-

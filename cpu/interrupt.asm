@@ -9,6 +9,8 @@
 ; they are defined
 [extern add_idt_entry]
 
+extern gdt_kernel_data
+extern gdt_kernel_code
 
 ; This is common to all interrupts.
 ; The only thing that differs is 
@@ -21,7 +23,7 @@ interrupt_common:
    pusha
    mov ax, ds  ;Save the data segment
    push eax    ;descriptor
-   mov ax, 0x10 
+   mov ax, word [gdt_kernel_data]
    mov ds, ax
    mov es, ax
    mov fs, ax
@@ -91,17 +93,20 @@ init_idt:
    leave
    ret
 
+
 global srupdate
 srupdate:
    ;Update the segment regesters
    ;after a GDT init
-   mov ax, 0x10 ;0x10 is our segment
+   mov ax, word [gdt_kernel_data] 
    mov ds, ax
    mov es, ax
    mov fs, ax
    mov gs, ax
    mov ss, ax
-   jmp 0x8: flush
+   jmp 0x8:flush ;This is the gdt_kernel_code value
+                 ;For some reason, I can't get 
+                 ;gdt_kernel_code in place of 0x8
 flush:
    ret
 

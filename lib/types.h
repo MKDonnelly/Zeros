@@ -1,6 +1,7 @@
 #pragma once
 
 #define NULL ((void*)0)
+#define CHAR_BITS ( sizeof(char) * 8 )
 
 typedef char               int8_t;
 typedef unsigned char      uint8_t;

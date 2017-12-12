@@ -7,8 +7,8 @@
 //Our specific GDT (initilized in init_gdt()
 //will be layed out with the code segment first
 //and the data segment second.
-#define GDT_CODE_SEG 0x8
-#define GDT_DATA_SEG 0x10
+extern const int16_t gdt_kernel_code;
+extern const int16_t gdt_kernel_data;
 
 //Used to update the Segment Registers
 //when initilizing the GDT.
