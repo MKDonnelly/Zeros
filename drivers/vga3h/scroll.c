@@ -11,10 +11,3 @@ void vga3h_scroll(){
       VGA3H_VIDEO_MEMORY[to] = VGA3H_VIDEO_MEMORY[from];
    }
 }
-
-//Just call scroll n times
-void vga3h_scroll_by(int n){
-   for(int i = 0; i < n; i++)
-      vga3h_scroll();
-}
-

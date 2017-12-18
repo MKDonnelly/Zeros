@@ -29,23 +29,16 @@ struct vga_screen{
    //Put a character onto the screen
    void (*k_putchar)(char);
 
+   //Put a character on the screen at
+   //the specified x, y
+   void (*k_putchar_at)(char,int,int);
+
    //Clear the screen
    void (*k_clear_screen)();
 
    //Make a newline
    void (*k_newline)();
 
-   //Print a non-formatted string
-   void (*k_puts)(char*);
-
-   //Print a formated string to the screen
-   //and automatically move the cursor
-   void (*k_printf)(char*, ...);
-
-   //Print a non-formatted string 
-   //at a specific location (x,y)
-   void (*k_print_at)(char*,int,int);
-  
 ////////////////////////////////////////
 
 //         Screen capture
@@ -74,14 +67,15 @@ void k_clear_screen();
 void k_newline();
 void k_puts(char*);
 void k_printf(char*, ...);
-void k_print_at(char*,int,int);
-
+void k_printf_at(char*,int,int,...);
 void k_vga_capture(char*);
 void k_vga_restore(char*);
 
 //This does the job of binding
 //the specific function to the
-//generic calls.
+//generic calls. This MUST be called
+//before any of the generic functions
+//above will work.
 // 0 = VGA 3h mode
 // 1 = VGA 13h mode
 void init_vga(uint8_t);

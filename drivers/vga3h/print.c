@@ -27,14 +27,16 @@ void vga3h_putchar( char input ){
    }
 }
 
+void vga3h_putchar_at( char input, int x, int y ){
 
-//Clear the screen and update the position
-void vga3h_clear_screen( ){
-   VGA3H_CUR_SCREEN_OFFSET = 0;
-   for( int i = 0; i < VGA3H_ROWS * VGA3H_COLS; i++){
-      vga3h_putchar(' ');
-   }
-   VGA3H_CUR_SCREEN_OFFSET = 0;
+   //We need to multiply both parts by 2 since
+   //every position has both a character and a color
+   //attribute.
+   int startIndex = y * VGA3H_COLS * 2 + x * 2;   
+   //We don't need to handle \n or \r characters here
+   //since we only keep the current cursor position with
+   //vga3h_putchar.
+   VGA3H_VIDEO_MEMORY[startIndex] = input;
 }
 
 //This functions alters SCREEN_LOCATION to
@@ -48,39 +50,15 @@ void vga3h_newline(){
   //Add 1 to the y value since we want to go
   //to the next line.
   vga3h_move_cursor( 0, current_line + 1);
-  VGA3H_CUR_CURSOR_OFFSET = k_xy_to_linear( 0, current_line + 1 );
+  VGA3H_CUR_CURSOR_OFFSET = vga3h_xy_to_linear( 0, current_line + 1 );
 }
 
-void vga3h_puts(char *s){
-   int i = 0;
-   while( s[i] != 0 ){
-      vga3h_putchar( s[i] );
-      i++;
+
+//Clear the screen and update the position
+void vga3h_clear_screen( ){
+   VGA3H_CUR_SCREEN_OFFSET = 0;
+   for( int i = 0; i < VGA3H_ROWS * VGA3H_COLS; i++){
+      vga3h_putchar(' ');
    }
+   VGA3H_CUR_SCREEN_OFFSET = 0;
 }
-
-//Skip the current index on the screen altogether.
-//Print at a certain (x,y) point on the screen
-void vga3h_print_at(char *s, int x, int y){
-
-   int i = 0;
-
-   //To find the row, multiply the row number
-   //by the number of cells in a line (COLS * 2).
-   //To get the x offset, we need to remember that
-   //each character space visible on the screen represents
-   //two bytes of memory (one for the char and the other
-   //for the color). So we need to double the x offset given
-   //by a factor of 2.
-   int startIndex = y * VGA3H_COLS * 2 + x*2 ;
-   while( s[i] != 0 ){
-      if( s[i] == '\n' || s[i] == '\r' ){
-         int currentLine = (startIndex / (VGA3H_COLS*2));
-	 startIndex = (currentLine + 1) * VGA3H_COLS * 2;
-      }else{
-         VGA3H_VIDEO_MEMORY[startIndex] = s[i];
-	 startIndex += 2;
-      }
-      i++;
-   }
-}  

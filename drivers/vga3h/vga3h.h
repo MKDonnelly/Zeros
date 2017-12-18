@@ -16,29 +16,26 @@
 //Initilized in print.c
 extern char *VGA3H_VIDEO_MEMORY;
 extern int VGA3H_CUR_SCREEN_OFFSET;
+extern int VGA3H_CUR_CURSOR_OFFSET;
 
 //cursor.c functions
 int vga3h_get_cursor();
 void vga3h_move_cursor(int,int);
 void vga3h_move_cursorl(int);
-int k_xy_to_linear(int,int);
-
+int vga3h_xy_to_linear(int,int);
 
 //print.c functions
 void vga3h_putchar(char);
+void vga3h_putchar_at(char,int,int);
 void vga3h_newline();
-void vga3h_puts(char*);
-void vga3h_print_at(char*,int,int);
 void vga3h_clear_screen();
 
 //screencap.c functions
 void vga3h_screen_cap(char *captureArray);
 void vga3h_screen_res(char *restoreArray);
 
-//scroll.c functions
+//scroll.c function
 void vga3h_scroll();
-void vga3h_scroll_by(int);
-
 
 //vgaentry.c functions
 //The colors capable of being printed

@@ -79,9 +79,9 @@ void timer_int_handler( registers_t r){
 
    //Update the clock if needed on the screen
    if( system_timer.enablePrint && secondOverflow ){
-      char hours[9];
-      char minutes[9];
-      char seconds[9];
+      char hours[9] = {0};
+      char minutes[9] = {0};
+      char seconds[9] = {0};
 
       itoa( system_time.hours, hours);
       itoa( system_time.minutes, minutes);
@@ -90,11 +90,19 @@ void timer_int_handler( registers_t r){
       int clockx = system_timer.x;
       int clocky = system_timer.y;
 
-      k_print_at( "System uptime: ", clockx, clocky);
-      k_print_at( hours, clockx+1, clocky+1);
-      k_print_at( ":", clockx+2, clocky+1);
-      k_print_at( minutes, clockx+4, clocky+1);
-      k_print_at( ":", clockx+5, clocky+1);
-      k_print_at( seconds, clockx+7, clocky+1);
+      k_printf_at( "System uptime: ", clockx, clocky);
+      k_printf_at( hours, clockx+1, clocky+1);
+      k_printf_at( ":", clockx+2, clocky+1);
+      //Print two spaces so that the field is clear
+      //if we don't, we will print "59" and then
+      //print a "0" on top of the five, giving the false
+      //impression that we went from 59 to 9 seconds when
+      //the seconds overflow.
+      k_printf_at( "  ", clockx+4, clocky+1);
+      k_printf_at( minutes, clockx+4, clocky+1);
+      k_printf_at( ":", clockx+5, clocky+1);
+      //Same as above
+      k_printf_at( "  ", clockx+7, clocky+1);
+      k_printf_at( seconds, clockx+7, clocky+1);
    }
 }

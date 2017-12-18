@@ -16,6 +16,7 @@ printing/screen manipulation:
   Get a dump of the vga font and create custom font 
   Add more vga modes
   Improve format capabilities of k_printf (print string)
+  Add a function to clear a line
  
 
 utils:
@@ -30,20 +31,19 @@ misc:
       heaps can coexist
    Add a how-to to explain how each subsystem works
       Add examples for each subsystem for reference
+      and list the dependencies
    Work on kmalloc
-      Create a slab allocator (have fixed size block ready)
+      Create a slab allocator (have fixed size blocks ready)
       Stress-test kmalloc
    Add alarms to timer subsystem
-   Timer on screen is currently broken
-      when going into the minutes range
    Work on multiboot header and understand
       what each field is doing
    Add directory support to initrd and improve
       initrd code
-   Create /dev virtual directory
    Copy the initrd over to some space of memory
       so that it is not overwritten. Or at least
       page-protect it.
+   Create /dev virtual directory
    create function to invalidate a page
       asm volatile ("invlpg (%0)" : : "b" (page_addr) : "memory")
    Add random number generator
