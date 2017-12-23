@@ -78,15 +78,15 @@ void itoa(int n, char s[]){
 }
 
 void itoh(int num, char s[]){
+
+   char hex_digits[] = "0123456789ABCDEF";
+
    for(int i = 0; i < 8; i++){
-      char val = num & 0xF;
-      if( val >= 10 ){
-         s[i] = (val - 10) + 'A';
-      }else{
-         s[i] = val + '0';
-      }
+      int val = num & 0xF;
+      s[i] = hex_digits[val];
       num = num >> 4;
    }
+   //Add the null bit
    s[8] = 0;
    reverse(s);
 }

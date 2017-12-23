@@ -50,7 +50,6 @@ void kmain(struct multiboot_info *h){
   k_newline();
   k_printf("Enter some text: ");
 
-
 /*
   k_newline();
   k_printf("Kernel command line: ");
