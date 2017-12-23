@@ -84,7 +84,8 @@ void keyboard_handler();
 
 //Manages KEYBOARD_BUFFER
 void add_keyboard_buffer(int8_t);
-void getline(int8_t*);
+void getline(int8_t*,int);
+char getc();
 
 //Various routines that communicate
 //to the keyboard controller/encoder

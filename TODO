@@ -1,8 +1,8 @@
 printing/screen manipulation:
   Implement a frame buffer in 3h mode
-  Add function to scroll.c to scroll both ways
-  Scroll screen when text input reaches the end
-      allow arrow keys to scroll through buffer 
+     Add function to scroll.c to scroll both ways
+     Scroll screen when text input reaches the end
+       allow arrow keys to scroll through buffer 
   Work on VGA 13h mode driver
      Implement basic shape drawing
      Later on, implement a frame buffer
@@ -19,13 +19,13 @@ utils:
 misc:   
    Unit tests for various subsystems
    Abstract the heap so that multiple 
-      heaps can coexist
+   Work on kmalloc
+     Create a slab allocator (have fixed size blocks ready)
+     Stress-test kmalloc
+     heaps can coexist
    Add a how-to to explain how each subsystem works
       Add examples for each subsystem for reference
       and list the dependencies
-   Work on kmalloc
-      Create a slab allocator (have fixed size blocks ready)
-      Stress-test kmalloc
    Add alarms to timer subsystem
    Work on multiboot header and understand
       what each field is doing
@@ -38,8 +38,6 @@ misc:
    create function to invalidate a page
       asm volatile ("invlpg (%0)" : : "b" (page_addr) : "memory")
    Add random number generator
-   Add a getc function and add max length to getline
-      use getline more
    Use structures to hold more information in devices
    Try to boot UEFI with grub-efi
    Add cpuid functions
