@@ -1,5 +1,7 @@
 #pragma once
 
+#include <types.h>
+
 //A structure describing a module
 //passed by grub
 struct module{

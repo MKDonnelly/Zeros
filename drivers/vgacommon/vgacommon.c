@@ -1,4 +1,3 @@
-
 #include <vgacommon.h>
 
 //These are meant to be called by external code
@@ -22,12 +21,6 @@ void k_newline(){
    kernel_vga_screen.k_newline();
 }
 
-void k_puts(char *string){
-   int i = 0;
-   while( string[i++] != 0 )
-      kernel_vga_screen.k_putchar( string[i] );
-}
-
 void k_printf(char *str, ...){
 
    va_arg args = va_start( str );
@@ -45,6 +38,9 @@ void k_printf(char *str, ...){
          }else if( str[i+1] == 'x' ){
             int arg = va_get( args, int );
             itoh( arg, buf );
+         }else if( str[i+1] == 's' ){
+            char *s = va_get( args, char* );
+            strncpy( buf, s, 20 ); 
          }
 
         //Print string representation
@@ -100,6 +96,23 @@ void k_vga_restore(char *restoreArray){
    kernel_vga_screen.k_screen_res( restoreArray );
 }
 
+void k_set_bg_color(int back){
+   kernel_vga_screen.k_set_bg_color(
+         kernel_vga_screen.vga_colors[back] );
+}
+
+void k_set_fg_color(int fore){
+   kernel_vga_screen.k_set_fg_color( 
+         kernel_vga_screen.vga_colors[fore] );
+}
+
+int k_get_bg_color(){
+   return kernel_vga_screen.k_get_bg_color();
+}
+
+int k_get_fg_color(){
+   return kernel_vga_screen.k_get_fg_color();
+}
 
 void init_vga(uint8_t mode){
 
@@ -116,9 +129,16 @@ void init_vga(uint8_t mode){
       kernel_vga_screen.k_screen_res = vga3h_screen_res;
 
       kernel_vga_screen.k_scroll = vga3h_scroll;
+
+
+      //Map the colors
+      kernel_vga_screen.vga_colors = vga3h_color_array;
+
+      kernel_vga_screen.k_set_bg_color = vga3h_set_bg_color;
+      kernel_vga_screen.k_set_fg_color = vga3h_set_fg_color;
+      kernel_vga_screen.k_get_bg_color = vga3h_get_bg_color;
+      kernel_vga_screen.k_get_fg_color = vga3h_get_fg_color;
    }else if( mode == 1){
       //TODO VGA 13h mode
    }
 }
-
-

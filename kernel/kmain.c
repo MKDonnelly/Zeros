@@ -12,7 +12,7 @@
 #include <types.h>
 #include <bitwise.h>
 #include <delay.h>
-#include <portio.h>
+#include <debug.h>
 
 #include <cpu.h>
 #include <isr.h>
@@ -29,8 +29,17 @@
 #include <fs.h>
 #include <initrd.h>
 
+
 void kmain(struct multiboot_info *h){
 
+  init_vga(0);
+
+
+  //k_set_fg_color(VGA_WHITE);
+  //k_set_bg_color(VGA_RED);
+  //k_printf("Testing...");
+
+/*
   set_vga_mode( vga_3h_mode );
   write_font( g_8x16_font, 16 );
   init_vga(0);
@@ -41,13 +50,12 @@ void kmain(struct multiboot_info *h){
   init_timer(1, 0, 0);
   init_keyboard();
   //kbd_enc_send_command( KE_ALL_MAKEBREAK_C );
-  enable_ints();
+  //enable_ints();
 
   k_clear_screen();
   k_newline();
   k_newline();
   k_printf("Enter some text: ");
-  enable_ints();
 
   kb_set_leds( 1, 1, 1);
   init_heap();
@@ -55,11 +63,13 @@ void kmain(struct multiboot_info *h){
   char *screen = (char*)kmalloc( VGA3H_ROWS * VGA3H_COLS, 0, 0 );
   k_vga_capture( screen );
 
-  k_printf("Captured screen!");
-  k_delays( 3 );
-  k_vga_restore( screen );
-  kfree( screen );
+  k_printf("this %s a test", "is");
 
+  //k_printf("Captured %s", "screen!");
+  //k_delays( 3 );
+  //k_vga_restore( screen );
+  //kfree( screen );
+*/
 /*
   k_newline();
   k_printf("Kernel command line: ");
@@ -90,7 +100,7 @@ void kmain(struct multiboot_info *h){
   k_printf("Content of \"first\" is now: ");
   k_printf( b );
 */
-  init_paging();
+  //init_paging();
 
   while(1);
 }

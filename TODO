@@ -1,23 +1,14 @@
 printing/screen manipulation:
   Implement a frame buffer in 3h mode
   Add function to scroll.c to scroll both ways
-  Implement a k_putchar_at and abstract
-     k_print_at in vgacommon
   Scroll screen when text input reaches the end
       allow arrow keys to scroll through buffer 
   Work on VGA 13h mode driver
      Implement basic shape drawing
      Later on, implement a frame buffer
-  Better utilize vga colors in 3h mode
-      (see https://github.com/JonathanSalwan/Kaminou-Kernel/blob/master/kernel/includes/sys/video.h)
-   Create better print output (BUG,LOG,etc)
-      and catch errors by using __FILE__
-      Use macros to create debug print info
   Get a dump of the vga font and create custom font 
   Add more vga modes
-  Improve format capabilities of k_printf (print string)
   Add a function to clear a line
- 
 
 utils:
    Create a basic file editor by dumping a file into the
