@@ -97,6 +97,7 @@ struct vga_screen{
 int cursor_position();
 void move_cursor(int,int);
 void k_putchar(char);
+void k_putchar_at(char,int,int);
 void k_clear_screen();
 void k_newline();
 void k_puts(char*);
@@ -104,6 +105,7 @@ void k_printf(char*, ...);
 void k_printf_at(char*,int,int,...);
 void k_vga_capture(char*);
 void k_vga_restore(char*);
+void k_scroll_screen();
 void k_set_bg_color(int);
 void k_set_fg_color(int);
 int  k_get_bg_color();

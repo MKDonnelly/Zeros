@@ -32,6 +32,7 @@ void vga3h_putchar_at(char,int,int);
 
 void vga3h_newline();
 void vga3h_clear_screen();
+void vga3h_fast_cls();
 
 //color handling
 void vga3h_set_fg_color(int);

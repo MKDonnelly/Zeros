@@ -13,6 +13,10 @@ void k_putchar(char character){
    kernel_vga_screen.k_putchar( character );
 }
 
+void k_putchar_at(char character, int x, int y){
+   kernel_vga_screen.k_putchar_at( character, x, y );
+}
+
 void k_clear_screen(){
    kernel_vga_screen.k_clear_screen();
 }
@@ -82,10 +86,10 @@ void k_printf_at(char *str, int x, int y, ...){
         //Print string representation
         int j = 0;
         while( buf[j] != 0 )
-          kernel_vga_screen.k_putchar_at( buf[j++], x++, y ); 
+          k_putchar_at( buf[j++], x++, y ); 
         i += 2;
       }else{
-         kernel_vga_screen.k_putchar_at( str[i], x++, y );
+         k_putchar_at( str[i], x++, y );
          i++;
       }
    }
@@ -98,6 +102,10 @@ void k_vga_capture(char *captureArray){
 
 void k_vga_restore(char *restoreArray){
    kernel_vga_screen.k_screen_res( restoreArray );
+}
+
+void k_scroll_screen(){
+   kernel_vga_screen.k_scroll();
 }
 
 void k_set_bg_color(int back){
@@ -126,14 +134,14 @@ void init_vga(uint8_t mode){
 
       kernel_vga_screen.k_putchar = vga3h_putchar;
       kernel_vga_screen.k_putchar_at = vga3h_putchar_at;
-      kernel_vga_screen.k_clear_screen = vga3h_clear_screen;
+      kernel_vga_screen.k_clear_screen = vga3h_fast_cls;
+      //kernel_vga_screen.k_clear_screen = vga3h_clear_screen;
       kernel_vga_screen.k_newline = vga3h_newline;
 
       kernel_vga_screen.k_screen_cap = vga3h_screen_cap;
       kernel_vga_screen.k_screen_res = vga3h_screen_res;
 
       kernel_vga_screen.k_scroll = vga3h_scroll;
-
 
       //Map the colors
       kernel_vga_screen.vga_colors = vga3h_color_array;

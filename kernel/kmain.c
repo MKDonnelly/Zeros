@@ -25,10 +25,20 @@
 #include <modeset.h>
 #include <vgacommon.h>
 #include <vgafont.h>
+#include <bootdemo.h>
 
 #include <fs.h>
 #include <initrd.h>
 
+/*
+void delay_print(char *string, int x, int y){
+   int i = 0;
+   while( string[i] != 0 ){
+      k_delayms(80);
+      k_putchar_at( string[i], x++, y);
+      i++;
+   }
+}*/
 
 void kmain(struct multiboot_info *h){
 
@@ -36,16 +46,26 @@ void kmain(struct multiboot_info *h){
   //write_font( g_8x16_font, 16 );
   init_vga(0);
 
+  k_clear_screen();
+
   init_gdt();
+
   remap_pic();
+
   init_interrupts();
-  init_timer(1, 0, 0);
+
+  init_timer(0, 0, 0);
+
   init_keyboard();
+
   kb_set_leds( 1, 1, 1);
   init_heap();
+
   enable_ints();
 
-  k_clear_screen();
+  demo();
+
+
   k_newline();
   k_newline();
   k_printf("Enter some text: ");

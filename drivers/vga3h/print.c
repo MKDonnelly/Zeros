@@ -121,6 +121,17 @@ void vga3h_clear_screen( ){
    VGA3H_CUR_SCREEN_OFFSET = 0;
 }
 
+//Skip the many function calls to putchar
+void vga3h_fast_cls(){
+   int colorToUse = vga3h_make_color( VGA3H_CUR_FG_COLOR,
+                                      VGA3H_CUR_BG_COLOR );
+   for(int start = 0, end = VGA3H_ROWS * VGA3H_COLS;
+                             start < end ; start+=2){
+      VGA3H_VIDEO_MEMORY[start] = ' ';
+      VGA3H_VIDEO_MEMORY[start+1] = colorToUse;
+   } 
+}
+
 
 void vga3h_set_bg_color(int bg){
    VGA3H_CUR_BG_COLOR = bg;
