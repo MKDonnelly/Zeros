@@ -11,7 +11,6 @@ void delay_print(char *string, int x, int y){
 
 void demo(){
 
-/*
   k_printf("Initilizing VGA .......... [ OK ]\n");
   k_delays(1);
   k_printf("Setting up GDT  .......... [ OK ]\n");
@@ -34,16 +33,16 @@ void demo(){
 
 
   k_clear_screen();
-  delay_print("In the beginning was the ___", 23, 8);
+  delay_print("In the beginning was the hacker", 23, 8);
   k_delays(1);
-  delay_print("and the ___ was all there was.", 23, 9);
+  delay_print("and the hacker was all there was.", 23, 9);
   k_delays(2);
 
   k_clear_screen();
 
-  delay_print("And so the ___ willed into existance", 23, 8);
+  delay_print("And so the hacker brought into existance", 23, 8);
   k_delays(1);
-  delay_print("a system with which to build upon.", 22, 9);
+  delay_print("a system with which to exert his will.", 22, 9);
   k_delays(2);
 
   k_printf_at("============", 10, 15);
@@ -58,9 +57,9 @@ void demo(){
   k_delays(2);
 
 
-  delay_print("And so the ___ began to program his creation", 18, 8);
+  delay_print("And so the hacker began to abstract the system", 18, 8);
   k_delays(1);
-  delay_print("upon the baren landscape. Yet many difficulties", 18, 9);
+  delay_print("upon the baren landscape. Many difficulties", 18, 9);
   k_delays(1);
   delay_print("slowed his progress, all conquered one by one", 25, 10);
   k_delays(2);
@@ -78,7 +77,7 @@ void demo(){
   k_printf_at("========", 56, 17);
   k_delays(2);
 
-  delay_print("Having extended the base system, the ___", 18, 8);
+  delay_print("Having extended the base system, the hacker", 18, 8);
   delay_print("lifted himself to 32-bit mode", 20, 9);
 
   k_delays(3);
@@ -145,16 +144,25 @@ void demo(){
 
   k_delays(2);
 
-  delay_print("And so the ___ rested, for his creation", 25, 4);
-  delay_print("had come far", 35, 5);
+  delay_print("And so the hacker rested, for his creation", 25, 4);
+  delay_print("had come far.", 35, 5);
   k_delays(2);
 
+  k_clear_screen();
+
+  delay_print("Intelligence is not the accrual of knowledge;", 25, 1);
+  k_delays(1);
+  delay_print("Intelligence is the most difficult challenge conquered.", 20, 2);
+
+  k_delays(2);
+
+/*
   for(int i = 0; i < 18; i++){
      k_printf_at("                                                                               ", 0, i);
      k_delayms(500);
   }
 */
-  //40
+  
   char bigbuf[40][80] = { \
 "   L                                                                            ",
 "   k                                           $                                ",
@@ -214,11 +222,67 @@ void demo(){
      k_delayms(150);
   }
 
-  k_printf_at("This is ring 0", 30, 12);
-  k_printf_at("This is kernel mode", 28, 13 );
+
+  //Prints 
+  // "This is ring 0
+  //  This is kernel mode"
+  //By scatter-printing each char
+  k_printf_at("T", 30, 12);
+  k_delayms(500);
+  k_printf_at("s", 34, 13);
+  k_delayms(500);
+  k_printf_at("i", 39, 12);
+  k_delayms(500);
+  k_printf_at("e", 37, 13);
+  k_delayms(500);
+  k_printf_at("i", 32, 12);
+  k_delayms(500);
+  k_printf_at("d", 45, 13);
+  k_delayms(500);
+  k_printf_at("r", 38, 13);
+  k_delayms(500);
+  k_printf_at("s", 36, 12);
+  k_delayms(500);
+  k_printf_at("h", 29, 13);
+  k_delayms(500);
+  k_printf_at(" ", 42, 13);
+  k_printf_at("m", 43, 13);
+  k_delayms(500);
+  k_printf_at("k", 36, 13);
+  k_delayms(500);
+  k_printf_at("s", 33, 12);
+  k_delayms(500);
+  k_printf_at("s", 31, 13);
+  k_delayms(500);
+  k_printf_at("o", 44, 13);
+  k_delayms(500);
+  k_printf_at("r", 38, 12);
+  k_delayms(500);
+  k_printf_at("n", 39, 13);
+  k_delayms(500);
+  k_printf_at("i", 33, 13);
+  k_delayms(500);
+  k_printf_at("n", 40, 12);
+  k_delayms(500);
+  k_printf_at("i", 30, 13);
+  k_delayms(500);
+  k_printf_at("i", 35, 12);
+  k_delayms(500);
+  k_printf_at("l", 41, 13);
+  k_delayms(500);
+  k_printf_at(" ", 42, 12);
+  k_printf_at("0", 43, 12);
+  k_delayms(500);
+  k_printf_at("T", 28, 13);
+  k_delayms(500);
+  k_printf_at("h", 31, 12);
+  k_delayms(500);
+  k_printf_at("e", 40, 13);
+  k_delayms(500);
+  k_printf_at("g", 41, 12);
+  k_delayms(500);
+  k_printf_at("e", 46, 13);
 
   k_delays(3);
   k_clear_screen();
-
-  return;
 }

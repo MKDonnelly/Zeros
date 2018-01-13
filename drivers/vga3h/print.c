@@ -125,7 +125,7 @@ void vga3h_clear_screen( ){
 void vga3h_fast_cls(){
    int colorToUse = vga3h_make_color( VGA3H_CUR_FG_COLOR,
                                       VGA3H_CUR_BG_COLOR );
-   for(int start = 0, end = VGA3H_ROWS * VGA3H_COLS;
+   for(int start = 0, end = VGA3H_ROWS * VGA3H_COLS * 2;
                              start < end ; start+=2){
       VGA3H_VIDEO_MEMORY[start] = ' ';
       VGA3H_VIDEO_MEMORY[start+1] = colorToUse;

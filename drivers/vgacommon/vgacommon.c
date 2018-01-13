@@ -129,6 +129,7 @@ int k_get_fg_color(){
 void init_vga(uint8_t mode){
 
    if( mode == 0 ){
+
       kernel_vga_screen.cursor_position = vga3h_get_cursor;
       kernel_vga_screen.move_cursor = vga3h_move_cursor;
 
@@ -150,6 +151,7 @@ void init_vga(uint8_t mode){
       kernel_vga_screen.k_set_fg_color = vga3h_set_fg_color;
       kernel_vga_screen.k_get_bg_color = vga3h_get_bg_color;
       kernel_vga_screen.k_get_fg_color = vga3h_get_fg_color;
+
    }else if( mode == 1){
       //TODO VGA 13h mode
    }

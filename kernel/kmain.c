@@ -30,15 +30,6 @@
 #include <fs.h>
 #include <initrd.h>
 
-/*
-void delay_print(char *string, int x, int y){
-   int i = 0;
-   while( string[i] != 0 ){
-      k_delayms(80);
-      k_putchar_at( string[i], x++, y);
-      i++;
-   }
-}*/
 
 void kmain(struct multiboot_info *h){
 
