@@ -19,10 +19,11 @@ utils:
 misc:   
    Unit tests for various subsystems
    Abstract the heap so that multiple 
+     heaps can coexist
+   Fix the delay code (randomly waits longer)
    Work on kmalloc
      Create a slab allocator (have fixed size blocks ready)
      Stress-test kmalloc
-     heaps can coexist
    Add a how-to to explain how each subsystem works
       Add examples for each subsystem for reference
       and list the dependencies

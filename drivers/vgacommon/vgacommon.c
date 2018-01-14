@@ -46,7 +46,7 @@ void k_printf(char *str, ...){
             char *s = va_get( args, char* );
             strncpy( buf, s, 20 ); 
          }else if( str[i+1] == 'c' ){
-            char c = va_get(args, char );
+            char c = va_get(args, char);
             buf[0] = c;
             buf[1] = 0;
          } 

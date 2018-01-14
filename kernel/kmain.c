@@ -26,6 +26,7 @@
 #include <vgacommon.h>
 #include <vgafont.h>
 #include <bootdemo.h>
+#include <shell.h>
 
 #include <fs.h>
 #include <initrd.h>
@@ -54,12 +55,18 @@ void kmain(struct multiboot_info *h){
 
   enable_ints();
 
-  demo();
+  //demo();
 
 
   k_newline();
   k_newline();
-  k_printf("Enter some text: ");
+  //k_printf("Enter some text: ");
+  //char input;
+  //while( 1 ){
+  //   if( input = getc() )
+  //      k_printf("You entered %c\n", input);
+  //}
+  shell_start();
 
 /*
   k_newline();

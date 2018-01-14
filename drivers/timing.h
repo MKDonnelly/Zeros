@@ -74,6 +74,10 @@ void init_timer(uint8_t enable,int x, int y);
 void set_timer_freq(int);
 void timer_int_handler( registers_t );
 
+//Register a function to call when 
+//the \r key is pressed.
+void kbd_register_callback();
+
 //TODO
 //set_timer_mode();
 //get_timer_counter();

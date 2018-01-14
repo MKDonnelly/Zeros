@@ -4,6 +4,9 @@
 char KEYBOARD_BUFFER[ KEYBOARD_BUFFER_SIZE ];
 int KEYBOARD_BUFFER_CHARS;
 
+void (*return_callback)();
+uint8_t return_callback_present = 0;
+
 //Make sure the PIC is remapped before
 //calling this.
 void init_keyboard(){
@@ -17,6 +20,11 @@ void init_keyboard(){
    //Initilize the number of characters in the keyboard
    //buffer
    KEYBOARD_BUFFER_CHARS = 0;
+}
+
+void kbd_register_callback( void (*func)() ){
+   return_callback = func;
+   return_callback_present = 1;
 }
 
 //Manages adding and maintaining the keyboard
