@@ -8,6 +8,7 @@
 #include <bitwise.h>
 
 extern void init_idt();
+extern void set_timer_count(uint16_t);
 
 //When calling an interrupt, 
 //the registers are pushed
@@ -23,12 +24,15 @@ extern void init_idt();
 //eflags, then returnCS, then returnEIP, then error, then
 //int_number ...
 typedef struct{
-   uint32_t dataSegment;
    uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax;
-   uint8_t int_number, error;
+
+   //int_number and error are 8 bit numbers, but the
+   //stack is aligned to 32 bits.
+   uint32_t int_number, error; 
+
    //automatically pushed by cpu
-   uint32_t returnEIP, returnCS, eflags;
-}__attribute__((packed)) registers_t;
+   uint32_t eip, cs, eflags;
+} registers_t;
 
 //This is where each handler is held when registered
 void (*int_handlers[TOTAL_INTERRUPTS])(registers_t);

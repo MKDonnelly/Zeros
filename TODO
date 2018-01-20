@@ -1,3 +1,22 @@
+currently working on threads and processes
+   Move the kernel stack to the end of the heap
+      so that when we map the pages, we can identity
+      map up to the end of the heap, then we can do
+      page_directory_t *savedKernelMap = current_identity_mapped_dir;
+      page_directory_t *kernelMapWithStack = clone_directory(savedKernelMap)
+      load_directory( kernelMapWithStack )
+      page_map_auto( <kernel stack area> ...)
+      Then a fork() from the kernel can use the savedKernelMap
+   Create a separate area for allocating thread stack
+      space. Place a guard page at the end of each so that
+      a page fault ocurrs if one exceeds its stack size
+   Fix the uneven scheduling with threads
+
+clean up:
+  Create a code standard
+  Organize files like Benu 
+
+=================================
 printing/screen manipulation:
   Implement a frame buffer in 3h mode
   Add function to scroll.c to scroll both ways
@@ -10,19 +29,21 @@ printing/screen manipulation:
      Later on, implement a frame buffer
   Better utilize vga colors in 3h mode
       (see https://github.com/JonathanSalwan/Kaminou-Kernel/blob/master/kernel/includes/sys/video.h)
-   Create better print output (BUG,LOG,etc)
-      and catch errors by using __FILE__
-      Use macros to create debug print info
+   Create better print output (BUG,LOG,ASSERT,etc)
+      and catch errors by using __FILE__ and __LINE__
   Get a dump of the vga font and create custom font 
-  Add more vga modes
-  Improve format capabilities of k_printf (print string)
- 
+  Add more vga register modes
+  Improve format capabilities of k_printf
+     print string,format specifiers
 
 utils:
    Create a basic file editor by dumping a file into the
       frame buffer and copying it back once done.
    List files in initrd
    Write a simple shell
+   Create a /programs directory to house demo programs
+   create simple games (pong, etc)
+   Make visual effects (digital rain, scrolling letters,etc)
 
 misc:   
    Unit tests for various subsystems
@@ -33,7 +54,11 @@ misc:
    Work on kmalloc
       Create a slab allocator (have fixed size block ready)
       Stress-test kmalloc
-   Add alarms to timer subsystem
+      Create several memory allocation algorithms
+   Add alarms to timer subsystem by using an array
+      of functions as callbacks (like interrupts)
+   Create a keyboard function callback
+   Get proper release/press code working with keyboard
    Timer on screen is currently broken
       when going into the minutes range
    Work on multiboot header and understand
@@ -47,19 +72,22 @@ misc:
    create function to invalidate a page
       asm volatile ("invlpg (%0)" : : "b" (page_addr) : "memory")
    Add random number generator
-   Add a getc function and add max length to getline
-      use getline more
+   Add a basic md5 sum function
+   Add a getc function and add max length to getline, fix getline
    Use structures to hold more information in devices
    Try to boot UEFI with grub-efi
    Add cpuid functions
    Learn qemu to better debug the kernel
-   Impelement call gate
-      Add GDT descriptor w/ CPL = 3 and type of
-      trap gate to a function as the base and limit
-      call using 
-          jmp <GDT offset>:0x0
    Use timer channel 2 to play sound on pc speaker
    Implement APIC
    Implement HPET
-   Implement multitasking
    Implement user mode
+   Create system calls using interrupts
+
+obsolete:
+Impelement call gate
+   Add GDT descriptor w/ CPL = 3 and type of
+   trap gate to a function as the base and limit
+   call using 
+          jmp <GDT offset>:0x0
+ 

@@ -1,5 +1,5 @@
 #include "isr.h"
-
+#include <sched.h>
 
 //This function initilizes the
 //whole interrupt system. It creates
@@ -38,8 +38,8 @@ void unregister_interrupt( uint8_t int_number ){
 }
 
 void main_interrupt_handler(registers_t r){
-
-   //check to see if there is a registered interrupt
+/*
+  //check to see if there is a registered interrupt
    if( bitGet( &int_present, r.int_number ) ){ 
       //If there is, call the function handler
       int_handlers[ r.int_number ]( r );
@@ -62,4 +62,7 @@ void main_interrupt_handler(registers_t r){
       portb_write( MASTER_PIC_CTRL_P, PIC_EOI_C );
       portb_write( SLAVE_PIC_CTRL_P, PIC_EOI_C );
    }
+*/
+      portb_write( MASTER_PIC_CTRL_P, PIC_EOI_C );
+   schedule();
 }
