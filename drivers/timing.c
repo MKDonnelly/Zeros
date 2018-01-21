@@ -59,7 +59,7 @@ uint16_t get_timer_count(){
 //This timer callback handles the system clock
 void timer_int_handler( registers_t r){
 
-/*
+
    //This will be set if the seconds 
    //have overflowed. We can then decide
    //if we should print the system uptime
@@ -122,7 +122,7 @@ void timer_int_handler( registers_t r){
       k_printf_at( "  ", clockx+7, clocky+1);
       k_printf_at( seconds, clockx+7, clocky+1);
    }
-*/
+
    //Switch tasks
-   //schedule();
+   schedule();
 }

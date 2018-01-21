@@ -39,6 +39,14 @@ void vga3h_putchar(char character){
    int colorToUse = vga3h_make_color( VGA3H_CUR_FG_COLOR,
                                       VGA3H_CUR_BG_COLOR );
 
+   //Handle text when it does off the bottom of the console
+   if( VGA3H_CUR_SCREEN_OFFSET >= VGA3H_ROWS * VGA3H_COLS * 2 ){
+      vga3h_scroll();
+      
+      //Move the cursor back a line
+      VGA3H_CUR_SCREEN_OFFSET = VGA3H_CUR_SCREEN_OFFSET - 2 * VGA3H_COLS;
+   }
+
    if( character == '\n' || character == '\r' ){
       vga3h_newline();
    }else if( character == '\b' ){

@@ -21,8 +21,7 @@ clean up:
 printing/screen manipulation:
   Implement a frame buffer in 3h mode
      Add function to scroll.c to scroll both ways
-     Scroll screen when text input reaches the end
-       allow arrow keys to scroll through buffer 
+     Allow arrow keys to scroll through buffer 
   Work on VGA 13h mode driver
      Implement basic shape drawing
      Later on, implement a frame buffer
@@ -32,6 +31,7 @@ printing/screen manipulation:
       and catch errors by using __FILE__ and __LINE__
   Get a dump of the vga font and create custom font 
   Add more vga register modes
+  Get arrow keys to work on terminal
   Improve format capabilities of k_printf
      print string,format specifiers
 
@@ -62,6 +62,7 @@ misc:
    Add alarms to timer subsystem by using an array
       of functions as callbacks (like interrupts)
    Create a keyboard function callback
+   Handle backspaces in keyboard buffer
    Get proper release/press code working with keyboard
    Add alarms to timer subsystem
    Work on multiboot header and understand

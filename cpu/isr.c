@@ -38,18 +38,6 @@ void unregister_interrupt( uint8_t int_number ){
 }
 
 void main_interrupt_handler(registers_t r){
-/*
-  //check to see if there is a registered interrupt
-   if( bitGet( &int_present, r.int_number ) ){ 
-      //If there is, call the function handler
-      int_handlers[ r.int_number ]( r );
-   }else{
-      k_printf("Caught unregistered interrupt %d\n", r.int_number);
-
-      //Make sure to halt if this is a processor error
-      if( r.int_number < 33 )
-         asm("hlt");
-   }
 
    //Check to see if this interrupt came from a PIC.
    //If it did, send the appropriate EOI
@@ -62,7 +50,16 @@ void main_interrupt_handler(registers_t r){
       portb_write( MASTER_PIC_CTRL_P, PIC_EOI_C );
       portb_write( SLAVE_PIC_CTRL_P, PIC_EOI_C );
    }
-*/
-      portb_write( MASTER_PIC_CTRL_P, PIC_EOI_C );
-   schedule();
+
+   //check to see if there is a registered interrupt
+   if( bitGet( &int_present, r.int_number ) ){ 
+      //If there is, call the function handler
+      int_handlers[ r.int_number ]( r );
+   }else{
+      k_printf("Caught unregistered interrupt %d\n", r.int_number);
+
+      //Make sure to halt if this is a processor error
+      if( r.int_number < 33 )
+         asm("hlt");
+   }
 }

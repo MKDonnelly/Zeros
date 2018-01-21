@@ -32,7 +32,7 @@ extern gdt_kernel_code
 
 extern cur_context
 interrupt_common:
-   ;cli
+   ;cli   ;We cannot be interrupt during an interrupt
    pushad
 
    ;Save the current context

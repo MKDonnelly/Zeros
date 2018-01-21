@@ -3,7 +3,7 @@
 #define MAX_THREADS 20
 kthread_t *threads[MAX_THREADS] = {0};
 
-int next_free_thread = 0;
+int next_free_thread = 1;
 int cur_thread_index = 0;
 thread_context_t *cur_context = NULL;
 
@@ -14,7 +14,7 @@ void add_thread(kthread_t *thread){
    }
 }
 
-void yield_thread(){
+void thread_yield(){
    asm volatile("int $50");
 }
 
@@ -28,7 +28,7 @@ static void idle_thread(){
 void init_threading(){
 
    //Setup the idle thread and jump to it
-   //threads[0] = k_create_thread( idle_thread, NULL, NULL, 0xff, 0);
+   threads[0] = k_create_thread( idle_thread, NULL, NULL, 1024, 0);
    register_interrupt( 50, schedule);
 
    jump_to_thread( threads[0]->context );
