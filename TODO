@@ -10,7 +10,8 @@ currently working on threads and processes
    Create a separate area for allocating thread stack
       space. Place a guard page at the end of each so that
       a page fault ocurrs if one exceeds its stack size
-   Fix the uneven scheduling with threads
+   Fix the uneven scheduling with threads (07_Simple_RR is an example
+      of an os that has very fair scheduling. Try to mimic it)
 
 clean up:
   Create a code standard
@@ -19,11 +20,9 @@ clean up:
 =================================
 printing/screen manipulation:
   Implement a frame buffer in 3h mode
-  Add function to scroll.c to scroll both ways
-  Implement a k_putchar_at and abstract
-     k_print_at in vgacommon
-  Scroll screen when text input reaches the end
-      allow arrow keys to scroll through buffer 
+     Add function to scroll.c to scroll both ways
+     Scroll screen when text input reaches the end
+       allow arrow keys to scroll through buffer 
   Work on VGA 13h mode driver
      Implement basic shape drawing
      Later on, implement a frame buffer
@@ -48,9 +47,14 @@ utils:
 misc:   
    Unit tests for various subsystems
    Abstract the heap so that multiple 
-      heaps can coexist
+     heaps can coexist
+   Fix the delay code (randomly waits longer)
+   Work on kmalloc
+     Create a slab allocator (have fixed size blocks ready)
+     Stress-test kmalloc
    Add a how-to to explain how each subsystem works
       Add examples for each subsystem for reference
+      and list the dependencies
    Work on kmalloc
       Create a slab allocator (have fixed size block ready)
       Stress-test kmalloc
@@ -59,16 +63,15 @@ misc:
       of functions as callbacks (like interrupts)
    Create a keyboard function callback
    Get proper release/press code working with keyboard
-   Timer on screen is currently broken
-      when going into the minutes range
+   Add alarms to timer subsystem
    Work on multiboot header and understand
       what each field is doing
    Add directory support to initrd and improve
       initrd code
-   Create /dev virtual directory
    Copy the initrd over to some space of memory
       so that it is not overwritten. Or at least
       page-protect it.
+   Create /dev virtual directory
    create function to invalidate a page
       asm volatile ("invlpg (%0)" : : "b" (page_addr) : "memory")
    Add random number generator

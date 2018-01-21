@@ -19,7 +19,7 @@ int vga3h_get_cursor(){
 //Given an x and y value, move the
 //cursor to that location
 void vga3h_move_cursor(int x, int y){
-   vga3h_move_cursorl( k_xy_to_linear( x, y ) );
+   vga3h_move_cursorl( vga3h_xy_to_linear( x, y ) );
 }
 
 //Move cursor using a linear offset
@@ -35,7 +35,7 @@ void vga3h_move_cursorl(int position){
 
 //Convert a x,y pair of coordinates on the screen
 //to a linear address in video memory
-int k_xy_to_linear(int x, int y){
+int vga3h_xy_to_linear(int x, int y){
    return y * VGA3H_COLS + x;
 }
 

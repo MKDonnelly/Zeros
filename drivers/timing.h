@@ -78,6 +78,7 @@ void set_timer_count(uint16_t);
 void timer_int_handler( registers_t );
 
 uint16_t get_timer_count();
+
 //TODO
 //set_timer_mode();
 //get_timer_counter();

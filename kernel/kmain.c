@@ -12,7 +12,7 @@
 #include <types.h>
 #include <bitwise.h>
 #include <delay.h>
-#include <portio.h>
+#include <debug.h>
 
 #include <cpu.h>
 #include <isr.h>
@@ -27,6 +27,8 @@
 #include <modeset.h>
 #include <vgacommon.h>
 #include <vgafont.h>
+#include <bootdemo.h>
+#include <shell.h>
 
 #include <fs.h>
 #include <initrd.h>
@@ -99,13 +101,17 @@ void thread8(){
 
 void kmain(struct multiboot_info *h){
 
-  set_vga_mode( vga_3h_mode );
-  write_font( g_8x16_font, 16 );
+  //set_vga_mode( vga_3h_mode );
+  //write_font( g_8x16_font, 16 );
   init_vga(0);
   k_clear_screen();
 
+  k_clear_screen();
+
   init_gdt();
+
   remap_pic();
+
   init_interrupts();
   init_timer(0, 0, 0);
   init_keyboard();
@@ -114,6 +120,8 @@ void kmain(struct multiboot_info *h){
   k_newline();
   k_newline();
   k_printf("Enter some text: ");
+
+  init_timer(0, 0, 0);
 
   init_heap();
   init_paging();

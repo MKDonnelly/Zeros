@@ -82,9 +82,14 @@ void init_keyboard();
 //Manages keyboard input
 void keyboard_handler();
 
+//Register a function to call
+//when \r is entered
+void kbd_register_callback( void (*func)());
+
 //Manages KEYBOARD_BUFFER
 void add_keyboard_buffer(int8_t);
-void getline(int8_t*);
+void getline(int8_t*,int);
+char getc();
 
 //Various routines that communicate
 //to the keyboard controller/encoder
