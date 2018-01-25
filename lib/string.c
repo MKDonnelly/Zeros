@@ -40,13 +40,28 @@ int strcmp(char *str1, char *str2){
 
 //We will assume that str1 has enough space
 //to place str2 at the end.
-void strappend(char *str1, char *str2){
+void strcat(char *str1, char *str2){
    int s1len = strlen(str1);
    int s2len = strlen(str2);
    for(int j = 0; j < s2len; j++){
       str1[s1len+j] = str2[j];
    }
 }
+
+/*
+char *strstr(char *source, char *substr){
+   int source_len = strlen(source);
+   int substr_len = strlen(substr);
+   char *ret = NULL;
+
+   int i = 0;
+   while( ! ret && i < source_len && i < substr_len ){
+      int j = 0;
+      while( source[i] == substr[j] ) j++;
+      if( j == substr_len )
+         ret = source[i];
+   }
+}*/
 
 //Reverse the given string
 void reverse(char s[]){

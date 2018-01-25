@@ -5,6 +5,8 @@
 #include <cpu.h>
 #include <sched.h>
 #include <memory.h>
+#include <fs.h>
+#include <kmalloc.h>
 
 #define PROMPT "Root@Ring0-> "
 
@@ -14,3 +16,4 @@ void zeros_shell();
 //Command parser
 void parse_command(char*);
 
+void help();

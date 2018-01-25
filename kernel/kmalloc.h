@@ -2,8 +2,6 @@
 
 #include <types.h>
 
-#define HEAPNODE_SIZE sizeof(struct heapNode)
-
 //When splitting a piece of free memory in the
 //heap, this is the minimum amount of free memory
 //that we need left over to make a split. Anything less
@@ -12,10 +10,10 @@
 
 extern uint32_t kernel_start_heap, kernel_end_heap;
 
-struct heapNode{
+typedef struct heapnode{
    //Pointer to the next heapNode
    //in the heap 
-   struct heapNode *nextNode;
+   struct heapnode *nextNode;
    
    //The start address of the free memory
    //in this chunk. It will be at the 
@@ -30,7 +28,7 @@ struct heapNode{
    //memory is free or allocated.
    int8_t isAllocated : 1; //Is this being used?
    int8_t not_used : 7; //For future information
-}__attribute__((packed));
+} heapnode_t;
 
 //Initilize the kernel heap
 void init_heap();

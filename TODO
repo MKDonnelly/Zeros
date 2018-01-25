@@ -46,18 +46,15 @@ utils:
 
 misc:   
    Unit tests for various subsystems
-   Abstract the heap so that multiple 
-     heaps can coexist
-   Fix the delay code (randomly waits longer)
-   Work on kmalloc
-     Create a slab allocator (have fixed size blocks ready)
-     Stress-test kmalloc
+  Fix the delay code (randomly waits longer)
    Add a how-to to explain how each subsystem works
       Add examples for each subsystem for reference
       and list the dependencies
    Work on kmalloc
       Create a slab allocator (have fixed size block ready)
       Stress-test kmalloc
+      Abstract the heap so that multiple 
+         heaps can coexist
       Create several memory allocation algorithms
    Add alarms to timer subsystem by using an array
       of functions as callbacks (like interrupts)

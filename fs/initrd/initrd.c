@@ -6,6 +6,19 @@
 //inode corresponding to its index, we can place the index
 //to get the initrd_object from the initrd header
 
+//initrd_close, initrd_readfile, and initrd_writefile
+//are used to implement close, read, and write for each
+//file node returned by either initrd_readdir or initrd_finddir
+
+//initrd_close, initrd_readdir and initrd_finddir are used to implement
+//close, readdir, finddir for the initrd root node. initrd_close works
+//for both files and directories.
+
+void initrd_close(fs_node_t *node){
+   kfree( node );
+   node = NULL;
+}
+
 //TODO: Make some meaningful error codes to be returned
 static uint32_t initrd_readfile(fs_node_t *node, uint32_t offset, uint32_t size, int8_t *buffer){
 
@@ -82,7 +95,7 @@ static fs_node_t *initrd_readdir(fs_node_t *node, uint32_t index){
       fsNode->read = initrd_readfile;
       fsNode->write = initrd_writefile;
       fsNode->open = 0;
-      fsNode->close = 0;
+      fsNode->close = initrd_close; 
       fsNode->readdir = 0;
       fsNode->finddir = 0;
    }
@@ -112,7 +125,7 @@ static fs_node_t *initrd_finddir(fs_node_t *node, char *name){
             fsNode->read = initrd_readfile;
             fsNode->write = initrd_writefile;
             fsNode->open = 0;
-            fsNode->close = 0;
+            fsNode->close = initrd_close; 
             fsNode->readdir = 0;
             fsNode->finddir = 0;
          }
@@ -120,7 +133,6 @@ static fs_node_t *initrd_finddir(fs_node_t *node, char *name){
    }
    return fsNode;
 }
-
 
 
 //This function will initilize the initrd for use.
@@ -158,7 +170,7 @@ fs_node_t *init_initrd(uint32_t *addr){
    initrd->read = 0;
    initrd->write = 0;
    initrd->open = 0;
-   initrd->close = 0;
+   initrd->close = initrd_close;
    initrd->readdir = initrd_readdir;
    initrd->finddir = initrd_finddir;
    initrd->ptr = 0;

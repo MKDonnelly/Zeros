@@ -121,9 +121,11 @@ void kmain(struct multiboot_info *h){
   init_heap();
   init_paging();
 
+
+  fs_root = init_initrd( h->mods->start );
+
   add_thread( k_create_thread( zeros_shell, NULL, NULL, 4192, 0) );
   
-
 /*
   add_thread( k_create_thread( thread1, NULL, NULL, 0x1000, 0) );
   add_thread( k_create_thread( thread2, NULL, NULL, 0x1000, 0) );
