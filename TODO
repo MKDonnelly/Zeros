@@ -27,13 +27,16 @@ printing/screen manipulation:
      Later on, implement a frame buffer
   Better utilize vga colors in 3h mode
       (see https://github.com/JonathanSalwan/Kaminou-Kernel/blob/master/kernel/includes/sys/video.h)
-   Create better print output (BUG,LOG,ASSERT,etc)
+  Create better print output (BUG,LOG,ASSERT,etc)
       and catch errors by using __FILE__ and __LINE__
+      use assert more in code 
   Get a dump of the vga font and create custom font 
   Add more vga register modes
   Get arrow keys to work on terminal
   Improve format capabilities of k_printf
      print string,format specifiers
+  Unify all of the screen operations into printf and have escape 
+     sequences dictate cursor position, color, etc
 
 utils:
    Create a basic file editor by dumping a file into the
@@ -46,7 +49,7 @@ utils:
 
 misc:   
    Unit tests for various subsystems
-  Fix the delay code (randomly waits longer)
+   Fix the delay code (randomly waits longer)
    Add a how-to to explain how each subsystem works
       Add examples for each subsystem for reference
       and list the dependencies
@@ -56,10 +59,14 @@ misc:
       Abstract the heap so that multiple 
          heaps can coexist
       Create several memory allocation algorithms
+      Advanced malloc idea: have malloc return a double pointer.
+         malloc will maintain the second pointer. This way, malloc
+         can change where each piece of dynamic memory lies transparent
+         to the external process.
+   Make as much as possible work through the VFS (screen, timer, etc)
    Add alarms to timer subsystem by using an array
       of functions as callbacks (like interrupts)
    Create a keyboard function callback
-   Handle backspaces in keyboard buffer
    Get proper release/press code working with keyboard
    Add alarms to timer subsystem
    Work on multiboot header and understand

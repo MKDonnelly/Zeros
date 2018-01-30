@@ -33,17 +33,18 @@ void demo(){
 
 
   k_clear_screen();
-  delay_print("In the beginning was the hacker", 23, 8);
+  delay_print("In the beginning was the hacker", 25, 5);
   k_delays(1);
-  delay_print("and the hacker was all there was.", 23, 9);
+  delay_print("and the hacker was all there was.", 23, 6);
   k_delays(2);
 
   k_clear_screen();
 
-  delay_print("And so the hacker brought into existance", 23, 8);
+  delay_print("And so the hacker brought into existance", 20, 5);
   k_delays(1);
-  delay_print("a system with which to exert his will.", 22, 9);
+  delay_print("a system with which to exert his will.", 21, 6);
   k_delays(2);
+
 
   k_printf_at("============", 10, 15);
   k_printf_at("+16-bit CPU+", 10, 16);
@@ -56,16 +57,8 @@ void demo(){
   k_printf_at("========", 56, 17);
   k_delays(2);
 
-
-  delay_print("And so the hacker began to abstract the system", 18, 8);
-  k_delays(1);
-  delay_print("upon the baren landscape. Many difficulties", 18, 9);
-  k_delays(1);
-  delay_print("slowed his progress, all conquered one by one", 25, 10);
-  k_delays(2);
-
   k_clear_screen();
-  
+
   k_printf_at("============", 10, 15);
   k_printf_at("+16-bit CPU+", 10, 16);
   k_printf_at("============", 10, 17); 
@@ -77,91 +70,103 @@ void demo(){
   k_printf_at("========", 56, 17);
   k_delays(2);
 
-  delay_print("Having extended the base system, the hacker", 18, 8);
-  delay_print("lifted himself to 32-bit mode", 20, 9);
+  delay_print("And so the hacker set to work,", 25, 5);
+  k_delays(1);
+  delay_print("to impose order upon the machine.", 23, 6);
+  k_delays(2);
+
+  delay_print("Yet such a primitive system was not pleasing,", 18, 8);
+  k_delays(1);
+  delay_print("and so the hacker ascended.", 27, 9);
 
   k_delays(3);
 
-  for(int i = 0; i < 20; i++){
+
+  for(int i = 0; i < 18; i++){
      k_scroll_screen();
      k_delays(1);
   }
 
-
-  k_printf_at("============", 10, 14);
-  k_printf_at("+32-bit CPU+", 10, 15);
-  k_printf_at("============", 10, 16); 
-  k_printf_at("==============================", 24, 14);
-  k_printf_at("+        4G Memory           +", 24, 15);
-  k_printf_at("==============================", 24, 16);
+  k_printf_at("============", 10, 20);
+  k_printf_at("+32-bit CPU+", 10, 21);
+  k_printf_at("============", 10, 22); 
+  k_printf_at("==============================", 24, 20);
+  k_printf_at("+        4G Memory           +", 24, 21);
+  k_printf_at("==============================", 24, 22);
+  k_printf_at("=======", 55, 20);
+  k_printf_at("+Drive+", 55, 21);
+  k_printf_at("=======", 55, 22);
  
   k_delays(2); 
   
-  delay_print("Upon this base would be placed paging,", 25, 4);
-  k_printf_at("          <Paging>            ", 24, 8);
-  k_printf_at("==============================", 24, 9);
-  k_printf_at("+      Virtual Memory        +", 24, 10);
-  k_printf_at("==============================", 24, 11);
-  k_printf_at("\\|/\\|/\\|/\\|/\\|/\\|/\\|/\\|/\\|/\\|/", 24, 12);
-  k_printf_at("/|\\/|\\/|\\/|\\/|\\/|\\/|\\/|\\/|\\/|\\", 24, 13);
+  delay_print("And so, unincumbered, the hacker", 24, 4);
+  k_delays(1);
+  delay_print("would impose virtual memory upon the physical;", 17, 5);
+  k_delays(1);
+  delay_print("would impose the thread upon the cpu;", 22, 6);
+  k_delays(1);
+  delay_print("and would impose the VFS upon the drive.", 20, 7);
+
+  
+
+  k_printf_at("          <Paging>            ", 24, 14);
+  k_printf_at("==============================", 24, 15);
+  k_printf_at("+      Virtual Memory        +", 24, 16);
+  k_printf_at("==============================", 24, 17);
+  k_printf_at("\\|/\\|/\\|/\\|/\\|/\\|/\\|/\\|/\\|/\\|/", 24, 18);
+  k_printf_at("/|\\/|\\/|\\/|\\/|\\/|\\/|\\/|\\/|\\/|\\", 24, 19);
+  k_delays(1);
+  
+  k_printf_at("========", 12, 17);
+  k_printf_at("+Thread+", 12, 18);
+  k_printf_at("========", 12, 19);
   k_delays(1);
 
-  delay_print("interrupts, ", 25, 5);  
-  k_printf_at("============", 55, 14);
-  k_printf_at("+Interrupts+", 55, 15);
-  k_printf_at("============", 55, 16); 
-
-  delay_print("a timer.", 38, 5);
-  k_printf_at("=======", 12, 11);  
-  k_printf_at("+Timer+", 12, 12);
-  k_printf_at("=======", 12, 13);
-  k_delays(1);
-
-  delay_print("With this base,", 48, 5);
-  delay_print("processes and threads could exist", 25, 6);
-  k_delays(1);
-
-  k_clear_screen();  
-
-  k_printf_at("============", 10, 14);
-  k_printf_at("+32-bit CPU+", 10, 15);
-  k_printf_at("============", 10, 16); 
-  k_printf_at("==============================", 24, 14);
-  k_printf_at("+        4G Memory           +", 24, 15);
-  k_printf_at("==============================", 24, 16);
-  k_printf_at("          <Paging>            ", 24, 8);
-  k_printf_at("==============================", 24, 9);
-  k_printf_at("+      Virtual Memory        +", 24, 10);
-  k_printf_at("==============================", 24, 11);
-  k_printf_at("\\|/\\|/\\|/\\|/\\|/\\|/\\|/\\|/\\|/\\|/", 24, 12);
-  k_printf_at("/|\\/|\\/|\\/|\\/|\\/|\\/|\\/|\\/|\\/|\\", 24, 13);
-  k_printf_at("============", 55, 14);
-  k_printf_at("+Interrupts+", 55, 15);
-  k_printf_at("============", 55, 16); 
-  k_printf_at("=======", 12, 11);  
-  k_printf_at("+Timer+", 12, 12);
-  k_printf_at("=======", 12, 13);
+  k_printf_at("=====", 56, 17);
+  k_printf_at("+VFS+", 56, 18);
+  k_printf_at("=====", 56, 19);
 
   k_delays(2);
 
-  delay_print("And so the hacker rested, for his creation", 25, 4);
-  delay_print("had come far.", 35, 5);
+  k_clear_screen();  
+
+  k_printf_at("          <Paging>            ", 24, 14);
+  k_printf_at("==============================", 24, 15);
+  k_printf_at("+      Virtual Memory        +", 24, 16);
+  k_printf_at("==============================", 24, 17);
+  k_printf_at("\\|/\\|/\\|/\\|/\\|/\\|/\\|/\\|/\\|/\\|/", 24, 18);
+  k_printf_at("/|\\/|\\/|\\/|\\/|\\/|\\/|\\/|\\/|\\/|\\", 24, 19);
+  k_printf_at("========", 12, 17);
+  k_printf_at("+Thread+", 12, 18);
+  k_printf_at("========", 12, 19);
+  k_printf_at("=====", 56, 17);
+  k_printf_at("+VFS+", 56, 18);
+  k_printf_at("=====", 56, 19);
+  k_printf_at("============", 10, 20);
+  k_printf_at("+32-bit CPU+", 10, 21);
+  k_printf_at("============", 10, 22); 
+  k_printf_at("==============================", 24, 20);
+  k_printf_at("+        4G Memory           +", 24, 21);
+  k_printf_at("==============================", 24, 22);
+  k_printf_at("=======", 55, 20);
+  k_printf_at("+Drive+", 55, 21);
+  k_printf_at("=======", 55, 22);
+ 
+
+  k_delays(2);
+
+  delay_print("And so the hacker rested, for his creation", 19, 4);
+  delay_print("had come far.", 34, 5);
   k_delays(2);
 
   k_clear_screen();
 
-  delay_print("Intelligence is not the accrual of knowledge;", 25, 1);
+  delay_print("Intelligence is not the accrual of knowledge;", 18, 1);
   k_delays(1);
-  delay_print("Intelligence is the most difficult challenge conquered.", 20, 2);
+  delay_print("Intelligence is the most difficult challenge conquered.", 13, 2);
 
   k_delays(2);
 
-/*
-  for(int i = 0; i < 18; i++){
-     k_printf_at("                                                                               ", 0, i);
-     k_delayms(500);
-  }
-*/
   
   char bigbuf[40][80] = { \
 "   L                                                                            ",
@@ -285,4 +290,12 @@ void demo(){
 
   k_delays(3);
   k_clear_screen();
+
+  //Now start the shell.
+  startShell = 1;
+
+  //We currently cannot exit a thread,
+  //so loop forever.
+  while(1)
+     thread_yield();
 }

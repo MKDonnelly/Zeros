@@ -98,6 +98,9 @@ void thread8(){
    }
 }
 
+//Horrible hack to start the shell
+//once the boot demo is done.
+int startShell = 1;
 
 void kmain(struct multiboot_info *h){
 
@@ -112,7 +115,7 @@ void kmain(struct multiboot_info *h){
   init_interrupts();
   init_timer(0, 0, 0);
   init_keyboard();
-  disable_ints();
+  //disable_ints();
 
   k_newline();
   k_newline();
@@ -120,11 +123,16 @@ void kmain(struct multiboot_info *h){
 
   init_heap();
   init_paging();
+  enable_ints();
+
+  //demo();
 
 
   fs_root = init_initrd( h->mods->start );
 
+  //add_thread( k_create_thread( demo, NULL, NULL, 0x3000, 0) );
   add_thread( k_create_thread( zeros_shell, NULL, NULL, 4192, 0) );
+
   
 /*
   add_thread( k_create_thread( thread1, NULL, NULL, 0x1000, 0) );
@@ -136,7 +144,7 @@ void kmain(struct multiboot_info *h){
   add_thread( k_create_thread( thread7, NULL, NULL, 0x1000, 0) );
   add_thread( k_create_thread( thread8, NULL, NULL, 0x1000, 0) );
 */  
-  init_threading();
 
+  init_threading();
   while(1);
 }

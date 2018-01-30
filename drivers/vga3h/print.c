@@ -138,6 +138,8 @@ void vga3h_fast_cls(){
       VGA3H_VIDEO_MEMORY[start] = ' ';
       VGA3H_VIDEO_MEMORY[start+1] = colorToUse;
    } 
+   VGA3H_CUR_SCREEN_OFFSET = 0;
+   VGA3H_CUR_CURSOR_OFFSET = 0;
 }
 
 

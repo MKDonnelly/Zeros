@@ -3,6 +3,9 @@
 
 char KEYBOARD_BUFFER[ KEYBOARD_BUFFER_SIZE ];
 int KEYBOARD_BUFFER_CHARS;
+//This lets getline do a quick check to see
+//if there is a line to return.
+int KEYBOARD_NUM_LINES = 0;
 
 void (*return_callback)();
 uint8_t return_callback_present = 0;
@@ -31,8 +34,12 @@ void kbd_register_callback( void (*func)() ){
 //buffer as new keys come in
 void add_keyboard_buffer(int8_t key){
 
-   //The array has space, append the key.
+   if( key == '\r' ){
+      KEYBOARD_NUM_LINES++;
+   }
+
    if( KEYBOARD_BUFFER_CHARS < KEYBOARD_BUFFER_SIZE ){
+      //The array has space, append the key.
       KEYBOARD_BUFFER[ KEYBOARD_BUFFER_CHARS ] = key;
       KEYBOARD_BUFFER_CHARS++;
    }else{
@@ -53,7 +60,11 @@ void add_keyboard_buffer(int8_t key){
 //Grabs a line out of the keyboard buffer and removes
 //it from the buffer. Ensures that no more than maxlen
 //characters are copied over.
-void getline(int8_t *buffer, int maxlen){
+//TODO getline cuts off the first character of input
+uint8_t getline(int8_t *buffer, int maxlen){
+
+   if( KEYBOARD_NUM_LINES == 0 )
+      return 0;
 
    //Go through the keyboard buffer and copy 
    //over characters to the buffer passed until
@@ -78,6 +89,12 @@ void getline(int8_t *buffer, int maxlen){
 
    //Add 1 since bufferIndex is and index, not a count
    KEYBOARD_BUFFER_CHARS -= bufferIndex+1;
+
+   //We now have 1 less line
+   KEYBOARD_NUM_LINES--;
+
+   //Return success
+   return 1;
 }
 
 //Get a single character from the buffer

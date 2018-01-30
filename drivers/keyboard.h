@@ -88,7 +88,7 @@ void kbd_register_callback( void (*func)());
 
 //Manages KEYBOARD_BUFFER
 void add_keyboard_buffer(int8_t);
-void getline(int8_t*,int);
+uint8_t getline(int8_t*,int);
 char getc();
 
 //Various routines that communicate
