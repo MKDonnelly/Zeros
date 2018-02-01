@@ -58,6 +58,7 @@ misc:
       Stress-test kmalloc
       Abstract the heap so that multiple 
          heaps can coexist
+      get unify_heap working or eliminate it
       Create several memory allocation algorithms
       Advanced malloc idea: have malloc return a double pointer.
          malloc will maintain the second pointer. This way, malloc

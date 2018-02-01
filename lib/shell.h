@@ -7,6 +7,7 @@
 #include <memory.h>
 #include <fs.h>
 #include <kmalloc.h>
+#include <string.h>
 
 #define PROMPT "Root@Ring0-> "
 
@@ -28,3 +29,4 @@ void sysuptime(char);
 void open_file(char*);
 void clear_screen();
 void sysinfo();
+void write_file(char*, char*);

@@ -76,6 +76,25 @@ void parse_command(char *input_cmd){
       clear_screen();
    }else if( strcmp( input_cmd, "sysinfo" ) == 0 ){
       sysinfo();
+   }else if( strcmp( input_cmd, "write_file" ) == ' ' ){
+
+      char *args_start = &input_cmd[11];
+
+      char filename_buf[100];
+      char string_buf[100];
+
+      //Copy over filename
+      int i = 0;
+      while( args_start[i] != ' ' ){
+         filename_buf[i] = args_start[i];
+         i++;
+      }
+      filename_buf[i] = 0;
+
+      //Copy over string
+      memcpy( string_buf, &args_start[i], buffer_len - i );
+
+      write_file( filename_buf, string_buf );
    }
 }
 
@@ -86,6 +105,7 @@ void help(){
    k_printf("   ls_files - List files in initrd\n");
    k_printf("   cat_file <filename> - Dump the given file to the screen\n");
    k_printf("   open_file <filename> - Open file in pager\n");
+   k_printf("   write_file <filename> <str> - Write <str> to <filename>\n");
    k_printf("   clear - Clear screen\n");
    k_printf("   sysinfo - Print system information\n");
 }
@@ -103,16 +123,17 @@ void cat_file(char *filename){
 
    k_printf("Contents of %s:\n", filename);
    fs_node_t *file = fs_root->finddir(fs_root, filename);
+   k_printf("Size: %d\n", file->length );
 
    //Allocate buffer space for the file content
    //do a sanity check to make sure the file is not
    //over 100K.
-   if( file->length < 100000 ){
+   if( file->length < 100000 && file ){
       char *buf = (char*)kmalloc( file->length, 0, 0 );
-      file->read( file, 0, file->length, buf);
-      k_printf("%s\n", buf);  
+      file->read( file, 0, file->length - 1 , buf);
+      k_printf(buf);  
    }
-  
+
    kfree(file);
 }
 
@@ -178,21 +199,13 @@ void sysinfo(){
    k_printf("Threads              Basic scheduler\n");
 }
 
+void write_file(char *filename, char *string){
 
+   fs_node_t *file = fs_root->finddir(fs_root, filename);
 
+   //Write the string and adjust the file length
+   file->write( file, 0, file->length, string);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+   kfree(file);
+}  
 

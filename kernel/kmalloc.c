@@ -143,6 +143,7 @@ void *kmalloc(uint32_t size, uint8_t align, uint32_t *phys){
 //free memory as possible. 
 //TODO Eliminate this and have a kfree look
 //at the node before and after it.
+//THIS IS BROKEN!
 static void unify_heap(){
    heapnode_t *head = (heapnode_t*)kernel_start_heap;
 
@@ -193,5 +194,5 @@ void kfree(void *memChunk){
 
    //Yes, this is very inefficient, 
    //but it is simple.
-   unify_heap();
+   //unify_heap();
 }
