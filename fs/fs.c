@@ -34,14 +34,6 @@ fs_node_t *readdir_fs(fs_node_t *node, uint32_t index){
       return 0;
 }
 
-/*
-struct dirent *readdir_fs(fs_node_t *node, uint32_t index){
-   if( node->readdir != 0 && (node->flags & FS_DIRECTORY))
-      return node->readdir(node, index);
-   else
-      return 0;
-}*/
-
 fs_node_t *finddir_fs(fs_node_t *node, char *name){
    if( node->finddir != 0 && (node->flags & FS_DIRECTORY))
       return node->finddir(node, name);

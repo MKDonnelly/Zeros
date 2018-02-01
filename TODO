@@ -1,45 +1,75 @@
+currently working on threads and processes
+   Move the kernel stack to the end of the heap
+      so that when we map the pages, we can identity
+      map up to the end of the heap, then we can do
+      page_directory_t *savedKernelMap = current_identity_mapped_dir;
+      page_directory_t *kernelMapWithStack = clone_directory(savedKernelMap)
+      load_directory( kernelMapWithStack )
+      page_map_auto( <kernel stack area> ...)
+      Then a fork() from the kernel can use the savedKernelMap
+   Create a separate area for allocating thread stack
+      space. Place a guard page at the end of each so that
+      a page fault ocurrs if one exceeds its stack size
+   Fix the uneven scheduling with threads (07_Simple_RR is an example
+      of an os that has very fair scheduling. Try to mimic it)
+
+clean up:
+  Create a code standard
+  Organize files like Benu 
+
+=================================
 printing/screen manipulation:
-   Revise screen_cap in vga3h mode to take a int
-     pointer instead of a 2d array
-   implement a frame buffer in both 3h and 13h mode
+  Implement a frame buffer in 3h mode
+     Add function to scroll.c to scroll both ways
+     Allow arrow keys to scroll through buffer 
+  Work on VGA 13h mode driver
+     Implement basic shape drawing
+     Later on, implement a frame buffer
   Better utilize vga colors in 3h mode
       (see https://github.com/JonathanSalwan/Kaminou-Kernel/blob/master/kernel/includes/sys/video.h)
-   Create better print output (BUG,LOG,etc)
-      and catch errors by using __FILE__
-   Get a proper printf working
-      use system va_args if all else fails
-   Add function to scroll.c to scroll both ways
-   Work on VGA 13h mode driver
-   Scroll screen when text input reaches the end
-      allow arrow keys to scroll through buffer 
-   Get a dump of the vga font   
+  Create better print output (BUG,LOG,ASSERT,etc)
+      and catch errors by using __FILE__ and __LINE__
+      use assert more in code 
+  Get a dump of the vga font and create custom font 
+  Add more vga register modes
+  Get arrow keys to work on terminal
+  Improve format capabilities of k_printf
+     print string,format specifiers
+  Unify all of the screen operations into printf and have escape 
+     sequences dictate cursor position, color, etc
 
 utils:
    Create a basic file editor by dumping a file into the
       frame buffer and copying it back once done.
    List files in initrd
    Write a simple shell
-
-clean up:
-   move files to more appropriate locations
-   declare constants if possible
-   Provide masks for i/o w/ ports
-   Export GDT constants from gdt.c/h to interrupt.asm
-   Clean up structure defs (struct this_struct -> this_struct_t)
-  
+   Create a /programs directory to house demo programs
+   create simple games (pong, etc)
+   Make visual effects (digital rain, scrolling letters,etc)
 
 misc:   
-   Add parameter to itoh to allow the number
-      of hex digits made
+   Unit tests for various subsystems
+   Fix the delay code (randomly waits longer)
    Add a how-to to explain how each subsystem works
-      Also add a dependency chart for the functions
-      (i.e. we can't use kmalloc unless we call init_heap())
-   Do more error checking in kmalloc.c
-      Currently, kmalloc is broken
+      Add examples for each subsystem for reference
+      and list the dependencies
+   Work on kmalloc
+      Create a slab allocator (have fixed size block ready)
       Stress-test kmalloc
+      Abstract the heap so that multiple 
+         heaps can coexist
+      get unify_heap working or eliminate it
+      Create several memory allocation algorithms
+      Advanced malloc idea: have malloc return a double pointer.
+         malloc will maintain the second pointer. This way, malloc
+         can change where each piece of dynamic memory lies transparent
+         to the external process.
+   Make as much as possible work through the VFS (screen, timer, etc)
+   Add alarms to timer subsystem by using an array
+      of functions as callbacks (like interrupts)
+   Create a keyboard function callback
+   Get proper release/press code working with keyboard
    Add alarms to timer subsystem
-   Timer on screen is currently broken
-      when going into the minutes range
    Work on multiboot header and understand
       what each field is doing
    Add directory support to initrd and improve
@@ -47,23 +77,26 @@ misc:
    Copy the initrd over to some space of memory
       so that it is not overwritten. Or at least
       page-protect it.
+   Create /dev virtual directory
    create function to invalidate a page
       asm volatile ("invlpg (%0)" : : "b" (page_addr) : "memory")
-   Add string functions (strncat, strappend, strcpy, etc)
    Add random number generator
-   Add a getc function and add max length to getline
+   Add a basic md5 sum function
+   Add a getc function and add max length to getline, fix getline
    Use structures to hold more information in devices
-   Re-define characters in vga text mode
    Try to boot UEFI with grub-efi
    Add cpuid functions
    Learn qemu to better debug the kernel
-   Impelement call gate
-      Add GDT descriptor w/ CPL = 3 and type of
-      trap gate to a function as the base and limit
-      call using 
-          jmp <GDT offset>:0x0
    Use timer channel 2 to play sound on pc speaker
    Implement APIC
    Implement HPET
-   Implement multitasking
    Implement user mode
+   Create system calls using interrupts
+
+obsolete:
+Impelement call gate
+   Add GDT descriptor w/ CPL = 3 and type of
+   trap gate to a function as the base and limit
+   call using 
+          jmp <GDT offset>:0x0
+ 

@@ -7,162 +7,192 @@ uint32_t kernel_end_heap = 0x500000;
 
 //Initilize the first heapNode in the heap.
 void init_heap(){
-    //Initilize the heap by creating the first
-    //linked list node at the start of the heap
-    ((struct heapNode*)kernel_start_heap)->nextChunk = 0; //Null it out
-    ((struct heapNode*)kernel_start_heap)->size = kernel_end_heap - 
-                                                kernel_start_heap - 
-                                                sizeof( struct heapNode );
-    ((struct heapNode*)kernel_start_heap)->isAllocated = 0; //Not allocated
+    heapnode_t* head = (heapnode_t*)kernel_start_heap;
+
+    //Initilize the first element by setting its size to
+    //the amount of memory, the next node to 0, and 
+    //is allocated to 0.
+    head->nextNode = NULL; //No next node, this is the first 
+    head->size = kernel_end_heap - kernel_start_heap - sizeof(heapnode_t);
+    head->freeMem = ( (uint8_t*)head + sizeof(heapnode_t) );
+    head->isAllocated = 0;
 }
 
+
 //Walk the heap until enough memory is found
-//Align aligns the page on 4K boundaries. 
+//If "align" is 0, do not align to 4k, else align. 
 //NOTE: To make it easier on ourselves when aligning 
-//      on 4K boundaries, this function will often 
-//      just add 4K as an overestimate instead of going through
-//      the calculation to get it perfect.
+//      on 4K boundaries, this function will just  
+//      add 4K as an overestimate instead of going through
+//      the calculation to get a perfect fit.
 void *kmalloc(uint32_t size, uint8_t align, uint32_t *phys){
 
-   struct heapNode* head = (struct heapNode*)kernel_start_heap;
-   int retAddr = 0; //The address of free memory to allocate.
-                    //This will not be changed if free memory
-                    //could not be found
+   heapnode_t* head = (heapnode_t*)kernel_start_heap;
 
-   //TODO: This align code is all messed up.
-   //We need to change the uint32_t types of the
-   //start address, or else adding sizeof something
-   //will not work. We also need to add a check to
-   //ensure that the current chunk of memory being considered
-   //is not already allocated
+   //Align on 4K boundary
    if( align ){
       //NOTE: We will simply overestimate the space
       //needed by adding 4K (0x1000). The most space
       //that could be wasted after aligning the memory
-      //to 4K boundaries is 0x1000 - 1 bytes. 
-      //Loop while the current chunk is not large enough and
-      //we have not hit the end.
-      while( head->size < ( size + 0x1000 ) && head->nextChunk){
-           head = head->nextChunk;
+      //to 4K boundaries is 4k - 1 bytes. Loop while
+      //the current node is allocated or the current node
+      //is not big enough
+      while( head->isAllocated || ( (head->size < ( size + 0x1000 ) && head->nextNode))){
+           head = head->nextNode;
       }
 
-      //Make sure we are dealing with enough memory in this chunk
-      //i.e. The while loop above did not break out because we hit
-      //the end and head->size is not big enough.
-      if( ! head->nextChunk || (head->size >= (size + 0x1000) )){
+      //Check to make sure the node we landed on is valid.
+      //If it is not, we probably ran out of memory
+      if( ! (head->isAllocated || ((head->size < (size+0x1000)) && (head->nextNode)))){
 
-         //Information about where the free memory in the block will
-         //start, where the 4K ALIGNED memory will start within this
-         //block, and the total size needed after aligning to 4K.
-         int memBlockStart = (int)head + sizeof(struct heapNode);
-         int alignedStart = ((int)head + sizeof(struct heapNode) + 0x1000)
-                             & 0xFFFFF000;
-         int totalSize = size + (alignedStart - memBlockStart);
-         ///
+         //This will point to a suitable block of free memory
+         heapnode_t *curNode = head;
+ 
+         //This will point to the start of the free area that will
+         //be split off from the end of this block
+         heapnode_t *nextNode = (heapnode_t*)( (uint8_t*)head + sizeof(heapnode_t) + size + 0x1000 );
 
-         struct heapNode *curItem = head;
-         struct heapNode *nextItem = (struct heapNode*)memBlockStart;      
+         //Imagine we have a block of 1000 free byte we are using.
+         //Now support we want 990 of those bytes. It does not make
+         //sense to take the last 10 bytes, create a heapnode with it,
+         //and still have free space left over. In the case where we
+         //have less than 20 bytes to work with (excluding the heapNode
+         //header), it is easier to just merge this will the current node
+         if( curNode->size - size - sizeof(heapnode_t) < MIN_SPLIT ){
+            //No extra heapnode needed
+            curNode->isAllocated = 1;
+            curNode->freeMem = (void*)((uint8_t*)curNode + sizeof(heapnode_t));
+            return curNode->freeMem;
 
-         nextItem->nextChunk = curItem->nextChunk;
-         nextItem->size = curItem->size - sizeof(struct heapNode) - totalSize;
-         nextItem->isAllocated = 0;
-   
-         curItem->nextChunk = nextItem;
-         curItem->size = totalSize;
-         curItem->isAllocated = 1;
+         }else{
+            //Create a heapnode
 
-         //This will find the first byte of usable memory in the chunk
-         //and align the free space to 4K boundaries.
-         retAddr = (memBlockStart + 0x1000) & 0xFFFFF000;
-  
-         if( phys )
-            *phys = retAddr;
+            //Initilize the chunk of free memory split off
+            nextNode->nextNode = curNode->nextNode;
+            //Pointer to start of free memory
+            nextNode->freeMem = ( (uint8_t*)nextNode + sizeof(heapnode_t) );
+            nextNode->size = curNode->size - sizeof(heapnode_t) - size - 0x1000;
+            nextNode->isAllocated = 0; //Again, assume that the block we are
+                                       //sitting on is unallocated
+
+            //Initilize the current node
+            curNode->nextNode = nextNode;
+            //Get the head of the current node, add sizeof(heapnode_t) to get
+            //to the first byte of free memory, add 4K since we
+            //just overestimate, and align it all to 4K.
+            curNode->freeMem = (void*)(((uint32_t)((uint8_t*)curNode + sizeof(heapnode_t) + 0x1000)) & 0xFFFFF000);
+            curNode->size = size + 0x1000;
+            curNode->isAllocated = 1;
+      
+            //If specified, return the address
+            if( phys )
+               *phys = (int)curNode->freeMem;
+
+            return curNode->freeMem;
+         }
       }
+
    //We do not need to align on 4K
    }else{
 
-      while( head->isAllocated || (head->size < size && head->nextChunk)){
-           head = head->nextChunk;
+      //Go through each block while the current block is allocated or
+      //is not large enough
+      while( head->isAllocated || (head->size < size && head->nextNode)){
+           head = head->nextNode;
       }
 
       //Make sure we are dealing with a valid chunk of free memory
-      if( head->size >= size ){
-         struct heapNode *curItem = head;
-         struct heapNode *nextItem = (struct heapNode*)( (uint8_t*)head + sizeof( struct heapNode ) + size);
+      if( ! ( head->isAllocated || (head->size < size && head->nextNode) )){
+
+         //It only makes sense to split the free space into two 
+         //heapnodes if we have enough space. See above
+         if( head->size - size - sizeof(heapnode_t) < MIN_SPLIT ){
+            //No heapnode required
+            head->freeMem = (void*)( (uint8_t*)head + sizeof(heapnode_t) );
+            head->isAllocated = 1;
+            return head->freeMem;
+         }else{
+            //Split into two sections
+
+            heapnode_t *curItem = head;
+            heapnode_t *nextItem = (heapnode_t*)( (uint8_t*)head + sizeof(heapnode_t) + size);
       
-         nextItem->nextChunk = curItem->nextChunk;
-         nextItem->size = curItem->size - sizeof( struct heapNode ) - size;
-         nextItem->isAllocated = 0;
+            nextItem->nextNode = curItem->nextNode;
+            nextItem->freeMem = ( (uint8_t*)nextItem + sizeof(heapnode_t) );
+            nextItem->size = curItem->size - sizeof(heapnode_t) - size;
+            nextItem->isAllocated = 0;
+ 
+            curItem->nextNode = nextItem;
+            curItem->size = size;
+            curItem->freeMem = ( (uint8_t*)curItem + sizeof(heapnode_t) );
+            curItem->isAllocated = 1;
 
-         curItem->nextChunk = nextItem;
-         curItem->size = size;
-         curItem->isAllocated = 1;
+            if( phys )
+               *phys = (int)curItem->freeMem;
 
-         if( phys )
-            *phys = retAddr;
-
-         retAddr = ((int)curItem + sizeof( struct heapNode ) );
+            return curItem->freeMem;
+         }
       }
    }
    
-   return (void*)retAddr;
+   //If we get here, we must have run out of memory.
+   return NULL;
 }
 
+//Run through the heap and merge as much
+//free memory as possible. 
+//TODO Eliminate this and have a kfree look
+//at the node before and after it.
+//THIS IS BROKEN!
+static void unify_heap(){
+   heapnode_t *head = (heapnode_t*)kernel_start_heap;
+
+   while( head->nextNode != NULL ){
+      //If we come across two ajacent free memory segments, unify them.
+      //Do NOT advance afterwards. Imagine we had three consecutive blocks
+      //of dynamic memory 1 2 and 3. On the first pass, we would unify 1 and
+      //2 and end up with 1 and 3. We would not want to advance until there
+      //is not another block to unify after 1.
+      if( head->isAllocated == 0 && head->nextNode->isAllocated == 0) {
+         //Say we are at node 1 and we find that node 2 is free.
+         //First, get the next item after node 2 (node 3) and
+         //set that as our next node.
+         head->nextNode = head->nextNode->nextNode;
+         //Then add the size of node 2, which will be whatever
+         // <node 2>->size is plus the header for it
+         head->size += head->nextNode->size + sizeof(heapnode_t);
+      }else{
+         //Finally, jump to the next node and repeat.
+         head = head->nextNode;
+      }
+   }
+}
 
 //Free an allocated chunk of memory
 void kfree(void *memChunk){
 
-   struct heapNode *head = (struct heapNode*)kernel_start_heap;
+   heapnode_t *head = (heapnode_t*)kernel_start_heap;
    char foundMem = 0;
 
-   while( head->nextChunk && ! foundMem){
+   while( head->nextNode && ! foundMem){
 
       //See if the memChunk address falls in the free 
       //space of the current chunk. If it does, we allocate
       //it and break out of the loop by setting foundMem.
-      int chunkStart = ( (int)head + sizeof( struct heapNode ) );
-      int chunkEnd = ( (int)head + sizeof(struct heapNode) + head->size );
+      uint32_t chunkStart = (uint32_t)((uint8_t*)head + sizeof(heapnode_t));
+      uint32_t chunkEnd = (uint32_t)((uint8_t*)head + sizeof(heapnode_t) + head->size);
 
       if( (int)memChunk <= chunkEnd && (int)memChunk >= chunkStart){
+         //If we found the chunk, all we need to do it
+         //set the isAllocated flag to 0.
          head->isAllocated = 0;
          foundMem = 1;
       }else{
-         head = head->nextChunk;
+         head = head->nextNode;
       }
    }
 
    //Yes, this is very inefficient, 
    //but it is simple.
-   unify_heap();
+   //unify_heap();
 }
-
-//Run through the heap and merge as much
-//free memory as possible
-void unify_heap(){
-   struct heapNode* head = (struct heapNode*)kernel_start_heap;
-   while( head->nextChunk ){
-      //If we come across two ajacent free memory segments, unify them.
-      if( head->isAllocated == 0 && head->nextChunk->isAllocated == 0 ) {
-         head->size += head->nextChunk->size + sizeof( struct heapNode );
-         head->nextChunk = head->nextChunk->nextChunk;
-      }
-   }
-}
-
-/*
-void *kmalloc(int size, int align, unsigned int *phys){
-   if( kernel_start_heap + size < kernel_end_heap ){
-      if( align ){
-        kernel_start_heap &= 0xFFFFF000;  //Align the allocated memory
-	kernel_start_heap += 0x1000;      //Add 4k to prevent overlap
-      }
-      if( phys ){
-         *phys = kernel_start_heap;
-      }
-      udword allocated = kernel_start_heap;
-      kernel_start_heap += size;
-      return (void*)allocated;
-   }
-   return (void*)0; //Cannot allocate any more memory
-}*/
-

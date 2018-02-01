@@ -10,10 +10,10 @@ run: kernel/kmain.elf
 	@qemu-system-x86_64 -kernel kernel/kmain.elf -append arg1 -initrd ./bootfiles/initrd 
 debug: kernel/kmain.elf
 	@qemu-system-x86_64 -serial file:serial.log -kernel kernel/kmain.elf  -append arg1 -initrd ./bootfiles/initrd -S -s &
-	@gdb -q -x gdbdebug
+	@gdb -q -x .gdbdebug
 
-kernel/kmain.elf: ${OBJECTS} kernel/kernelheader.o cpu/interrupt.o
-	@ld -m elf_i386 -o kernel/kmain.elf -T link.ld kernel/kernelheader.o cpu/interrupt.o ${OBJECTS}
+kernel/kmain.elf: ${OBJECTS} kernel/kernelheader.o cpu/int.o 
+	@ld -m elf_i386 -o kernel/kmain.elf -T link.ld kernel/kernelheader.o cpu/int.o ${OBJECTS}
 
 %.o: %.c ${CHEADERS}
 	@gcc ${CFLAGS} -c $< -o $@

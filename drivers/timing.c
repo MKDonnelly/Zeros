@@ -1,7 +1,6 @@
 #include "timing.h"
 
 
-
 void init_timer(uint8_t enable, int x, int y){
 
    //Set the received information in system_timer
@@ -10,11 +9,11 @@ void init_timer(uint8_t enable, int x, int y){
    system_timer.y = y;
 
    //Set the timer to operate at 100HZ
-   set_timer_freq( I8253_10MS_COUNTER );
+   set_timer_count( I8253_10MS_COUNTER );
 
    //Enable the timer interrupt and 
    //set the interrupt handler
-   enable_irq( 0 );
+   enable_irq( TIMER_IRQ );
    register_interrupt( TIMER_INTERRUPT, timer_int_handler );
 
    //Zero out the members of the sys_time struct
@@ -26,22 +25,40 @@ void init_timer(uint8_t enable, int x, int y){
    system_time.milliseconds = 0;
 }
 
-void set_timer_freq(int freq){
-   uint32_t opFreq = freq;
+void set_timer_count(uint16_t count){
 
-   //Tell the timer we are going to initilize it
-   portb_write( I8253_CTRL_P, I8253_LOAD_C );
+   //Select Channel 0, set the access mode to
+   //both low/high byte, set it to operate in
+   //mode 3, and use binary instead of BCD 
+   portb_write( I8253_CTRL_P, I8253_CTRL_CH0_M |
+                              I8253_CTRL_LHBYTE_M |
+                              I8253_CTRL_MODE3_M |
+                              I8253_CTRL_BIN_M );
 
    //Write the frequency to the timer
-   int8_t lowerByte = (uint8_t)(opFreq & 0xFF );
-   int8_t higherByte = (uint8_t)( (opFreq >> 8) & 0xFF );
+   int8_t lowerByte = (uint8_t)(count & 0xFF );
+   int8_t higherByte = (uint8_t)( (count >> 8) & 0xFF );
    portb_write( I8253_CH0_P, lowerByte );
    portb_write( I8253_CH0_P, higherByte );
 }
 
+uint16_t get_timer_count(){
+   portb_write( I8253_CTRL_P, 0 );
+   
+   uint16_t result;
+   uint8_t tmp;
+   tmp = portb_read( 0x40 );
+   result = tmp;
+   tmp = portb_read( 0x40 );
+   result |= (tmp << 8 );
+
+   return result;
+}
+
 
 //This timer callback handles the system clock
-void timer_int_handler( struct registers r){
+void timer_int_handler( registers_t r){
+
 
    //This will be set if the seconds 
    //have overflowed. We can then decide
@@ -79,9 +96,9 @@ void timer_int_handler( struct registers r){
 
    //Update the clock if needed on the screen
    if( system_timer.enablePrint && secondOverflow ){
-      char hours[9];
-      char minutes[9];
-      char seconds[9];
+      char hours[9] = {0};
+      char minutes[9] = {0};
+      char seconds[9] = {0};
 
       itoa( system_time.hours, hours);
       itoa( system_time.minutes, minutes);
@@ -90,36 +107,22 @@ void timer_int_handler( struct registers r){
       int clockx = system_timer.x;
       int clocky = system_timer.y;
 
-      k_print_at( "System uptime: ", clockx, clocky);
-      k_print_at( hours, clockx+1, clocky+1);
-      k_print_at( ":", clockx+2, clocky+1);
-      k_print_at( minutes, clockx+4, clocky+1);
-      k_print_at( ":", clockx+5, clocky+1);
-      k_print_at( seconds, clockx+7, clocky+1);
+      k_printf_at( "System uptime: ", clockx, clocky);
+      k_printf_at( hours, clockx+1, clocky+1);
+      k_printf_at( ":", clockx+2, clocky+1);
+      //Print two spaces so that the field is clear
+      //if we don't, we will print "59" and then
+      //print a "0" on top of the five, giving the false
+      //impression that we went from 59 to 9 seconds when
+      //the seconds overflow.
+      k_printf_at( "  ", clockx+4, clocky+1);
+      k_printf_at( minutes, clockx+4, clocky+1);
+      k_printf_at( ":", clockx+5, clocky+1);
+      //Same as above
+      k_printf_at( "  ", clockx+7, clocky+1);
+      k_printf_at( seconds, clockx+7, clocky+1);
    }
+
+   //Switch tasks
+   schedule();
 }
-
-
-/*
-unsigned int i8253_get(){
-
-   unsigned int lower_byte, higher_byte;
-
-   portb_write( I8253_CMD, I8253_CMD_LATCH );
-   lower_byte = portb_read( I8253_CH0 );
-   higher_byte = portb_read( I8253_CH0 );
-
-   return lower_byte + (higher_byte << 8);
-}
-void i8253_set( unsigned int c ){
-
-   unsigned char counter;
-
-   portb_write( I8253_CMD, I8253_CMD_LOAD );
-
-   counter = (unsigned char) ( c & 0x00ff );
-   portb_write( I8253_CH0, counter );
-
-   counter = (unsigned char) ( ( c >> 8 ) & 0x00ff );
-   portb_write( I8253_CH0, counter);
-}*/

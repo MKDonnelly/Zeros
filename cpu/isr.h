@@ -1,16 +1,14 @@
 #pragma once
 
 #include <idt.h>
-#include <cpu.h>
 #include <vgacommon/vgacommon.h>
-#include <portio.h>
 #include <pic.h>
 
-#include <string.h>
 #include <types.h>
 #include <bitwise.h>
 
 extern void init_idt();
+extern void set_timer_count(uint16_t);
 
 //When calling an interrupt, 
 //the registers are pushed
@@ -25,16 +23,19 @@ extern void init_idt();
 //bottom to top to see how the registers are pushed.
 //eflags, then returnCS, then returnEIP, then error, then
 //int_number ...
-struct registers{
-   uint32_t dataSegment;
+typedef struct{
    uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax;
-   uint8_t int_number, error;
+
+   //int_number and error are 8 bit numbers, but the
+   //stack is aligned to 32 bits.
+   uint32_t int_number, error; 
+
    //automatically pushed by cpu
-   uint32_t returnEIP, returnCS, eflags;
-}__attribute__((packed));
+   uint32_t eip, cs, eflags;
+} registers_t;
 
 //This is where each handler is held when registered
-void (*int_handlers[TOTAL_INTERRUPTS])(struct registers);
+void (*int_handlers[TOTAL_INTERRUPTS])(registers_t);
 
 //This is a boolean array to signify that the interrupt
 //handler of the given number is present. We will use
@@ -47,10 +48,10 @@ void init_interrupts();
 
 //This function registers the interrupt so that
 //main_interrupt_handler may use it
-void register_interrupt( uint8_t number, void (*handler)(struct registers));
+void register_interrupt( uint8_t number, void (*handler)(registers_t));
 void unregister_interrupt( uint8_t );
 
 //All interrupts must pass through this to
 //be routed to the correct destination.
-void main_interrupt_handler(struct registers);
+void main_interrupt_handler(registers_t);
 

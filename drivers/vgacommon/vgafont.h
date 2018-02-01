@@ -9,4 +9,5 @@
       write_font( g_8x16_font, 16 );
 */
 
+unsigned char g_8x16_font[4096];
 void write_font(unsigned char *buf, unsigned font_height);

@@ -11,8 +11,8 @@ void bitSet( void *mem, int bitNum ){
    //need to find the index and offset
    //of the bit in memory (with regard
    //to a char type).
-   int index = bitNum / 8;
-   int offset = bitNum % 8;
+   int index = bitNum / CHAR_BITS;
+   int offset = bitNum % CHAR_BITS;
 
    //In this ugly expression, we are casting
    //the void* of the first parameter into
@@ -28,15 +28,14 @@ void bitClear( void *mem, int bitNum ){
    //need to find the index and offset
    //of the bit in memory (with regard
    //to a char type).
-   int index = bitNum / 8;
-   int offset = bitNum % 8;
+   int index = bitNum / CHAR_BITS;
+   int offset = bitNum % CHAR_BITS;
 
    //In this ugly expression, we are casting
    //the void* of the first parameter into
    //something that we can use, a char*.
    //We then access that char* as an array
    //and clear the specified bit.
-   //( (char*)mem )[index] |= (0x0 << offset);
    ( (char*)mem )[index] &= ~( 0x1 << offset );
 }
 
@@ -48,8 +47,8 @@ uint8_t bitGet( void *mem, int bitNum ){
    //need to find the index and offset
    //of the bit in memory (with regard
    //to a char type).
-   int index = bitNum / 8;
-   int offset = bitNum % 8;
+   int index = bitNum / CHAR_BITS;
+   int offset = bitNum % CHAR_BITS;
 
    //In this ugly expression, we are casting
    //the void* of the first parameter into
@@ -57,5 +56,5 @@ uint8_t bitGet( void *mem, int bitNum ){
    //We then get the specified char at the index
    //and select the given bit using the &
    char val = ( ((char*)mem)[index] & (0x1 << offset) );
-   return (val ? (char)1 : (char)0);
+   return (val ? 1 : 0);
 }

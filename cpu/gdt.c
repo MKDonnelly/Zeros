@@ -1,6 +1,9 @@
 
 #include "gdt.h"
 
+const int16_t gdt_kernel_code = 0x8;
+const int16_t gdt_kernel_data = 0x10;
+
 //Our global descriptor table
 struct gdt_entry GDT[GDT_ENTRIES];
 //The GDT descriptor
@@ -43,7 +46,14 @@ void init_gdt(){
    //Load the GDT
    asm volatile("lgdtl (%0)" : : "r" (&GDT_DES));
 
-   //Update our segment registers
-   srupdate();
+   //Update segment registers and do a long jump to update cs
+   asm volatile("movw %0, %%ax" : : "b"(gdt_kernel_data) :);
+   asm volatile("movw %%ax, %%ds" :);
+   asm volatile("movw %%ax, %%es" :);
+   asm volatile("movw %%ax, %%fs" :);
+   asm volatile("movw %%ax, %%gs" :);
+   asm volatile("movw %%ax, %%ss" :);
+   asm volatile("ljmp %0, $updateCS;  \
+                 updateCS: " :: "i"(gdt_kernel_code));
 }
 

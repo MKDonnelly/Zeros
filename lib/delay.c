@@ -37,7 +37,10 @@ void k_delayms(int milliSeconds){
    while( (system_time.hours < endHours )    ||
           (system_time.minutes < endMinutes) || 
           (system_time.seconds < endSeconds) || 
-          (system_time.milliseconds < endMilliseconds) ) ;
+          (system_time.milliseconds < endMilliseconds) ){
+      //Do this so that the cpu is not floored at 100%
+      thread_yield();
+   }
 }
 
 //Just re-use the kdelay_ms function

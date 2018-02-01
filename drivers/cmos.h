@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include <types.h>
@@ -11,13 +10,13 @@
 #define CMOS_COMMAND_P 0x70
 #define CMOS_IO_P  0x71
 
-#define CMOS_SECOND_REG   0x00
-#define CMOS_MINUTE_REG   0x02
-#define CMOS_HOUR_REG    0x04
-#define CMOS_WEEKDAY_REG  0x06
-#define CMOS_DOM_REG      0x07
-#define CMOS_MONTH_REG    0x08
-#define CMOS_YEAR_REG     0x09
+#define CMOS_SECOND_R   0x00
+#define CMOS_MINUTE_R   0x02
+#define CMOS_HOUR_R     0x04
+#define CMOS_WEEKDAY_R  0x06
+#define CMOS_DOM_R      0x07
+#define CMOS_MONTH_R    0x08
+#define CMOS_YEAR_R     0x09
 
 //Initilize the cmos
 void initCMOS();

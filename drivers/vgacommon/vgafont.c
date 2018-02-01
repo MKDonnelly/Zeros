@@ -268,45 +268,44 @@ void write_font(unsigned char *buf, unsigned font_height){
 
 // save registers
 //set_plane() modifies GC 4 and SEQ 2, so save them as well 
-	portb_write( 0x3C4, 2);
-	seq2 = portb_read(0x3C5);
+	portb_write( VGA_SEQ_IDX_P, 2);
+	seq2 = portb_read(VGA_SEQ_DATA_P);
 
-	portb_write(0x3C4, 4);
-	seq4 = portb_read(0x3C5);
+	portb_write(VGA_SEQ_IDX_P, 4);
+	seq4 = portb_read(VGA_SEQ_DATA_P);
 // turn off even-odd addressing (set flat addressing)
 //assume: chain-4 addressing already off 
-	portb_write(0x3C5, seq4 | 0x04);
+	portb_write(VGA_SEQ_DATA_P, seq4 | 0x04);
 
-	portb_write(0x3CE, 4);
-	gc4 = portb_read(0x3CF);
+	portb_write(VGA_GRAPHICSC_IDX_P, 4);
+	gc4 = portb_read(VGA_GRAPHICSC_DATA_P);
 
-	portb_write(0x3CE, 5);
-	gc5 = portb_read(0x3CF);
+	portb_write(VGA_GRAPHICSC_IDX_P, 5);
+	gc5 = portb_read(VGA_GRAPHICSC_DATA_P);
 // turn off even-odd addressing 
-	portb_write(0x3CF, gc5 & ~0x10);
+	portb_write(VGA_GRAPHICSC_DATA_P, gc5 & ~0x10);
 
-	portb_write(0x3CE, 6);
-	gc6 = portb_read(0x3CF);
+	portb_write(VGA_GRAPHICSC_IDX_P, 6);
+	gc6 = portb_read(VGA_GRAPHICSC_DATA_P);
 // turn off even-odd addressing 
-	portb_write(0x3CF, gc6 & ~0x02);
+	portb_write(VGA_GRAPHICSC_DATA_P, gc6 & ~0x02);
 // write font to plane P4 
 	set_plane(2);
 // write font 0 
 	for(i = 0; i < 256; i++)
 	{
-                //memcpy( 0xb8000 + i * 32, buf, font_height);
-                memcpy( (char*)( 0xb800 * 16 + (i * 32)), buf, font_height );
+                memcpy( (char*)( 0xb8000 + (i * 32)), buf, font_height );
 		buf += font_height;
 	}
 // restore registers 
-	portb_write(0x3C4, 2);
-	portb_write(0x3C5, seq2);
-	portb_write(0x3C4, 4);
-	portb_write(0x3C5, seq4);
-	portb_write(0x3CE, 4);
-	portb_write(0x3CF, gc4);
-	portb_write(0x3CE, 5);
-	portb_write(0x3CF, gc5);
-	portb_write(0x3CE, 6);
-	portb_write(0x3CF, gc6);
+	portb_write(VGA_SEQ_IDX_P, 2);
+	portb_write(VGA_SEQ_DATA_P, seq2);
+	portb_write(VGA_SEQ_IDX_P, 4);
+	portb_write(VGA_SEQ_DATA_P, seq4);
+	portb_write(VGA_GRAPHICSC_IDX_P, 4);
+	portb_write(VGA_GRAPHICSC_DATA_P, gc4);
+	portb_write(VGA_GRAPHICSC_IDX_P, 5);
+	portb_write(VGA_GRAPHICSC_DATA_P, gc5);
+	portb_write(VGA_GRAPHICSC_IDX_P, 6);
+	portb_write(VGA_GRAPHICSC_DATA_P, gc6);
 }

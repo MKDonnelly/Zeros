@@ -1,31 +1,40 @@
 #pragma once
 
 #include <types.h>
-#include <string.h>
-#include <vgacommon.h>
-#include <cpu.h>
 
-#define HEAPNODE_SIZE sizeof( struct heapNode )
+//When splitting a piece of free memory in the
+//heap, this is the minimum amount of free memory
+//that we need left over to make a split. Anything less
+//and kmalloc will just merge it into the called memory.
+#define MIN_SPLIT 20
 
 extern uint32_t kernel_start_heap, kernel_end_heap;
 
-//Experimental heap allocator
-struct heapNode{
-   //A pointer to the next heap node
-   //udword nextChunk; 
-   struct heapNode *nextChunk;
-   //The size of the chunk of memory,
-   //not including this header.
+typedef struct heapnode{
+   //Pointer to the next heapNode
+   //in the heap 
+   struct heapnode *nextNode;
+   
+   //The start address of the free memory
+   //in this chunk. It will be at the 
+   //end of this header.
+   void *freeMem;
+
+   //The size of this chunk of memory,
+   //not including the header
    uint32_t size;
+
    //Various attributes such as if the
    //memory is free or allocated.
-   //ubyte attributes;
    int8_t isAllocated : 1; //Is this being used?
    int8_t not_used : 7; //For future information
-}__attribute__((packed));
+} heapnode_t;
 
-
+//Initilize the kernel heap
 void init_heap();
+
+//Dynamically allocate memory
 void *kmalloc(uint32_t,uint8_t,uint32_t*);
+
+//Free dynamic memory
 void kfree(void*);
-void unify_heap();

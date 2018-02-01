@@ -9,6 +9,8 @@
 ; they are defined
 [extern add_idt_entry]
 
+extern gdt_kernel_data
+extern gdt_kernel_code
 
 ; This is common to all interrupts.
 ; The only thing that differs is 
@@ -16,27 +18,44 @@
 ; number pushed by each. By having
 ; each interrupt jump here, we cut
 ; down the size of the compiled file.
+
+; Stack 
+;     ;;;;; PUSHED BY CPU ;;;;;;;
+;     32 bits EFLAGS
+;     32 bits CS
+;     32 bits EIP
+;
+;     ;;;;; PUSHED BY ME ;;;;;;;;
+;     8 bits error code, int #
+;     <pushad stuff>
+;        32 bits e[a,c,d,b]x, edi, esi, esp, ebp
+
+extern cur_context
 interrupt_common:
-   cli
-   pusha
-   mov ax, ds  ;Save the data segment
-   push eax    ;descriptor
-   mov ax, 0x10 
-   mov ds, ax
-   mov es, ax
-   mov fs, ax
-   mov gs, ax
+   ;cli   ;We cannot be interrupt during an interrupt
+   pushad
+
+   ;Save the current context
+   mov [cur_context], esp
 
    call main_interrupt_handler 
 
-   pop eax
-   mov ds, ax
-   mov es, ax
-   mov fs, ax
-   mov gs, ax
-   popa
+   ;Restore context after scheduler call
+   mov esp, [cur_context]
+
+   popad
+
+   ;This is to move the stack back
+   ;over the error code and interrupt number.
+   ;While we only push two bytes worth of
+   ;data, the stack is automatically aligned
+   ;to 4-byte boundaries. As a result, we need
+   ;to jump back 8 bytes. We could also do 
+   ;   pop eax
+   ;   pop eax
    add esp, 8
-   iret
+   iretd
+
 
 ; This defines an interrupt 
 ; handler that will be automatically
@@ -89,19 +108,5 @@ init_idt:
 %endrep
 
    leave
-   ret
-
-global srupdate
-srupdate:
-   ;Update the segment regesters
-   ;after a GDT init
-   mov ax, 0x10 ;0x10 is our segment
-   mov ds, ax
-   mov es, ax
-   mov fs, ax
-   mov gs, ax
-   mov ss, ax
-   jmp 0x8:flush
-flush:
    ret
 

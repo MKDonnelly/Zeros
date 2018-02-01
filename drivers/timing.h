@@ -1,15 +1,23 @@
-
 #pragma once
 
 #include <portio.h>
 #include <isr.h>
 #include <vgacommon/vgacommon.h>
+#include <thread.h>
+#include <sched.h>
 
 #define I8253_CH0_P   0x40 //This can generate an interrupt
 //CH1 @ 0x41 is not implemented
 #define I8253_CH2_P   0x42 //This controls the PC speaker
+
 #define I8253_CTRL_P  0x43
+#define I8253_CTRL_CH0_M (0b00 << 6)
+#define I8253_CTRL_LHBYTE_M (0b11 << 4)
+#define I8253_CTRL_MODE3_M ( 0b011 << 1 )
+#define I8253_CTRL_BIN_M ( 0 << 0 )
+
 #define TIMER_INTERRUPT 32
+#define TIMER_IRQ        0
 
 //Configuration bits for port 0x43:
 //(from wiki.osdev.or/Programmable_Interval_Timer)
@@ -37,12 +45,8 @@
 //                 1 1 1 = same as 0 1 1
 //0              Binary (0) or BCD (1) mode
 
-//commands to send to timer
-#define I8253_LOAD_C   0x34
-#define I8253_LATCH_C  0x04
-
 #define I8253_FREQ 1193182
-#define I8253_10MS_COUNTER 11932
+#define I8253_10MS_COUNTER 11932 
 
 //A primitive system uptime clock
 struct sys_time{
@@ -70,8 +74,10 @@ struct timer_info{
 void init_timer(uint8_t enable,int x, int y);
 
 //Handler function for the timer
-void set_timer_freq(int);
-void timer_int_handler( struct registers);
+void set_timer_count(uint16_t);
+void timer_int_handler( registers_t );
+
+uint16_t get_timer_count();
 
 //TODO
 //set_timer_mode();

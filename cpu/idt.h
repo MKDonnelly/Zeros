@@ -1,14 +1,7 @@
 #pragma once
 #include <types.h>
+#include <gdt.h>
 
-// KERNEL_CS describes the index of the segment
-// descriptor to reference in the GDT. In this case,
-// 0x08 references the first valid segment, or 
-// the kernel code segment. This index is also scaled
-// by eight by the CPU to get an offset from the GDT.
-// This is actually a segment selector.
-#define KERNEL_CS 0x08    //My kernel uses this
-//#define KERNEL_CS 0x10
 #define TOTAL_INTERRUPTS 256
 
 //The main structure is the interrupt table (int_table)
@@ -28,17 +21,17 @@ typedef struct{
     * */   
    uint8_t flags;
    uint16_t higher_offset;    //higher 16 bits for offset of handler
-}__attribute__((packed)) idt_entry;
+}__attribute__((packed)) idt_entry_t;
 
 typedef struct{
    uint16_t length;
    uint32_t base_addr;
-}__attribute__((packed)) idt_descriptor;
+}__attribute__((packed)) idt_descriptor_t;
 
 //The Interrupt descriptor table and 
 //interrupt descriptor
-idt_entry IDT_TABLE[ TOTAL_INTERRUPTS ];
-idt_descriptor IDT_DESCRIPTOR;
+idt_entry_t IDT_TABLE[ TOTAL_INTERRUPTS ];
+idt_descriptor_t IDT_DESCRIPTOR;
 
 //Given an interrupt number and a 
 //function handler, place it into
