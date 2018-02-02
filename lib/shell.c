@@ -1,4 +1,4 @@
-#include <shell.h>
+#include <lib/shell.h>
 
 #define BUFFER_MAX_LEN 128
 

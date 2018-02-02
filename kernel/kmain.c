@@ -1,37 +1,37 @@
-#include <portio.h>
-#include <timing.h>
-#include <serial/serial.h>
-#include <cmos.h>
-#include <pic.h>
-#include <vga3h/vga3h.h>
-#include <vga13h/vga13h.h>
-#include <keyboard.h>
+#include <arch/x86/portio.h>
+#include <arch/x86/timing.h>
+#include <arch/x86/serial/serial.h>
+#include <arch/x86/cmos.h>
+#include <arch/x86/pic.h>
+#include <arch/x86/vga3h/vga3h.h>
+#include <arch/x86/vga13h/vga13h.h>
+#include <arch/x86/cpu.h>
+#include <arch/x86/isr.h>
+#include <arch/x86/idt.h>
+#include <arch/x86/gdt.h>
+#include <arch/x86/paging.h>
+#include <arch/x86/keyboard.h>
 
-#include <string.h>
-#include <bcd.h>
-#include <types.h>
-#include <bitwise.h>
-#include <delay.h>
-#include <debug.h>
+#include <lib/string.h>
+#include <lib/bcd.h>
+#include <lib/types.h>
+#include <lib/bitwise.h>
+#include <lib/delay.h>
+#include <lib/debug.h>
+#include <lib/bootdemo.h>
+#include <lib/shell.h>
 
-#include <cpu.h>
-#include <isr.h>
-#include <idt.h>
-#include <gdt.h>
-#include <paging.h>
-#include <kmalloc.h>
-#include <multiboot.h>
-#include <thread.h>
-#include <sched.h>
+#include <kernel/kmalloc.h>
+#include <kernel/multiboot.h>
+#include <kernel/thread.h>
+#include <kernel/sched.h>
 
-#include <modeset.h>
-#include <vgacommon.h>
-#include <vgafont.h>
-#include <bootdemo.h>
-#include <shell.h>
+#include <arch/x86/vgacommon/modeset.h>
+#include <arch/x86/vgacommon/vgacommon.h>
+#include <arch/x86/vgacommon/vgafont.h>
 
-#include <fs.h>
-#include <initrd.h>
+#include <fs/fs.h>
+#include <fs/initrd/initrd.h>
 
 void thread1(){
 
@@ -116,10 +116,10 @@ void kmain(struct multiboot_info *h){
   init_timer(0, 0, 0);
   init_keyboard();
   //disable_ints();
+  //k_printf("Enter some text: ");
 
   k_newline();
   k_newline();
-  //k_printf("Enter some text: ");
 
   init_heap();
   init_paging();

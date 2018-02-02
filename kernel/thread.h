@@ -1,7 +1,7 @@
 #pragma once
-#include <types.h>
-#include <kmalloc.h>
-#include <isr.h>
+#include <lib/types.h>
+#include <kernel/kmalloc.h>
+#include <arch/x86/isr.h>
 
 //The initial EFlags value when starting a thread
 #define INITIAL_EFLAGS 0x0202

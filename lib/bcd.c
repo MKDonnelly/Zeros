@@ -1,5 +1,5 @@
 
-#include "bcd.h"
+#include <lib/bcd.h>
 
 //Every 4 binary digits of the bcd number
 //equal the corresponding digit in decimal.

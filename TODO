@@ -13,10 +13,6 @@ currently working on threads and processes
    Fix the uneven scheduling with threads (07_Simple_RR is an example
       of an os that has very fair scheduling. Try to mimic it)
 
-clean up:
-  Create a code standard
-  Organize files like Benu 
-
 =================================
 printing/screen manipulation:
   Implement a frame buffer in 3h mode

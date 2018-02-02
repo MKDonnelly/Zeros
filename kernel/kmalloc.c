@@ -1,4 +1,4 @@
-#include "kmalloc.h"
+#include <kernel/kmalloc.h>
 
 //Heap will start at 3MB mark...
 uint32_t kernel_start_heap = 0x300000;

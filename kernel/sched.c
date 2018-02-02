@@ -1,4 +1,4 @@
-#include <sched.h>
+#include <kernel/sched.h>
 
 #define MAX_THREADS 20
 kthread_t *threads[MAX_THREADS] = {0};

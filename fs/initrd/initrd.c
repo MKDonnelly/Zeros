@@ -1,4 +1,4 @@
-#include "initrd.h"
+#include <fs/initrd/initrd.h>
 
 //This does the job of reading a file from the initrd
 //*node should be a pointer to a fs_node_t FILE

@@ -1,4 +1,4 @@
-#include <thread.h>
+#include <kernel/thread.h>
 
 
 //A thread context is identical to the interrupt stack layout

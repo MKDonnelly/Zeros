@@ -1,5 +1,5 @@
 
-#include "bitwise.h"
+#include <lib/bitwise.h>
 
 //Routines to deal with bitfields.
 //Note that these can set an arbitrary
