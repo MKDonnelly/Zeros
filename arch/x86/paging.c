@@ -1,4 +1,4 @@
-#include "paging.h"
+#include <arch/x86/paging.h>
 
 //These two global variables are used
 //to keep track of how the frames have been

@@ -2,7 +2,8 @@
 
 #include <arch/x86/portio.h>
 #include <arch/x86/isr.h>
-#include <arch/x86/vgacommon/vgacommon.h>
+#include <arch/x86/drivers/vgacommon/vgacommon.h>
+
 #include <kernel/thread.h>
 #include <kernel/sched.h>
 
@@ -48,38 +49,11 @@
 #define I8253_FREQ 1193182
 #define I8253_10MS_COUNTER 11932 
 
-//A primitive system uptime clock
-struct sys_time{
-   int days;
-   int hours;
-   int minutes;
-   int seconds;
-   int milliseconds;
-} system_time;
-
-//Various pieces of information
-//about the timer.
-struct timer_info{
-   uint8_t enablePrint;
-   int x;
-   int y;
-} system_timer; //Default timer struct
-
 //Initilize the timer
-//Enable its IRQ and handler
-//Takes three parameters dictating
-//if the system clock should be printed,
-//and if so, the (x,y) coordinates of
-//where it should be printed
-void init_timer(uint8_t enable,int x, int y);
+//Enable its IRQ and sets timer_callback
+//as its handler.
+void arch_timer_init( void (*timer_callback)() );
 
-//Handler function for the timer
-void set_timer_count(uint16_t);
-void timer_int_handler( registers_t );
+//If the handler needs to be changed at a later time.
+void arch_timer_register_callback( void (*timer_callback)() );
 
-uint16_t get_timer_count();
-
-//TODO
-//set_timer_mode();
-//get_timer_counter();
-//set_timer_divider();

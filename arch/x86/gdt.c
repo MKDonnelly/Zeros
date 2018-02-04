@@ -1,5 +1,4 @@
-
-#include "gdt.h"
+#include <arch/x86/gdt.h>
 
 const int16_t gdt_kernel_code = 0x8;
 const int16_t gdt_kernel_data = 0x10;

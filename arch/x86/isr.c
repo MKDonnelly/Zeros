@@ -1,5 +1,4 @@
 #include <arch/x86/isr.h>
-#include <kernel/sched.h>
 
 //This function initilizes the
 //whole interrupt system. It creates

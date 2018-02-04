@@ -138,10 +138,11 @@ void cat_file(char *filename){
 }
 
 void sysuptime(char c){
-   if( c == '0' )
+/*
+   if( c == '0' );
       system_timer.enablePrint = 0;
    else if( c == '1' )
-      system_timer.enablePrint = 1;
+      system_timer.enablePrint = 1;*/
 }
 
 void open_file(char *filename){

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <arch/x86/vgacommon/vgacommon.h>
-#include <arch/x86/keyboard.h>
+#include <arch/x86/drivers/vgacommon/vgacommon.h>
+#include <arch/x86/drivers/keyboard.h>
 #include <arch/x86/cpu.h>
 #include <kernel/sched.h>
 #include <lib/memory.h>

@@ -5,7 +5,7 @@
 //We will assume that no dramatically long
 //delay will be entered (such as a 1-day delay)
 void k_delayms(int milliSeconds){
-
+/*
    int curMilliseconds = system_time.milliseconds;
    int curSeconds = system_time.seconds;
    int curMinutes = system_time.minutes;
@@ -40,7 +40,7 @@ void k_delayms(int milliSeconds){
           (system_time.milliseconds < endMilliseconds) ){
       //Do this so that the cpu is not floored at 100%
       thread_yield();
-   }
+   }*/
 }
 
 //Just re-use the kdelay_ms function

@@ -1,8 +1,10 @@
 #pragma once
 
-#include <arch/x86/vgacommon/vgacommon.h>
+#include <arch/x86/drivers/vgacommon/vgacommon.h>
 #include <arch/x86/isr.h>
+
 #include <kernel/kmalloc.h>
+
 #include <lib/memory.h>
 #include <lib/bitwise.h>
 #include <lib/types.h>

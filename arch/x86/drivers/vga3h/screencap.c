@@ -1,4 +1,4 @@
-#include "vga3h.h"
+#include <arch/x86/drivers/vga3h/vga3h.h>
 
 //Array is assumed to be at least VGA3H_ROWS * VGA3H_COLS
 void vga3h_screen_cap(char *captureArray){

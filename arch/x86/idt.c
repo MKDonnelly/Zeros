@@ -1,4 +1,4 @@
-#include "idt.h"
+#include <arch/x86/idt.h>
 
 void add_idt_entry( uint8_t intNumber, uint32_t handlerFunction) {
 

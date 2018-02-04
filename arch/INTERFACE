@@ -1,0 +1,20 @@
+Each arch system exposes the following interfaces 
+grouped by purpose. All start with "arch_" to indicate
+that it is using arch-specific code:
+
+Timer interface:
+   The arch timer interface serves one basic
+   purpose: run a callback function on every
+   timer tick.
+
+   //Initilizes timer subsystem
+   arch_init_timer()
+
+Interrupts:
+
+Memory descriptors:
+
+CPU functions:
+   arch_stop_cpu
+   
+

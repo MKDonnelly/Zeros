@@ -1,4 +1,4 @@
-#include "vga3h.h"
+#include <arch/x86/drivers/vga3h/vga3h.h>
 
 void vga3h_scroll(){
    unsigned int max = VGA3H_ROWS * VGA3H_COLS * 2;

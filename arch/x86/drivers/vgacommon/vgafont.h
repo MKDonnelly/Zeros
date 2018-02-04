@@ -1,7 +1,7 @@
 #pragma once 
 
 #include <arch/x86/portio.h>
-#include <arch/x86/vgacommon/modeset.h>
+#include <arch/x86/drivers/vgacommon/modeset.h>
 #include <lib/memory.h>
 #include <lib/types.h>
 /*

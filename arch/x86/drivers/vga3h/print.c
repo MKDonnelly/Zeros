@@ -1,4 +1,4 @@
-#include "vga3h.h"
+#include <arch/x86/drivers/vga3h/vga3h.h>
 
 char *VGA3H_VIDEO_MEMORY = (char*)0xb8000;
 //Current screen offset as linear offset

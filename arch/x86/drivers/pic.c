@@ -1,6 +1,4 @@
-
-#include "pic.h"
-
+#include <arch/x86/drivers/pic.h>
 
 //Initilize the PIC
 void remap_pic(){

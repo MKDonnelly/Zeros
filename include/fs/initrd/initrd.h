@@ -3,7 +3,7 @@
 #include <lib/types.h>
 #include <fs/fs.h>
 #include <kernel/kmalloc.h>
-#include <arch/x86/vgacommon/vgacommon.h>
+#include <arch/x86/drivers/vgacommon/vgacommon.h>
 
 #define INITRD_MAGIC 0x12345678
 #define FILENAME_MAX_LEN 32

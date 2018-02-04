@@ -25,7 +25,7 @@ extern gdt_kernel_code
 ;     32 bits CS
 ;     32 bits EIP
 ;
-;     ;;;;; PUSHED BY ME ;;;;;;;;
+;     ;;;;; PUSHED BY INTERRUPT_COMMON ;;;;;;;;
 ;     8 bits error code, int #
 ;     <pushad stuff>
 ;        32 bits e[a,c,d,b]x, edi, esi, esp, ebp

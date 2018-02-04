@@ -1,4 +1,4 @@
-#include "serial.h"
+#include <arch/x86/drivers/serial/serial.h>
 
 void sp_init(){
    portb_write( COM1_IOPORT + 1, 0x00 ); //Disable interrupts for serial port

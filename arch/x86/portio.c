@@ -1,5 +1,4 @@
-
-#include "portio.h"
+#include <arch/x86/portio.h>
 
 int8_t portb_read(uint16_t port) {
 

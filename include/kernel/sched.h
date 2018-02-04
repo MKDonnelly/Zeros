@@ -1,11 +1,11 @@
 #pragma once 
 
 #include <kernel/thread.h>
-#include <arch/x86/vgacommon/vgacommon.h>
+#include <arch/x86/drivers/vgacommon/vgacommon.h>
 #include <lib/delay.h>
 #include <arch/x86/isr.h>
 #include <arch/x86/cpu.h>
-#include <arch/x86/timing.h>
+#include <arch/x86/drivers/timer.h>
 #include <lib/string.h>
 
 //typedef llnode_t thread_node_t;

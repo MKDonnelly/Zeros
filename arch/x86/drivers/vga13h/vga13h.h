@@ -1,8 +1,6 @@
-
 #pragma once
 
 #include <lib/string.h>
-#include <arch/x86/serial/serial.h>
 
 #define VGA13H_LINES 200
 #define VGA13H_COLS 320

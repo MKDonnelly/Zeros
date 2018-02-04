@@ -1,4 +1,4 @@
-#include <arch/x86/vgacommon/modeset.h>
+#include <arch/x86/drivers/vgacommon/modeset.h>
 
 //Based on 
 //http://files.osdev.org/mirrors/geezer/osd/graphics/modes.c

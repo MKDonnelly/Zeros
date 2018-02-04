@@ -1,4 +1,4 @@
-#include <arch/x86/vgacommon/vgacommon.h>
+#include <arch/x86/drivers/vgacommon/vgacommon.h>
 
 //These are meant to be called by external code
 int k_cursor_position(){

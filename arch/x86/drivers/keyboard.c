@@ -1,5 +1,4 @@
-
-#include "keyboard.h"
+#include <arch/x86/drivers/keyboard.h>
 
 char KEYBOARD_BUFFER[ KEYBOARD_BUFFER_SIZE ];
 int KEYBOARD_BUFFER_CHARS;

@@ -1,8 +1,8 @@
 #pragma once
 
 #include <arch/x86/idt.h>
-#include <arch/x86/vgacommon/vgacommon.h>
-#include <arch/x86/pic.h>
+#include <arch/x86/drivers/vgacommon/vgacommon.h>
+#include <arch/x86/drivers/pic.h>
 
 #include <lib/types.h>
 #include <lib/bitwise.h>

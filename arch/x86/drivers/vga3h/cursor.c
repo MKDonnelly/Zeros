@@ -1,4 +1,4 @@
-#include "vga3h.h" 
+#include <arch/x86/drivers/vga3h/vga3h.h>
 
 int vga3h_get_cursor(){
 

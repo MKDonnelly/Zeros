@@ -1,4 +1,4 @@
-currently working on threads and processes
+Multitasking
    Move the kernel stack to the end of the heap
       so that when we map the pages, we can identity
       map up to the end of the heap, then we can do
@@ -13,7 +13,6 @@ currently working on threads and processes
    Fix the uneven scheduling with threads (07_Simple_RR is an example
       of an os that has very fair scheduling. Try to mimic it)
 
-=================================
 printing/screen manipulation:
   Implement a frame buffer in 3h mode
      Add function to scroll.c to scroll both ways
@@ -29,19 +28,13 @@ printing/screen manipulation:
   Get a dump of the vga font and create custom font 
   Add more vga register modes
   Get arrow keys to work on terminal
-  Improve format capabilities of k_printf
-     print string,format specifiers
   Unify all of the screen operations into printf and have escape 
      sequences dictate cursor position, color, etc
 
 utils:
    Create a basic file editor by dumping a file into the
       frame buffer and copying it back once done.
-   List files in initrd
-   Write a simple shell
-   Create a /programs directory to house demo programs
    create simple games (pong, etc)
-   Make visual effects (digital rain, scrolling letters,etc)
 
 misc:   
    Unit tests for various subsystems
@@ -61,11 +54,9 @@ misc:
          can change where each piece of dynamic memory lies transparent
          to the external process.
    Make as much as possible work through the VFS (screen, timer, etc)
-   Add alarms to timer subsystem by using an array
-      of functions as callbacks (like interrupts)
+   Add and use abstract linked list for managing data
    Create a keyboard function callback
    Get proper release/press code working with keyboard
-   Add alarms to timer subsystem
    Work on multiboot header and understand
       what each field is doing
    Add directory support to initrd and improve
@@ -78,8 +69,6 @@ misc:
       asm volatile ("invlpg (%0)" : : "b" (page_addr) : "memory")
    Add random number generator
    Add a basic md5 sum function
-   Add a getc function and add max length to getline, fix getline
-   Use structures to hold more information in devices
    Try to boot UEFI with grub-efi
    Add cpuid functions
    Learn qemu to better debug the kernel
@@ -88,11 +77,3 @@ misc:
    Implement HPET
    Implement user mode
    Create system calls using interrupts
-
-obsolete:
-Impelement call gate
-   Add GDT descriptor w/ CPL = 3 and type of
-   trap gate to a function as the base and limit
-   call using 
-          jmp <GDT offset>:0x0
- 

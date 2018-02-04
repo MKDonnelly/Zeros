@@ -1,8 +1,9 @@
 #pragma once
 
 #include <arch/x86/isr.h>
+#include <arch/x86/drivers/vgacommon/vgacommon.h>
+
 #include <lib/types.h>
-#include <arch/x86/vgacommon/vgacommon.h>
 
 #define KEYBOARD_BUFFER_SIZE 128
 #define KEYBOARD_IRQ 1
