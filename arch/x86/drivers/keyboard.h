@@ -5,7 +5,7 @@
 
 #include <lib/types.h>
 
-#define KEYBOARD_BUFFER_SIZE 128
+//#define KEYBOARD_BUFFER_SIZE 128
 #define KEYBOARD_IRQ 1
 #define KEYBOARD_INTERRUPT 33
 
@@ -70,27 +70,8 @@
 #define SHIFT_LEFT_KEY  42 
 #define SHIFT_RIGHT_KEY 54
 
-extern char keyboard_map[];
-
-//Characters are appended to the end of the array
-//When the array is full, characters are shifted
-//down and the first is removed.
-extern char KEYBOARD_BUFFER[ KEYBOARD_BUFFER_SIZE ];
-//Number of characters in the buffer.
-extern int KEYBOARD_BUFFER_CHARS;
-
-void init_keyboard();
-//Manages keyboard input
-void keyboard_handler();
-
-//Register a function to call
-//when \r is entered
-void kbd_register_callback( void (*func)());
-
-//Manages KEYBOARD_BUFFER
-void add_keyboard_buffer(int8_t);
-uint8_t getline(int8_t*,int);
-char getc();
+void arch_keyboard_init( void (*keypress_callback)(char) );
+void arch_keyboard_register_callback(void (*keypress_callback)(char) );
 
 //Various routines that communicate
 //to the keyboard controller/encoder

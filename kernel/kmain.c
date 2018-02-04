@@ -1,16 +1,17 @@
-#include <arch/x86/portio.h>
 #include <arch/x86/drivers/timer.h>
 #include <arch/x86/drivers/serial/serial.h>
 #include <arch/x86/drivers/cmos.h>
 #include <arch/x86/drivers/pic.h>
 #include <arch/x86/drivers/vga3h/vga3h.h>
+//#include <arch/x86/drivers/keyboard.h>
 #include <arch/x86/drivers/vga13h/vga13h.h>
+#include <arch/x86/drivers/vgacommon/modeset.h>
+#include <arch/x86/drivers/vgacommon/vgacommon.h>
+#include <arch/x86/drivers/vgacommon/vgafont.h>
+
+#include <arch/x86/portio.h>
 #include <arch/x86/cpu.h>
-#include <arch/x86/isr.h>
-#include <arch/x86/idt.h>
-#include <arch/x86/gdt.h>
 #include <arch/x86/paging.h>
-#include <arch/x86/drivers/keyboard.h>
 
 #include <lib/string.h>
 #include <lib/bcd.h>
@@ -27,9 +28,6 @@
 #include <kernel/thread.h>
 #include <kernel/sched.h>
 
-#include <arch/x86/drivers/vgacommon/modeset.h>
-#include <arch/x86/drivers/vgacommon/vgacommon.h>
-#include <arch/x86/drivers/vgacommon/vgafont.h>
 
 #include <fs/fs.h>
 #include <fs/initrd/initrd.h>
@@ -42,18 +40,29 @@ void myf(){
    k_printf("In my function!\n");
 }
 
+void kbh(char c){
+   k_printf("Keyboard handler!");
+}
+
 #include <arch/x86/archx86.h>
+#include <lib/keyboard.h>
 
 void kmain(struct multiboot_info *h){
 
   //set_vga_mode( vga_3h_mode );
   //write_font( g_8x16_font, 16 );
 
+  //Arch initilization
   arch_init_system();
-  k_clear_screen();
   arch_timer_init( timing_main_handler );
+  arch_keyboard_init( keyboard_main_handler );
+
+  //Timer subsystem initilization
   timing_set_alarm( myf, 1000 );
 
+  keyboard_register_key_callback( kbh, 'a' );
+
+  k_clear_screen();
   init_heap();
   init_paging();
   enable_ints();

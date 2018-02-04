@@ -10,9 +10,6 @@ void arch_init_system(int video_mode){
    //Re-map the pic
    remap_pic();
 
-   //Enable the keyboard
-   init_keyboard();
-
    //Setup the function points to use
    //the screen
    init_vga(0);

@@ -7,6 +7,7 @@ int buffer_len;
 
 void zeros_shell(){
 
+/*
    //Horrible hack to start the
    //shell once the bootdemo is done
    while( startShell == 0 )
@@ -50,7 +51,7 @@ void zeros_shell(){
          //Yield so as to not burn up our cpu cycles
          thread_yield();
       }
-   }
+   }*/
 }
 
 void parse_command(char *input_cmd){

@@ -53,7 +53,7 @@ misc:
          malloc will maintain the second pointer. This way, malloc
          can change where each piece of dynamic memory lies transparent
          to the external process.
-   Make as much as possible work through the VFS (screen, timer, etc)
+   Make as much as possible work through the VFS 
    Add and use abstract linked list for managing data
    Create a keyboard function callback
    Get proper release/press code working with keyboard
