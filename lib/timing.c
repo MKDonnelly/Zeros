@@ -7,6 +7,7 @@ system_time_t timing_get_time(){
 }
 
 //TODO use an ALL to make this neat
+//TODO have a oneshot time for delay
 void (*callback)() = 0;
 int callback_period = 0;
 int time_left = 0;

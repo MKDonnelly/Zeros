@@ -30,7 +30,7 @@ link: $(COUTPUT) $(ASMOUTPUT)
 clean:
 	@-\rm -Rf ./build/*
 
-run:
+run: all
 	@qemu-system-x86_64 -kernel build/Zeros.elf -initrd arch/x86/initrd &
 
 debug:

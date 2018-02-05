@@ -1,4 +1,4 @@
-#include "keyboard.h"
+#include <include/lib/keyboard.h>
 
 char keyboard_buffer[KEYBOARD_BUFFER_MAX];
 int keyboard_number_chars = 0;

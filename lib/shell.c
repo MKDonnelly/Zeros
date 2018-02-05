@@ -6,7 +6,8 @@ char input_buffer[BUFFER_MAX_LEN+1];
 int buffer_len;
 
 void zeros_shell(){
-
+   k_printf("IN SHELL!");
+   while(1);
 /*
    //Horrible hack to start the
    //shell once the bootdemo is done

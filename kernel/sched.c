@@ -37,16 +37,12 @@ void init_threading(){
 //*Very* simple scheduler. Runs down the list
 //of threads in a round-robin fashion. 
 void schedule(){
-
    //Save the current context
    threads[cur_thread_index]->context = cur_context;
 
-   //Go to the next thread index
+   //Go to the next thread 
    cur_thread_index++;
-
-   //cur_thread_index %= next_free_thread;
-   if( cur_thread_index == next_free_thread )
-      cur_thread_index = 0;
+   cur_thread_index %= next_free_thread;
 
    //Grab the context from this thread
    cur_context = threads[cur_thread_index]->context;

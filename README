@@ -47,23 +47,31 @@ Notation:
 Dependencies:
    Certain subsystems in the kernel require other
    parts to be working before it can be fully used.
+
+
+------------------------------------------------------
+Add debugging symbols to kernel while
+   maintaining a flat binary to run
+   nasm -f elf -F dwarf -g kernel.asm
+   objcopy -O binary kernel.o kernel.bin
    
-k_printf,k_print,screen functions:
-   Requires init_vga()
+   qemu-system-x86_64 -s -S kernel.bin
+   gdb -q
+   -> target remote localhost:1234
+   -> symbol-file kernel.o
 
-init_gdt
-remap_pic
-init_heap
-   Requires nothing
-
-init_interrupts:
-   Requires remap_pic and init_gdt
-
-init_timer:
-   requires init_interrupts
-
-init_keyboard:
-   requires initrd_interrupts
-
-init_paging:
-   requires init_heap
+If global variables are not working in the kernel,
+make sure everything has been compiled like
+   gcc -fno-pie -m32 -ffreestanding -c kmain.c -o kmain.o
+   ld -m elf_i386 -o kmain.bin -T link.ld kmain.o --oformat binary
+   where link.ld contains
+   OUTPUT_FORMAT(elf32-i386)
+   ETNRY(kmain)
+   SECTIONS(
+      . = 0x1000;
+      .text : { *(.text) }
+      .data : { *(.data) }
+      .bss  : { *(.bss ) }
+   }
+   This is mainly caused by the improper address being loaded for
+   the global variable's address.   

@@ -1,13 +1,10 @@
 #pragma once
 
-#include <arch/x86/drivers/vgacommon/vgacommon.h>
-#include <arch/x86/drivers/keyboard.h>
-#include <arch/x86/cpu.h>
 #include <kernel/sched.h>
-#include <lib/memory.h>
-#include <fs/fs.h>
 #include <kernel/kmalloc.h>
+#include <fs/fs.h>
 #include <lib/string.h>
+#include <lib/memory.h>
 
 #define PROMPT "Root@Ring0-> "
 
