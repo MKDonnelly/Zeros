@@ -24,4 +24,8 @@ void rm_thread(kthread_t*);
 void thread_yield();
 
 //Called when a thread returns
-void thread_exit();
+void thread_exit(void*);
+
+//Called to join with the given
+//thread with thread_id
+void *thread_join( int thread_id );

@@ -1,5 +1,9 @@
 #include <kernel/thread.h>
 
+//Internally used by k_create_thread to assign
+//a unique id to every thread
+int next_thread_id = 0;
+
 kthread_t *k_create_thread ( void *start_func, void *param, void *exit_func, uint32_t stack_size ){
 
    //Create a thread descriptor
@@ -15,8 +19,10 @@ kthread_t *k_create_thread ( void *start_func, void *param, void *exit_func, uin
                                 exit_func, stack, stack_size );
 
    // Null the exit status
-   thread->exit_status = 0;
+   thread->return_value = 0;
+
+   //Add a unique thread id
+   thread->thread_id = next_thread_id++;
 
    return thread;
 }
-

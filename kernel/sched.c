@@ -24,9 +24,25 @@ void thread_yield(){
 }
 
 //Called by a thread when returning
-void thread_exit(){
+//Explicitly calling this will give the return
+//value. If this is implicitly called when the
+//thread index (when k_create_thread sets it up)
+//the return value will be undefined.
+void thread_exit(void *retval){
    threads[cur_thread_index]->state = THREAD_EXIT;
+   threads[cur_thread_index]->return_value = retval;
    thread_yield();
+}
+
+void *thread_join( int thread_id ){
+   while(1){
+      for(int i = 0; i < next_free_thread; i++){
+         if( threads[i]->thread_id == thread_id && threads[i]->state == THREAD_EXIT ){
+            return threads[i]->return_value;
+         }
+      }
+      thread_yield();
+   }
 }
 
 //The default thread to run when

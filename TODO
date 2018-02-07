@@ -11,8 +11,7 @@ Multitasking
       space. Place a guard page at the end of each so that
       a page fault ocurrs if one exceeds its stack size
    Work on threading code
-      add thread state, priority, exit function, blocking,
-         exit status, to kthread_t
+      separate scheduling and threading code
       create thread synchronization constructs, messages
 
 printing/screen manipulation:
@@ -32,6 +31,8 @@ printing/screen manipulation:
   Get arrow keys to work on terminal
   Unify all of the screen operations into printf and have escape 
      sequences dictate cursor position, color, etc
+  use hwinfo --framebuffer to see and program video modes
+    also use grub gfx directive to boot into a higher video mode
 
 utils:
    Create a basic file editor by dumping a file into the
@@ -57,8 +58,12 @@ initrd
    Copy the initrd over to some space of memory
       so that it is not overwritten. Or at least
       page-protect it.
+   load basic binary from initrd and execute
  
 misc:   
+   Implement APIC, HPET, user mode, ATA PIO mode driver,
+      PCI driver, network card driver,  
+   Mouse driver
    Make a cross compiler
    Unit tests for various subsystems
    Add a how-to to explain how each subsystem works
@@ -76,7 +81,6 @@ misc:
    Add a basic md5 sum function
    Try to boot UEFI with grub-efi
    Add cpuid functions
-   Learn qemu to better debug the kernel
    Use timer channel 2 to play sound on pc speaker
-   Implement APIC, HPET, user mode, ATA PIO mode driver
    Create system calls using interrupts
+   work on arm arch code with qemu-arm

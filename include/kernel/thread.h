@@ -12,7 +12,9 @@ typedef struct kthread{
    thread_context_t *context;
    void *stack_ptr; //For freeing dynamic memory
    enum THREAD_STATE state;
-   int exit_status;
+   void *return_value;
+   int thread_id;
+   int priority;
 } kthread_t;
 
 //Initilize a thread descriptor. Currently, it passes most of the

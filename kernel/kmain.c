@@ -106,10 +106,23 @@ void threada(){
    }
 }*/
 
-void test(){
-   k_printf("IN THREAD!\n");
-   for(int i = 0; i < 90000000; i++);
-   return;
+void test_function(void *arg){
+   k_printf("In test function with %d!\n", (int)arg);
+   thread_exit( (void*)99 );
+}
+
+void main_kernel_thread(){
+
+   k_printf("In main kernel thread\n");
+
+   kthread_t *new_thread = k_create_thread( test_function, (void*)20, thread_exit, 0x1000 );
+   add_thread( new_thread );
+
+   void *val = thread_join( new_thread->thread_id );
+
+   k_printf("Thread joined with %d\n", (int)val);
+
+   thread_exit( 0 );
 }
 
 void kmain(struct multiboot_info *h){
@@ -138,19 +151,19 @@ void kmain(struct multiboot_info *h){
 
   fs_root = init_initrd( h->mods->start );
 
-  add_thread( k_create_thread( test, NULL, thread_exit, 0x1000 ) );
+  add_thread( k_create_thread( main_kernel_thread, NULL, thread_exit, 0x4000 ) );
 
 /*
-  add_thread( k_create_thread( thread1, NULL, NULL, 0x1000, 0 ) );  
-  add_thread( k_create_thread( thread2, NULL, NULL, 0x1000, 0 ) );  
-  add_thread( k_create_thread( thread3, NULL, NULL, 0x1000, 0 ) );  
-  add_thread( k_create_thread( thread4, NULL, NULL, 0x1000, 0 ) );  
-  add_thread( k_create_thread( thread5, NULL, NULL, 0x1000, 0 ) );  
-  add_thread( k_create_thread( thread6, NULL, NULL, 0x1000, 0 ) );  
-  add_thread( k_create_thread( thread7, NULL, NULL, 0x1000, 0 ) );  
-  add_thread( k_create_thread( thread8, NULL, NULL, 0x1000, 0 ) );  
-  add_thread( k_create_thread( thread9, NULL, NULL, 0x1000, 0 ) );  
-  add_thread( k_create_thread( threada, NULL, NULL, 0x1000, 0 ) );  
+  add_thread( k_create_thread( thread1, NULL, NULL, 0x1000) );  
+  add_thread( k_create_thread( thread2, NULL, NULL, 0x1000) );  
+  add_thread( k_create_thread( thread3, NULL, NULL, 0x1000) );  
+  add_thread( k_create_thread( thread4, NULL, NULL, 0x1000) );  
+  add_thread( k_create_thread( thread5, NULL, NULL, 0x1000) );  
+  add_thread( k_create_thread( thread6, NULL, NULL, 0x1000) );  
+  add_thread( k_create_thread( thread7, NULL, NULL, 0x1000) );  
+  add_thread( k_create_thread( thread8, NULL, NULL, 0x1000) );  
+  add_thread( k_create_thread( thread9, NULL, NULL, 0x1000) );  
+  add_thread( k_create_thread( threada, NULL, NULL, 0x1000) );  
 */
   //add_thread( k_create_thread( demo, NULL, NULL, 0x3000, 0) );
   //add_thread( k_create_thread( zeros_shell, NULL, NULL, 4192, 0) );
