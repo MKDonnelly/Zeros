@@ -10,6 +10,7 @@
 #include <lib/bootdemo.h>
 #include <lib/shell.h>
 #include <lib/timing.h>
+#include <lib/abstract_ll.h>
 
 #include <kernel/kmalloc.h>
 #include <kernel/multiboot.h>
@@ -23,15 +24,8 @@
 //once the boot demo is done.
 int startShell = 1;
 
-void myf(){
-   k_printf("In my function!\n");
-}
 
-void kbh(char c){
-   k_printf("Keyboard handler!");
-}
-
-
+/*
 void thread1(){
    int t1count = 0;
    while(1){
@@ -110,8 +104,13 @@ void threada(){
       k_printf_at("a", tacount++, 9);
       for(int i = 0; i < 50000000; i++);
    }
-}
+}*/
 
+void test(){
+   k_printf("IN THREAD!\n");
+   for(int i = 0; i < 90000000; i++);
+   return;
+}
 
 void kmain(struct multiboot_info *h){
 
@@ -124,7 +123,7 @@ void kmain(struct multiboot_info *h){
   arch_keyboard_init( keyboard_main_handler );
 
   //Keyboard system initilization
-  keyboard_register_key_callback( kbh, 'a' );
+  //keyboard_register_key_callback( kbh, 'a' );
 
   //Timer subsystem initilization
   timing_set_alarm( schedule, 100 );
@@ -139,6 +138,9 @@ void kmain(struct multiboot_info *h){
 
   fs_root = init_initrd( h->mods->start );
 
+  add_thread( k_create_thread( test, NULL, thread_exit, 0x1000 ) );
+
+/*
   add_thread( k_create_thread( thread1, NULL, NULL, 0x1000, 0 ) );  
   add_thread( k_create_thread( thread2, NULL, NULL, 0x1000, 0 ) );  
   add_thread( k_create_thread( thread3, NULL, NULL, 0x1000, 0 ) );  
@@ -149,7 +151,7 @@ void kmain(struct multiboot_info *h){
   add_thread( k_create_thread( thread8, NULL, NULL, 0x1000, 0 ) );  
   add_thread( k_create_thread( thread9, NULL, NULL, 0x1000, 0 ) );  
   add_thread( k_create_thread( threada, NULL, NULL, 0x1000, 0 ) );  
-
+*/
   //add_thread( k_create_thread( demo, NULL, NULL, 0x3000, 0) );
   //add_thread( k_create_thread( zeros_shell, NULL, NULL, 4192, 0) );
   

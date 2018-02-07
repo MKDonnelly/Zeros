@@ -38,6 +38,24 @@ int strcmp(char *str1, char *str2){
    return (str1[i] - str2[i]);
 }
 
+int strncmp(char *str1, char *str2, int max){
+   int i = 0;
+   while( ! (str1[i] - str2[i]) && str1[i] != 0 && str2[i] != 0 && i < max)
+      i++;
+   return (str1[i] - str2[i]);
+}
+
+
+
+char *strchr(char *str, char c){
+   int i = 0;
+   while( str[i] != 0 ){
+      if( str[i] == c )
+         return &str[i];
+   }
+   return 0;
+}
+
 //We will assume that str1 has enough space
 //to place str2 at the end.
 void strcat(char *str1, char *str2){

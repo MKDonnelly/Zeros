@@ -10,17 +10,20 @@ Multitasking
    Create a separate area for allocating thread stack
       space. Place a guard page at the end of each so that
       a page fault ocurrs if one exceeds its stack size
-   Create thread synchronization constructs
+   Work on threading code
+      add thread state, priority, exit function, blocking,
+         exit status, to kthread_t
+      create thread synchronization constructs, messages
 
 printing/screen manipulation:
   Implement a frame buffer in 3h mode
      Add function to scroll.c to scroll both ways
+  Better utilize vga colors in 3h mode
+      (see https://github.com/JonathanSalwan/Kaminou-Kernel/blob/master/kernel/includes/sys/video.h)
      Allow arrow keys to scroll through buffer 
   Work on VGA 13h mode driver
      Implement basic shape drawing
      Later on, implement a frame buffer
-  Better utilize vga colors in 3h mode
-      (see https://github.com/JonathanSalwan/Kaminou-Kernel/blob/master/kernel/includes/sys/video.h)
   Create better print output (BUG,LOG,ASSERT,etc)
       and catch errors by using __FILE__ and __LINE__
       use assert more in code 
@@ -38,10 +41,11 @@ utils:
 dynamic memory
    Create a slab allocator (have fixed size block ready)
    Stress-test kmalloc
+   Create several memory allocation algorithms
    Abstract the heap so that multiple 
       heaps can coexist
+      create_heap( <start addr>, size, allocator );
    get unify_heap working or eliminate it
-   Create several memory allocation algorithms
    Advanced malloc idea: have malloc return a double pointer.
       malloc will maintain the second pointer. This way, malloc
       can change where each piece of dynamic memory lies transparent
@@ -55,6 +59,7 @@ initrd
       page-protect it.
  
 misc:   
+   Make a cross compiler
    Unit tests for various subsystems
    Add a how-to to explain how each subsystem works
       Add examples for each subsystem for reference
@@ -73,7 +78,5 @@ misc:
    Add cpuid functions
    Learn qemu to better debug the kernel
    Use timer channel 2 to play sound on pc speaker
-   Implement APIC
-   Implement HPET
-   Implement user mode
+   Implement APIC, HPET, user mode, ATA PIO mode driver
    Create system calls using interrupts

@@ -1,4 +1,4 @@
-#include <include/lib/timing.h>
+#include <lib/timing.h>
 
 system_time_t global_time = {0};
 
@@ -14,8 +14,7 @@ int time_left = 0;
 
 void timing_set_alarm(void (*alarm_function)(), int ms_period){
    callback = alarm_function;
-   callback_period = ms_period;
-   time_left = ms_period;
+   callback_period = time_left = ms_period;
 }
 
 //Increment the global time and call any
@@ -29,7 +28,3 @@ void timing_main_handler(){
       callback();
    }
 }
-
-
-
-

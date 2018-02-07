@@ -5,12 +5,7 @@
 #include <lib/delay.h>
 #include <lib/string.h>
 
-//typedef llnode_t thread_node_t;
-
 extern thread_context_t *cur_context;
-
-//Limitations:
-//  We assume all threads never exit
 
 //Initilize the threading system
 void init_threading();
@@ -27,3 +22,6 @@ void rm_thread(kthread_t*);
 
 //Voluntarily stop a thread
 void thread_yield();
+
+//Called when a thread returns
+void thread_exit();

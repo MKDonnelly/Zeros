@@ -7,6 +7,8 @@ int strlen(char[]);
 void strcpy(char*,char*);
 void strncpy(char*,char*,int);
 int strcmp(char*,char*);
+int strncmp(char*,char*,int);
+char *strchr(char *,char);
 void strcat(char*,char*);
 char *strstr(char*,char*);
 void reverse(char[]);
