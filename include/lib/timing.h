@@ -13,22 +13,28 @@ typedef struct{
    int years;
 }system_time_t;
 
+//Represents a kernel task to
+//run at a given interval. This is
+//the node definition and is used with
+//the abstract linked list.
 typedef struct alarm{
    struct alarm *next;
 
-   //Run when time_remaining <= 0
+   //The function to call every...
    void (*callback)();
 
-   //The interval at which to
-   //call callback
-   int callback_ms_period;
+   //this many milliseconds.
+   int callback_period;
 
-   //Current time until triggering
-   //callback
-   int time_remaining;
-
+   //current countdown
+   int time_left;
 }alarm_t;
 
+//Calls alarm_function every ms_period milliseconds
 void timing_set_alarm( void (*alarm_function)(), int ms_period);
+
+//Handles periodic interrupts from arch code
 void timing_main_handler();
-system_time_t timing_get_time();
+
+//Return current system time
+//system_time_t timing_get_time();

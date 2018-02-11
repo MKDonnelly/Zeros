@@ -5,9 +5,5 @@
 
 #define ASSERT( condition ) \
    if( ! (condition) && DEBUG_ON ) { \
-       k_printf("WARNING: ASSERT \"%s\" FAILED AT %d %d in function %d\n", #condition, __FILE__, __LINE__, __FUNCTION__); \
+       k_printf("WARNING: ASSERT \"%s\" FAILED IN %s LINE %d in function %s\n", #condition, __FILE__, __LINE__, __FUNCTION__); \
    }
-
-
-   
-

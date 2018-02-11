@@ -63,12 +63,17 @@ initrd
 misc:   
    Implement APIC, HPET, user mode, ATA PIO mode driver,
       PCI driver, network card driver,  
+   Write oneshot for timer callback code
+   Write simple ext2 filesystem driver
    Mouse driver
    Make a cross compiler
    Unit tests for various subsystems
    Add a how-to to explain how each subsystem works
       Add examples for each subsystem for reference
       and list the dependencies
+   Set variables to trace dependency problems in kernel
+      (i.e. make sure if the heap is not setup, we do not
+      try to use it and throw an error)
    Make as much as possible work through the VFS 
    Add and use abstract linked list for managing data
    Get proper release/press code working with keyboard

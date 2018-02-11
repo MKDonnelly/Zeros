@@ -125,6 +125,13 @@ void main_kernel_thread(){
    thread_exit( 0 );
 }
 
+void test_thread(){
+   while(1){
+      k_printf("In test thread!\n");
+      for(int i = 0; i < 80000000; i++);
+   }
+}
+
 void kmain(struct multiboot_info *h){
 
   //set_vga_mode( vga_3h_mode );
@@ -132,21 +139,24 @@ void kmain(struct multiboot_info *h){
 
   //Arch initilization
   arch_init_system();
+  disable_ints();
   arch_timer_init( timing_main_handler );
   arch_keyboard_init( keyboard_main_handler );
 
   //Keyboard system initilization
   //keyboard_register_key_callback( kbh, 'a' );
 
-  //Timer subsystem initilization
-  timing_set_alarm( schedule, 100 );
-
   k_clear_screen();
+
   init_heap();
   init_paging();
 
-  sp_init();
+  //Timer subsystem initilization
+  //Required dynamic memory
+  timing_set_alarm( schedule, 100 );
 
+  //Serial port test
+  sp_init();
   sp_putstr("Hello on serial!\n");
 
   fs_root = init_initrd( h->mods->start );

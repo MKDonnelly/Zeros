@@ -6,8 +6,12 @@
 
 enum THREAD_STATE { THREAD_RUNNING, THREAD_EXIT };
 
-//This is a kernel thread
+//This is a kernel thread. It is designed
+//to be used by an abstract linked list
+//in the scheduler code.
 typedef struct kthread{
+   struct kthread *next;
+
    //Pointer to stack with context
    thread_context_t *context;
    void *stack_ptr; //For freeing dynamic memory
@@ -15,6 +19,7 @@ typedef struct kthread{
    void *return_value;
    int thread_id;
    int priority;
+
 } kthread_t;
 
 //Initilize a thread descriptor. Currently, it passes most of the

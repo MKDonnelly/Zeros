@@ -14,3 +14,16 @@ typedef unsigned int       uint32_t;
 typedef char* va_arg;
 #define va_start( arg ) ( (char*)&arg + sizeof(arg) )
 #define va_get( args, type ) ( *((type*)args) ) ; (args += sizeof(type))
+
+//Used to create an anonymous function
+//e.g int (*min)(int,int) = ANONF( int, (int x,int y), 
+//                                return x < y ? x : y ;
+//                               )
+#define ANONF( rettype, params, func ) \
+        ({                              \
+           rettype __anonf__ params {   \
+               func;                    \
+           }                            \
+           __anonf__;                   \
+        })
+
