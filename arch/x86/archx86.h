@@ -9,8 +9,10 @@
 #include <arch/x86/isr.h>
 #include <arch/x86/gdt.h>
 #include <arch/x86/cpu.h>
+#include <arch/x86/portio.h>
 
 #include <arch/x86/drivers/keyboard.h>
+#include <arch/x86/drivers/mouse.h>
 #include <arch/x86/drivers/timer.h>
 #include <arch/x86/drivers/serial/serial.h>
 #include <arch/x86/drivers/cmos.h>

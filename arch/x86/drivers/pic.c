@@ -27,10 +27,23 @@ void remap_pic(){
   portb_write( SLAVE_PIC_DATA_P, 0xff );
 }
 
+//When telling the PIC to enable/disable an IRQ, we must
+//keep in mind that we have two pics cascaded. Both are set 
+//by sending tye byte to each port.
+//We have IRQ's 0-7 on master, 8-13 on slave
 void enable_irq(uint8_t num){
-   int8_t curPICMask = portb_read( MASTER_PIC_DATA_P );
-   int8_t mask = ~(0x1 << num);
-   portb_write( MASTER_PIC_DATA_P, curPICMask & mask );
+
+   if( num < 8 ){
+      int8_t curPICMask = portb_read( MASTER_PIC_DATA_P );
+      //We enable an IRQ by setting the corresponding bit to 0
+      int8_t mask = ~(0x1 << num);
+      portb_write( MASTER_PIC_DATA_P, curPICMask & mask );
+   }else{
+      portb_write( SLAVE_PIC_DATA_P, 0 );
+      int8_t curPICMask = portb_read( SLAVE_PIC_DATA_P );
+      int8_t mask = ~(0x1 << (num-8) );
+      portb_write( SLAVE_PIC_DATA_P, curPICMask & mask );
+   }
 }
 
 void disable_irq(uint8_t num){

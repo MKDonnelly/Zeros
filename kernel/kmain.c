@@ -122,14 +122,17 @@ void main_kernel_thread(){
 
    k_printf("Thread joined with %d\n", (int)val);
 
+   while(1){
+      if( portb_read( 0x64 ) & 0x20 ){
+         k_printf("Mouse with data %x %x %x\n", portb_read( 0x60 ), portb_read(0x60), portb_read(0x60));
+         for(int i = 0; i < 10000000; i++);
+      }
+   }
    thread_exit( 0 );
 }
 
-void test_thread(){
-   while(1){
-      k_printf("In test thread!\n");
-      for(int i = 0; i < 80000000; i++);
-   }
+void kbh(char c){
+   k_printf("Key pressed\n");
 }
 
 void kmain(struct multiboot_info *h){
@@ -144,7 +147,7 @@ void kmain(struct multiboot_info *h){
   arch_keyboard_init( keyboard_main_handler );
 
   //Keyboard system initilization
-  //keyboard_register_key_callback( kbh, 'a' );
+  keyboard_register_key_callback( kbh, 'a' );
 
   k_clear_screen();
 
@@ -160,6 +163,11 @@ void kmain(struct multiboot_info *h){
   sp_putstr("Hello on serial!\n");
 
   fs_root = init_initrd( h->mods->start );
+
+  ///////
+  mouse_init();
+  //////
+
 
   add_thread( k_create_thread( main_kernel_thread, NULL, thread_exit, 0x4000 ) );
 

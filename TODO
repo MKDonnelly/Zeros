@@ -27,7 +27,10 @@ printing/screen manipulation:
       and catch errors by using __FILE__ and __LINE__
       use assert more in code 
   Get a dump of the vga font and create custom font 
-  Add more vga register modes
+  Add more vga register modes (have grub boot into various
+      modes and record the register values. we can boot from
+      a usb drive so grub is actually run and not emulated
+      by qemu)
   Get arrow keys to work on terminal
   Unify all of the screen operations into printf and have escape 
      sequences dictate cursor position, color, etc

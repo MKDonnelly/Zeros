@@ -6,7 +6,6 @@ void (*keyboard_callback)(char) = 0;
 //into a char and send it to the callback
 void keyboard_handler(){
 
-
    static uint8_t shift_activated = 0;
 
    int8_t key;
