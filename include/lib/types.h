@@ -9,6 +9,8 @@ typedef short int          int16_t;
 typedef unsigned short int uint16_t;
 typedef int                int32_t;
 typedef unsigned int       uint32_t;
+typedef unsigned long long uint64_t;
+typedef long long          int64_t;
 
 //va_args type and macro
 typedef char* va_arg;

@@ -66,6 +66,7 @@ initrd
 misc:   
    Implement APIC, HPET, user mode, ATA PIO mode driver,
       PCI driver, network card driver,  
+   work on elf file parser
    Write oneshot for timer callback code
    Write simple ext2 filesystem driver
    Mouse driver
@@ -78,10 +79,7 @@ misc:
       (i.e. make sure if the heap is not setup, we do not
       try to use it and throw an error)
    Make as much as possible work through the VFS 
-   Add and use abstract linked list for managing data
    Get proper release/press code working with keyboard
-   Work on multiboot header and understand
-      what each field is doing
    Create /dev virtual directory
    create function to invalidate a page
       asm volatile ("invlpg (%0)" : : "b" (page_addr) : "memory")

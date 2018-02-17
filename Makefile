@@ -16,6 +16,8 @@ ASMOUTPUT = $(ASMFILES:.asm=.o)
 
 all: $(COUTPUT) $(ASMOUTPUT) link
 
+#NOTE: We make sure the asm files are first, since the multiboot
+#header needs to be at the head
 link: $(COUTPUT) $(ASMOUTPUT)
 	@ld -m elf_i386 -o $(BUILDDIR)/$(KERNEL_NAME) -T arch/$(ARCH)/link.ld $(addprefix $(BUILDDIR)/,$(ASMOUTPUT)) $(addprefix $(BUILDDIR)/,$(COUTPUT))
 
@@ -31,7 +33,7 @@ clean:
 	@-\rm -Rf ./build/*
 
 run: all
-	@qemu-system-x86_64 -kernel build/Zeros.elf -initrd arch/x86/initrd &
+	@qemu-system-x86_64 -kernel build/Zeros.elf -append arg1 -initrd arch/x86/initrd &
 
 debug:
 	@qemu-system-x86_64 -serial file:serial.log -kernel kernel/kmain.elf  -append arg1 -initrd ./bootfiles/initrd -S -s &

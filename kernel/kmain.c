@@ -122,12 +122,13 @@ void main_kernel_thread(){
 
    k_printf("Thread joined with %d\n", (int)val);
 
+/*
    while(1){
       if( portb_read( 0x64 ) & 0x20 ){
          k_printf("Mouse with data %x %x %x\n", portb_read( 0x60 ), portb_read(0x60), portb_read(0x60));
          for(int i = 0; i < 10000000; i++);
       }
-   }
+   }*/
    thread_exit( 0 );
 }
 
@@ -135,7 +136,7 @@ void kbh(char c){
    k_printf("Key pressed\n");
 }
 
-void kmain(struct multiboot_info *h){
+void kmain(struct multiboot_info *multiboot_info){
 
   //set_vga_mode( vga_3h_mode );
   //write_font( g_8x16_font, 16 );
@@ -162,12 +163,8 @@ void kmain(struct multiboot_info *h){
   sp_init();
   sp_putstr("Hello on serial!\n");
 
-  fs_root = init_initrd( h->mods->start );
-
-  ///////
-  mouse_init();
-  //////
-
+//TODO map in initrd with paging
+//  fs_root = init_initrd( h->mods->start );
 
   add_thread( k_create_thread( main_kernel_thread, NULL, thread_exit, 0x4000 ) );
 
