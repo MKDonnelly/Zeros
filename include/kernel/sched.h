@@ -4,6 +4,7 @@
 #include <arch/x86/archx86.h>
 #include <lib/delay.h>
 #include <lib/string.h>
+#include <lib/abstract_ll.h>
 
 extern thread_context_t *cur_context;
 
@@ -28,4 +29,5 @@ void thread_exit(void*);
 
 //Called to join with the given
 //thread with thread_id
-void *thread_join( int thread_id );
+//void *thread_join( int thread_id );
+void *thread_join( kthread_t *descriptor );

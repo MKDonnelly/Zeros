@@ -296,6 +296,6 @@ void demo(){
 
   //We currently cannot exit a thread,
   //so loop forever.
-  while(1)
-     thread_yield();
+  while(1);
+     //thread_yield();
 }

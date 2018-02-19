@@ -1,6 +1,5 @@
 #pragma once 
 
-#include <lib/types.h>
 #include <kernel/kmalloc.h>
 
 //Creates a linked list. Callers would do something like
@@ -33,3 +32,17 @@ void *set_node_ll(void **list, void *new_node, int index);
 //Also, this can be used to iterate over each item in the list
 //by having compare_function always return 0.
 void *find_node_ll( void **list, void *reference, int (*compare_function)(void*,void*) );
+
+//Create a lambda function.
+#define LAMBDA( rettype, params, func )  \
+        ({                               \
+           rettype __lambda__ params {   \
+               func;                     \
+           }                             \
+           __lambda__;                   \
+        })
+
+
+//Iterate through each member of the linked list and apply the
+//given operation. ANON_F above is really useful for this.
+void apply_op_ll( void **list, void (*operator_function)(void*) );

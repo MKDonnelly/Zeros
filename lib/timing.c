@@ -12,7 +12,8 @@ void timing_set_alarm(void (*alarm_function)(), int ms_period){
    new_alarm->callback = alarm_function;
    new_alarm->callback_period = new_alarm->time_left = ms_period;
 
-   add_node_ll( (void**)&alarm_list, new_alarm, total_alarms++);
+   add_node_ll( (void**)&alarm_list, new_alarm, 0);
+   total_alarms++;
 }
 
 //used with find_node_ll to run down
@@ -34,7 +35,7 @@ int handle_alarms(void *alarm1, void *alarm2){
       current_alarm->callback();
    }
 
-   //Always return 1 so that we run down the linked list
+   //Always return 0 so that we run down the linked list
    return 0;
 }
 

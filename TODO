@@ -12,6 +12,7 @@ Multitasking
       a page fault ocurrs if one exceeds its stack size
    Work on threading code
       separate scheduling and threading code
+      scheduling is STILL not fair!
       create thread synchronization constructs, messages
 
 printing/screen manipulation:

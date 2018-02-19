@@ -24,8 +24,6 @@
 //once the boot demo is done.
 int startShell = 1;
 
-
-/*
 void thread1(){
    int t1count = 0;
    while(1){
@@ -104,7 +102,7 @@ void threada(){
       k_printf_at("a", tacount++, 9);
       for(int i = 0; i < 50000000; i++);
    }
-}*/
+}
 
 void test_function(void *arg){
    k_printf("In test function with %d!\n", (int)arg);
@@ -118,7 +116,7 @@ void main_kernel_thread(){
    kthread_t *new_thread = k_create_thread( test_function, (void*)20, thread_exit, 0x1000 );
    add_thread( new_thread );
 
-   void *val = thread_join( new_thread->thread_id );
+   void *val = thread_join( new_thread );
 
    k_printf("Thread joined with %d\n", (int)val);
 
