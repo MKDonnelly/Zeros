@@ -24,8 +24,12 @@
 #define PIC_ICW4_8086_MODE_C   0x01
 #define PIC_ICW4_AUTO_EOI_C    0x02
 
+//Each pic has 8 interrupt lines
+#define PIC_INTERRUPT_LINES 8
 #define PIC_MASTER_START 0x20
+#define PIC_MASTER_END   0x27
 #define PIC_SLAVE_START  0x28
+#define PIC_SLAVE_END    0x35
 
 //Remap the PIC to non-handware
 //interrupt numbers

@@ -7,7 +7,10 @@
 #include <lib/types.h>
 #include <lib/bitwise.h>
 
+#define ARCH_MAX_INTERRUPTS 256
+
 extern void init_idt();
+//TODO get this out!
 extern void set_timer_count(uint16_t);
 
 //When calling an interrupt, 
@@ -48,8 +51,8 @@ void init_interrupts();
 
 //This function registers the interrupt so that
 //main_interrupt_handler may use it
-void register_interrupt( uint8_t number, void (*handler)(registers_t));
-void unregister_interrupt( uint8_t );
+void arch_register_interrupt( uint8_t number, void (*handler)(registers_t));
+void arch_unregister_interrupt( uint8_t );
 
 //All interrupts must pass through this to
 //be routed to the correct destination.

@@ -1,9 +1,6 @@
 #pragma once
 
 #include <arch/x86/isr.h>
-#include <arch/x86/drivers/mouse.h>
-//#include <arch/x86/drivers/vgacommon/vgacommon.h>
-
 #include <lib/types.h>
 
 //#define KEYBOARD_BUFFER_SIZE 128

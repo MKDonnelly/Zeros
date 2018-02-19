@@ -1,7 +1,7 @@
 #pragma once
+
 #include <lib/types.h>
 #include <kernel/kmalloc.h>
-#include <arch/x86/isr.h>
 
 //The initial EFlags value when starting a thread
 #define INITIAL_EFLAGS 0x0202
@@ -15,4 +15,4 @@ void arch_create_thread_context(thread_context_t**,void(func)(void *),void*, voi
 
 //Used by init_threading to jump to the first thread.
 //Never returns.
-void jump_to_thread(thread_context_t*);
+void arch_jump_to_thread(thread_context_t*);

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <lib/types.h>
-#include <lib/string.h>
 #include <fs/fs.h>
 #include <kernel/kmalloc.h>
 

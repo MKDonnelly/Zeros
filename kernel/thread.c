@@ -7,10 +7,12 @@ int next_thread_id = 0;
 kthread_t *k_create_thread ( void *start_func, void *param, void *exit_func, uint32_t stack_size ){
 
    //Create a thread descriptor
-   kthread_t *thread = kmalloc(sizeof(kthread_t), 0, 0 );
+   kthread_t *thread = kmalloc(sizeof(kthread_t), KMALLOC_NO_ALIGN, 0 );
 
    //Allocate stack space for the thread
-   void *stack = kmalloc( stack_size, 0, 0 );
+   //WE MUST ALIGN THE THREAD STACK TO 4K OR ELSE THE
+   //THREADS WILL GET ASYMETRIC PROCESSING TIME!
+   void *stack = kmalloc( stack_size, KMALLOC_ALIGN, 0 );
 
    thread->stack_ptr = stack;
 

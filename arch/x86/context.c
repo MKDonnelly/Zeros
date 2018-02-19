@@ -31,7 +31,7 @@ void arch_create_thread_context (thread_context_t **context,
 }
 
 //Called when first initilizing threading. 
-void jump_to_thread(thread_context_t *to){
+void arch_jump_to_thread(thread_context_t *to){
    asm volatile("      \
       movl %0, %%esp;  \
       popal;          \

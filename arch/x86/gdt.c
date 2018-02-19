@@ -5,6 +5,7 @@ const int16_t gdt_kernel_data = 0x10;
 
 //Our global descriptor table
 struct gdt_entry GDT[GDT_ENTRIES];
+
 //The GDT descriptor
 struct gdt_descriptor GDT_DES;
 
@@ -55,4 +56,3 @@ void init_gdt(){
    asm volatile("ljmp %0, $updateCS;  \
                  updateCS: " :: "i"(gdt_kernel_code));
 }
-

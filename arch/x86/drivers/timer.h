@@ -2,10 +2,6 @@
 
 #include <arch/x86/portio.h>
 #include <arch/x86/isr.h>
-#include <arch/x86/drivers/vgacommon/vgacommon.h>
-
-#include <kernel/thread.h>
-#include <kernel/sched.h>
 
 #define I8253_CH0_P   0x40 //This can generate an interrupt
 //CH1 @ 0x41 is not implemented
@@ -48,6 +44,7 @@
 
 #define I8253_FREQ 1193182
 #define I8253_10MS_COUNTER 11932 
+#define ARCH_TIMER_MS_PERIOD 10
 
 //Initilize the timer
 //Enable its IRQ and sets timer_callback

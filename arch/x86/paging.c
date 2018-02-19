@@ -30,7 +30,7 @@ page_directory_t *kernel_page_dir;
 //Loop over *frames to find the first unset bit,
 //which will indicate a free frame. Return -1
 //if no frames are present.
-int32_t first_free_frame(){
+static int32_t first_free_frame(){
    unsigned int index;
    uint8_t offset;
 
@@ -75,14 +75,14 @@ uint8_t page_map(page_entry_t *page, uint8_t is_kernel, uint8_t is_writeable, ui
       //We receive the physical address, not the offset
       //in the frames pointer, so change it to an index
       //by dividing by FRAME_SIZE
-      bitSet( frames, physical / FRAME_SIZE );
+      bitSet( frames, physical / ARCH_FRAME_SIZE );
       page->present = 1; //True, the page is present
       page->rw = is_writeable;
       page->user = is_kernel;
       //the frame member is the frame address, shifted
       //up by 12 bits. To get the physical address in,
       //we will pre-shift the address down 12 bits.
-      page->frame = physical / FRAME_SIZE;
+      page->frame = physical / ARCH_FRAME_SIZE;
    }
    return 0;
 }
@@ -138,7 +138,7 @@ void init_paging(){
    unsigned int mem_end_page = 0x1000000;
 
    //Calculate the number of frames in total
-   total_frames = mem_end_page / PAGE_SIZE;
+   total_frames = mem_end_page / ARCH_PAGE_SIZE;
 
    //Calculate the size of *frames as the
    //number of chars it needs to hold. Add 1
@@ -162,7 +162,7 @@ void init_paging(){
    while( i < kernel_end_heap){
       //Identity map each page upto the end of the heap.
       page_map(get_page(i, 1, kernel_page_dir), KERNEL_MEMORY, IS_WRITEABLE, i);
-      i += FRAME_SIZE;
+      i += ARCH_FRAME_SIZE;
    }
 
    //Let the processor know where our page table is
@@ -170,7 +170,7 @@ void init_paging(){
    load_page_dir( kernel_page_dir );
 
    //Finally, setup the interrupt handler
-   register_interrupt( PAGE_INTERRUPT, page_int_handler);
+   arch_register_interrupt( PAGE_INTERRUPT, page_int_handler);
 }
 
 //Load the given page_directory into cr3
@@ -186,7 +186,7 @@ void load_page_dir(page_directory_t *dir){
 //Get a pointer to a page. given its physical address
 page_entry_t *get_page(uint32_t address, uint8_t make, page_directory_t *dir){
    //Turn the address into an index
-   address /= FRAME_SIZE;
+   address /= ARCH_FRAME_SIZE;
    //Find the page table containing this address
    unsigned int table_idx = address / 1024;
    if( dir->tables[table_idx] ){
@@ -227,5 +227,5 @@ void page_int_handler(registers_t r){
 
    //We currently cannot handle a fault, so
    //halt the machine
-   asm("hlt");
+   arch_stop_cpu();
 }

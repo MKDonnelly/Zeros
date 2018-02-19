@@ -20,10 +20,10 @@ void init_heap(){
 
 
 //Walk the heap until enough memory is found
-//If "align" is 0, do not align to 4k, else align. 
+//If "align" is 0, do not align to PAGE_SIZE, else align. 
 //NOTE: To make it easier on ourselves when aligning 
-//      on 4K boundaries, this function will just  
-//      add 4K as an overestimate instead of going through
+//      on PAGE_SIZE boundaries, this function will just  
+//      add PAGE_SZE as an overestimate instead of going through
 //      the calculation to get a perfect fit.
 void *kmalloc(uint32_t size, uint8_t align, uint32_t *phys){
 
@@ -32,25 +32,25 @@ void *kmalloc(uint32_t size, uint8_t align, uint32_t *phys){
    //Align on 4K boundary
    if( align ){
       //NOTE: We will simply overestimate the space
-      //needed by adding 4K (0x1000). The most space
+      //needed by adding the page size (4K for x86). The most space
       //that could be wasted after aligning the memory
-      //to 4K boundaries is 4k - 1 bytes. Loop while
+      //to PAGE_SIZE boundaries is PAGE_SIZE - 1 bytes. Loop while
       //the current node is allocated or the current node
       //is not big enough
-      while( head->isAllocated || ( (head->size < ( size + 0x1000 ) && head->nextNode))){
+      while( head->isAllocated || ( (head->size < ( size + ARCH_PAGE_SIZE ) && head->nextNode))){
            head = head->nextNode;
       }
 
       //Check to make sure the node we landed on is valid.
       //If it is not, we probably ran out of memory
-      if( ! (head->isAllocated || ((head->size < (size+0x1000)) && (head->nextNode)))){
+      if( ! (head->isAllocated || ((head->size < ( size + ARCH_PAGE_SIZE)) && (head->nextNode)))){
 
          //This will point to a suitable block of free memory
          heapnode_t *curNode = head;
  
          //This will point to the start of the free area that will
          //be split off from the end of this block
-         heapnode_t *nextNode = (heapnode_t*)( (uint8_t*)head + sizeof(heapnode_t) + size + 0x1000 );
+         heapnode_t *nextNode = (heapnode_t*)( (uint8_t*)head + sizeof(heapnode_t) + size + ARCH_PAGE_SIZE );
 
          //Imagine we have a block of 1000 free byte we are using.
          //Now support we want 990 of those bytes. It does not make
@@ -71,7 +71,7 @@ void *kmalloc(uint32_t size, uint8_t align, uint32_t *phys){
             nextNode->nextNode = curNode->nextNode;
             //Pointer to start of free memory
             nextNode->freeMem = ( (uint8_t*)nextNode + sizeof(heapnode_t) );
-            nextNode->size = curNode->size - sizeof(heapnode_t) - size - 0x1000;
+            nextNode->size = curNode->size - sizeof(heapnode_t) - size - ARCH_PAGE_SIZE;
             nextNode->isAllocated = 0; //Again, assume that the block we are
                                        //sitting on is unallocated
 
@@ -80,8 +80,8 @@ void *kmalloc(uint32_t size, uint8_t align, uint32_t *phys){
             //Get the head of the current node, add sizeof(heapnode_t) to get
             //to the first byte of free memory, add 4K since we
             //just overestimate, and align it all to 4K.
-            curNode->freeMem = (void*)(((uint32_t)((uint8_t*)curNode + sizeof(heapnode_t) + 0x1000)) & 0xFFFFF000);
-            curNode->size = size + 0x1000;
+            curNode->freeMem = (void*)(((uint32_t)((uint8_t*)curNode + sizeof(heapnode_t) + ARCH_PAGE_SIZE)) & 0xFFFFF000);
+            curNode->size = size + ARCH_PAGE_SIZE;
             curNode->isAllocated = 1;
       
             //If specified, return the address
@@ -92,7 +92,7 @@ void *kmalloc(uint32_t size, uint8_t align, uint32_t *phys){
          }
       }
 
-   //We do not need to align on 4K
+   //We do not need to align on PAGE_ZIE
    }else{
 
       //Go through each block while the current block is allocated or

@@ -9,8 +9,8 @@
 #include <lib/bitwise.h>
 #include <lib/types.h>
 
-#define PAGE_SIZE  0x1000
-#define FRAME_SIZE 0x1000
+#define ARCH_PAGE_SIZE  0x1000
+#define ARCH_FRAME_SIZE 0x1000
 #define TABLE_SIZE 0x1000
 
 #define KERNEL_MEMORY 0

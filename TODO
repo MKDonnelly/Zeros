@@ -12,12 +12,16 @@ Multitasking
       a page fault ocurrs if one exceeds its stack size
    Work on threading code
       separate scheduling and threading code
-      scheduling is STILL not fair!
+      improve scheduler (queues, priority, different algs)
       create thread synchronization constructs, messages
+         use xchg to implement mutexes
 
 printing/screen manipulation:
   Implement a frame buffer in 3h mode
      Add function to scroll.c to scroll both ways
+  Abstract printf from out of the arch code
+  Use vfs to have printf operate through screen and serial
+     the same
   Better utilize vga colors in 3h mode
       (see https://github.com/JonathanSalwan/Kaminou-Kernel/blob/master/kernel/includes/sys/video.h)
      Allow arrow keys to scroll through buffer 
@@ -64,10 +68,15 @@ initrd
       page-protect it.
    load basic binary from initrd and execute
  
+execution
+   create symbol table for dynamic linker
+
 misc:   
    Implement APIC, HPET, user mode, ATA PIO mode driver,
       PCI driver, network card driver,  
    work on elf file parser
+   add in arch-specific bitwise operators
+   convert inline assembly to assembly-only file
    Write oneshot for timer callback code
    Write simple ext2 filesystem driver
    Mouse driver

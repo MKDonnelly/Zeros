@@ -1,6 +1,7 @@
 #pragma once
 
 #include <lib/types.h>
+#include <arch/x86/archx86.h>
 
 //When splitting a piece of free memory in the
 //heap, this is the minimum amount of free memory
@@ -34,7 +35,9 @@ typedef struct heapnode{
 void init_heap();
 
 //Dynamically allocate memory
-void *kmalloc(uint32_t,uint8_t,uint32_t*);
+#define KMALLOC_ALIGN 1
+#define KMALLOC_NO_ALIGN 0
+void *kmalloc(uint32_t size, uint8_t align, uint32_t *phys);
 
 //Free dynamic memory
 void kfree(void*);

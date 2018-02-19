@@ -4,7 +4,7 @@ void (*keyboard_callback)(char) = 0;
 
 //Thin layer to transform the input scancode
 //into a char and send it to the callback
-void keyboard_handler(){
+static void keyboard_handler(){
 
    static uint8_t shift_activated = 0;
 
@@ -37,7 +37,7 @@ void arch_keyboard_init( void (*keypress_callback)(char) ){
    enable_irq( KEYBOARD_IRQ );
 
    //And set the interrupt handler
-   register_interrupt( KEYBOARD_INTERRUPT, keyboard_handler );
+   arch_register_interrupt( KEYBOARD_INTERRUPT, keyboard_handler );
 
    keyboard_callback = keypress_callback;
 }

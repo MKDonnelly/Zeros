@@ -38,7 +38,10 @@ static uint32_t initrd_readfile(fs_node_t *node, uint32_t offset, uint32_t size,
    for(i = 0; i < size && i < node->length; i++){
       buffer[i] = ptr[i];
    }
-   buffer[i] = 0; //Set that null bit
+
+   //Make sure the string read is terminated by a null
+   //TODO change this as we will not always be reading strings
+   buffer[i] = 0; 
    return 0;
 }
 
@@ -76,7 +79,7 @@ static fs_node_t *initrd_readdir(fs_node_t *node, uint32_t index){
    //Check to make sure we did not 
    //go over the end.
    if( node->length <= index )
-      return 0; 
+      return NULL; 
 
    fs_node_t *fsNode = (fs_node_t*)kmalloc( sizeof(fs_node_t), 0, 0);
    strcpy( fsNode->name, current_initrd.initrdObjects[index].name );
@@ -94,10 +97,10 @@ static fs_node_t *initrd_readdir(fs_node_t *node, uint32_t index){
       //higher abstraction that we need atm.
       fsNode->read = initrd_readfile;
       fsNode->write = initrd_writefile;
-      fsNode->open = 0;
+      fsNode->open = NULL;
       fsNode->close = initrd_close; 
-      fsNode->readdir = 0;
-      fsNode->finddir = 0;
+      fsNode->readdir = NULL;
+      fsNode->finddir = NULL;
    }
    return fsNode;
 }
@@ -124,10 +127,10 @@ static fs_node_t *initrd_finddir(fs_node_t *node, char *name){
          if( fsNode->flags & FS_FILE ){
             fsNode->read = initrd_readfile;
             fsNode->write = initrd_writefile;
-            fsNode->open = 0;
+            fsNode->open = NULL;
             fsNode->close = initrd_close; 
-            fsNode->readdir = 0;
-            fsNode->finddir = 0;
+            fsNode->readdir = NULL;
+            fsNode->finddir = NULL;
          }
       }
    }
@@ -144,7 +147,7 @@ static fs_node_t *initrd_finddir(fs_node_t *node, char *name){
 fs_node_t *init_initrd(uint32_t *addr){
    //Verify the initrd magic number
    if( *addr != INITRD_MAGIC )
-      return (fs_node_t*)0;
+      return NULL;
 
    //TODO do more error checking?
    
@@ -167,13 +170,13 @@ fs_node_t *init_initrd(uint32_t *addr){
 
    //The initrd is treated as a directory, the only functions 
    //applicable are readdir and finddir
-   initrd->read = 0;
-   initrd->write = 0;
-   initrd->open = 0;
+   initrd->read = NULL;
+   initrd->write = NULL;
+   initrd->open = NULL;
    initrd->close = initrd_close;
    initrd->readdir = initrd_readdir;
    initrd->finddir = initrd_finddir;
-   initrd->ptr = 0;
+   initrd->ptr = NULL;
 
    return initrd;
 }

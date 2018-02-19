@@ -1,11 +1,13 @@
 #pragma once 
 
 #include <kernel/thread.h>
-#include <arch/x86/archx86.h>
-#include <lib/delay.h>
-#include <lib/string.h>
 #include <lib/abstract_ll.h>
 
+#define SCHEDULER_INTERRUPT 50
+
+//The arch interrupt handler will put the
+//current context in this variable. This can
+//be used by the scheduler to swap threads.
 extern thread_context_t *cur_context;
 
 //Initilize the threading system

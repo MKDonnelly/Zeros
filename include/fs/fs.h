@@ -52,15 +52,8 @@ typedef struct fs_node{
    struct fs_node *ptr;
 } fs_node_t;
 
-//This strucure is returned by readdir
-//typedef struct dirent{
-//   char name[FS_NODE_NAME_MAXLEN]; //Filename
-//   uint32_t ino; //Inode number for file/dir
-//} directory_t;
-
 //The root file system
 extern fs_node_t *fs_root;
-
 
 //These are the generic fs_node_t operators. These will perform error
 //checking before calling the specific function inside of the
@@ -80,7 +73,7 @@ void close_fs(fs_node_t *node);
 //has three files (file1,file2,file3), a call of readdir_fs(...,0)
 //will return info about file1, readdir_fs(...,1) will return info
 //about file2, and so on.
-//struct dirent *readdir_fs(fs_node_t *node, uint32_t index);
 fs_node_t *readdir_fs(fs_node_t *node, uint32_t index);
+
 //Given the name of a file, try to locate it in the directory.
 fs_node_t *finddir_fs(fs_node_t *node, char *name);

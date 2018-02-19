@@ -1,18 +1,18 @@
 
 //Various routines to manage the cpu
 
-void stop_cpu(){
+void arch_stop_cpu(){
    asm("suspend:");
    asm("   cli");
    asm("   hlt");
    asm("   jmp suspend");
 }
 
-void disable_ints(){
+void arch_disable_ints(){
    asm volatile("cli");
 }
 
-void enable_ints(){
+void arch_enable_ints(){
    asm volatile("sti");
 }
 

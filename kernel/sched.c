@@ -24,9 +24,8 @@ void add_thread(kthread_t *thread){
 
 //Called by a thread to voluntarily
 //give up processor time. 
-//TODO move this to arch since we have assembly
 void thread_yield(){
-   asm volatile("int $50");
+   arch_trigger_interrupt( SCHEDULER_INTERRUPT );
 }
 
 //Called by a thread when returning
@@ -65,9 +64,9 @@ void *thread_join( kthread_t *thread_descriptor ){
 //The default thread to run when
 //there is nothing else
 static void idle_thread(){
-   enable_ints();
+   arch_enable_ints();
    while(1){
-      asm volatile("hlt");
+      arch_halt_cpu();
    }
 }
 
@@ -77,8 +76,8 @@ void init_threading(){
    thread_count++;
    current_thread = get_node_ll( (void**)&thread_list, 0 );
 
-   register_interrupt( 50, schedule );
-   jump_to_thread( current_thread->context );
+   arch_register_interrupt( SCHEDULER_INTERRUPT, schedule );
+   arch_jump_to_thread( current_thread->context );
 }
 
 //*Very* simple scheduler. Runs down the list

@@ -9,8 +9,9 @@ void arch_timer_init( void (*timer_callback)(registers_t) ){
    //Enable the timer interrupt and 
    //set the interrupt handler
    enable_irq( TIMER_IRQ );
-   register_interrupt( TIMER_INTERRUPT, timer_callback );
+   arch_register_interrupt( TIMER_INTERRUPT, timer_callback );
 }
+
 
 void set_timer_count(uint16_t count){
 
@@ -29,7 +30,8 @@ void set_timer_count(uint16_t count){
    portb_write( I8253_CH0_P, higherByte );
 }
 
-uint16_t get_timer_count(){
+/*
+static uint16_t get_timer_count(){
    portb_write( I8253_CTRL_P, 0 );
    
    uint16_t result;
@@ -40,4 +42,4 @@ uint16_t get_timer_count(){
    result |= (tmp << 8 );
 
    return result;
-}
+}*/

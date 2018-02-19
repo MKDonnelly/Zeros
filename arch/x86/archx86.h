@@ -7,9 +7,8 @@
 
 #include <arch/x86/paging.h>
 #include <arch/x86/isr.h>
-#include <arch/x86/gdt.h>
 #include <arch/x86/cpu.h>
-#include <arch/x86/portio.h>
+#include <arch/x86/context.h>
 
 #include <arch/x86/drivers/keyboard.h>
 #include <arch/x86/drivers/mouse.h>
@@ -22,4 +21,3 @@
 #include <arch/x86/drivers/vgacommon/vgafont.h>
 
 void arch_init_system();
-

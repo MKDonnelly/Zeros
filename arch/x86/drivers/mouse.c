@@ -89,7 +89,7 @@ void mouse_init(){
 
    //Enable interrupt and setup handler
    //enable_irq( MOUSE_ISR );
-   register_interrupt( MOUSE_INTERRUPT, mouse_interrupt_handler );
+   arch_register_interrupt( MOUSE_INTERRUPT, mouse_interrupt_handler );
 }
 
 void mouse_interrupt_handler(){

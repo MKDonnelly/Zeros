@@ -141,7 +141,7 @@ void kmain(struct multiboot_info *multiboot_info){
 
   //Arch initilization
   arch_init_system();
-  disable_ints();
+  arch_disable_ints();
   arch_timer_init( timing_main_handler );
   arch_keyboard_init( keyboard_main_handler );
 

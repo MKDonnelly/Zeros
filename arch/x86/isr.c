@@ -21,18 +21,20 @@ void init_interrupts(){
    load_idt();
 }
 
-
 //Places the handler function into the interrupt handler array 
-void register_interrupt( uint8_t int_number, void (*handler)(registers_t)){
+//This is exported to general kernel code.
+void arch_register_interrupt( uint8_t int_number, void (*handler)(registers_t)){
   //Mark the interrupt as present
   bitSet( &int_present, int_number );
   int_handlers[int_number] = handler;
 }
 
-void unregister_interrupt( uint8_t int_number ){
+void arch_unregister_interrupt( uint8_t int_number ){
    //Mark the interrupt as not present
    //and null out the function pointer
    bitClear( &int_present, int_number);
+
+   //Null out function pointer to handler
    int_handlers[int_number] = 0;
 }
 
@@ -41,11 +43,11 @@ void main_interrupt_handler(registers_t r){
    //Check to see if this interrupt came from a PIC.
    //If it did, send the appropriate EOI
    if( r.int_number >= PIC_MASTER_START 
-		   && r.int_number <= PIC_MASTER_START + 8 ){
+		   && r.int_number <= PIC_MASTER_END ){
       //Interrupt came from master pic
       portb_write( MASTER_PIC_CTRL_P, PIC_EOI_C );
    }else if( r.int_number >= PIC_SLAVE_START 
-		   && r.int_number <= PIC_SLAVE_START + 8 ){
+		   && r.int_number <= PIC_SLAVE_END ){
       portb_write( MASTER_PIC_CTRL_P, PIC_EOI_C );
       portb_write( SLAVE_PIC_CTRL_P, PIC_EOI_C );
    }
@@ -57,8 +59,8 @@ void main_interrupt_handler(registers_t r){
    }else{
       k_printf("Caught unregistered interrupt %d\n", r.int_number);
 
-      //Make sure to halt if this is a processor error
+      //So far, we cannot recover from exceptions
       if( r.int_number < 33 )
-         asm("hlt");
+         arch_stop_cpu();
    }
 }

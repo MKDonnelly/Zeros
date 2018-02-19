@@ -1,6 +1,7 @@
+Everything that is arch-specific but not prefixed with 
+arch_ is never used outside of the arch code. 
 Each arch system exposes the following interfaces 
-grouped by purpose. All start with "arch_" to indicate
-that it is using arch-specific code:
+grouped by purpose.
 
 Timer interface:
    The arch timer interface serves one basic
