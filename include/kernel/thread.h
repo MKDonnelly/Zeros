@@ -1,7 +1,7 @@
 #pragma once
 
 #include <lib/types.h>
-#include <kernel/kmalloc.h>
+#include <kernel/mm/heap.h>
 #include <arch/x86/archx86.h>
 
 enum THREAD_STATE { THREAD_RUNNING, THREAD_EXIT };

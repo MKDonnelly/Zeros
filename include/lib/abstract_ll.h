@@ -1,6 +1,6 @@
 #pragma once 
 
-#include <kernel/kmalloc.h>
+#include <kernel/mm/heap.h>
 
 //Creates a linked list. Callers would do something like
 //test_t *my_ll_head;

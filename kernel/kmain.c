@@ -8,11 +8,9 @@
 #include <lib/delay.h>
 #include <lib/debug.h>
 #include <lib/bootdemo.h>
-#include <lib/shell.h>
 #include <lib/timing.h>
 #include <lib/abstract_ll.h>
 
-#include <kernel/kmalloc.h>
 #include <kernel/multiboot.h>
 #include <kernel/thread.h>
 #include <kernel/sched.h>
@@ -135,8 +133,8 @@ void kbh(char c){
    k_printf("Key pressed\n");
 }
 
-#include <staging/heap_blocklist.h>
-#include <staging/heap.h>
+#include <kernel/mm/heap_blocklist.h>
+#include <kernel/mm/heap.h>
 
 void kmain(struct multiboot_info *multiboot_info){
 
@@ -154,16 +152,8 @@ void kmain(struct multiboot_info *multiboot_info){
 
   k_clear_screen();
 
-  init_heap();
   //See heap.h for kernel_heap
-  create_heap( &kernel_heap, 0x300000, 0xf0000, blocklist_malloc, blocklist_free, blocklist_init_heap );
-
-
-
-//  char *mem = (char*)kernel_heap.malloc( &kernel_heap, 100, 0x1000, 0 );
-//  k_printf("Allocated memory at %x\n", mem );
-
-//  k_printf("%x %d %d\n", kernel_heap.start, kernel_heap.len, kernel_heap.size_left);
+  create_heap( &kernel_heap, 0x300000, 0x200000, blocklist_malloc, blocklist_free, blocklist_init_heap );
 
 
   init_paging();
@@ -186,13 +176,12 @@ void kmain(struct multiboot_info *multiboot_info){
   add_thread( k_create_thread( thread2, NULL, NULL, 0x1000) );  
   add_thread( k_create_thread( thread3, NULL, NULL, 0x1000) );  
   add_thread( k_create_thread( thread4, NULL, NULL, 0x1000) );  
-  add_thread( k_create_thread( thread5, NULL, NULL, 0x1000) );  
+  add_thread( k_create_thread( thread5, NULL, NULL, 0x1000) );
   add_thread( k_create_thread( thread6, NULL, NULL, 0x1000) );  
   add_thread( k_create_thread( thread7, NULL, NULL, 0x1000) );  
   add_thread( k_create_thread( thread8, NULL, NULL, 0x1000) );  
   add_thread( k_create_thread( thread9, NULL, NULL, 0x1000) );  
   add_thread( k_create_thread( threada, NULL, NULL, 0x1000) );  
-
   
   init_threading();
   while(1);

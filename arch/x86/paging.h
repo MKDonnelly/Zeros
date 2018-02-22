@@ -3,8 +3,7 @@
 #include <arch/x86/drivers/vgacommon/vgacommon.h>
 #include <arch/x86/isr.h>
 
-#include <kernel/kmalloc.h>
-#include <staging/heap.h>
+#include <kernel/mm/heap.h>
 
 #include <lib/memory.h>
 #include <lib/bitwise.h>

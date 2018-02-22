@@ -15,7 +15,8 @@
 //for both files and directories.
 
 void initrd_close(fs_node_t *node){
-   kfree( node );
+   //kfree( node );
+   k_free( kernel_heap, node );
    node = NULL;
 }
 
@@ -81,7 +82,8 @@ static fs_node_t *initrd_readdir(fs_node_t *node, uint32_t index){
    if( node->length <= index )
       return NULL; 
 
-   fs_node_t *fsNode = (fs_node_t*)kmalloc( sizeof(fs_node_t), 0, 0);
+   //fs_node_t *fsNode = (fs_node_t*)kmalloc( sizeof(fs_node_t), 0, 0);
+   fs_node_t *fsNode = (fs_node_t*)k_malloc( kernel_heap, sizeof(fs_node_t), 0, 0);
    strcpy( fsNode->name, current_initrd.initrdObjects[index].name );
    fsNode->mask = fsNode->uid = fsNode->gid = fsNode->impl = 0;
    fsNode->flags = current_initrd.initrdObjects[index].flags;
@@ -114,7 +116,8 @@ static fs_node_t *initrd_finddir(fs_node_t *node, char *name){
    for(int item = 0; item < current_initrd.numFiles; item++){
       //We have found the file!
       if( ! strcmp( name, current_initrd.initrdObjects[item].name) ){
-         fsNode = (fs_node_t*)kmalloc(sizeof(fs_node_t), 0, 0);
+         fsNode = (fs_node_t*)k_malloc(kernel_heap, sizeof(fs_node_t), 0, 0);
+         //fsNode = (fs_node_t*)kmalloc(sizeof(fs_node_t), 0, 0);
 
          strcpy( fsNode->name, current_initrd.initrdObjects[item].name );
          fsNode->mask = fsNode->uid = fsNode->gid = fsNode->impl = 0;
@@ -162,7 +165,8 @@ fs_node_t *init_initrd(uint32_t *addr){
    //THAT WE NEED
    current_initrd.initrdObjects = (struct initrd_object*)(addr + 2);
 
-   fs_node_t *initrd = (fs_node_t*)kmalloc(sizeof(fs_node_t), 0, 0);
+   fs_node_t *initrd = (fs_node_t*)k_malloc(kernel_heap, sizeof(fs_node_t), 0, 0);
+   //fs_node_t *initrd = (fs_node_t*)kmalloc(sizeof(fs_node_t), 0, 0);
    strcpy( initrd->name, "initrd");
    initrd->mask = initrd->uid = initrd->gid = initrd->inode = initrd->impl = 0;
    initrd->flags = FS_DIRECTORY;

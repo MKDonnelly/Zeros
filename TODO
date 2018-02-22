@@ -1,3 +1,26 @@
+dynamic memory
+   Create a slab allocator (have fixed size block ready)
+   Stress-test kmalloc
+   Create several memory allocation algorithms by abstracting
+      the algorithm to deal with only a range of memory addrs
+      Buddy allocator
+   Better organize the kernel memory layout (i.e. heap comes
+      before the stack, text is under the heap)
+ 
+userland
+   get ring 3 working
+   create system call interface
+
+initrd
+   Add directory support to initrd and improve
+      initrd code
+   Page in the initrd since it currently cannot be accessed
+
+paging
+   handle page faults when memory runs out
+   improve code where needed
+   copy a page table for fork()
+
 Multitasking
    Move the kernel stack to the end of the heap
       so that when we map the pages, we can identity
@@ -15,10 +38,6 @@ Multitasking
       improve scheduler (queues, priority, different algs)
       create thread synchronization constructs, messages
          use xchg to implement mutexes
-
-userland
-   get ring 3 working
-   create system call interface
 
 printing/screen manipulation:
   Implement a frame buffer in 3h mode
@@ -50,28 +69,11 @@ utils
    Create a basic file editor by dumping a file into the
       frame buffer and copying it back once done.
    create simple games (pong, etc)
-
-dynamic memory
-   Create a slab allocator (have fixed size block ready)
-   Stress-test kmalloc
-   Create several memory allocation algorithms by abstracting
-      the algorithm to deal with only a range of memory addrs
-   Abstract the heap so that multiple heaps can coexist
-      create_heap( <start addr>, size, allocator_alg );
-   get unify_heap working or eliminate it
- 
-initrd
-   Add directory support to initrd and improve
-      initrd code
-   Copy the initrd over to some space of memory
-      so that it is not overwritten. Or at least
-      page-protect it.
-   load basic binary from initrd and execute
  
 program execution
    create symbol table for dynamic linker
    elf file parser
-   load flat binaries (c and assembly)
+   load and exec flat binaries (c and assembly) from initrd
 
 documentation/testing
    Unit tests for various subsystems
@@ -85,19 +87,21 @@ documentation/testing
 
 drivers
    APIC, HPET, ATA PIO mode, PCI, network card
-   basic ext2 filesystem driver
-   mouse driver
+   basic ext2 filesystem
+   mouse, CMOS, serial,  
  
 misc tasks 
-   add in arch-specific bitwise operators
    convert inline assembly to assembly-only file
-   write oneshot for timer callback code
    use a cross compiler
-   make as much as possible work through the VFS 
-   Get proper release/press code working with keyboard
    Create /dev virtual directory
+   Get proper release/press code working with keyboard
    create function to invalidate a page
-      asm volatile ("invlpg (%0)" : : "b" (page_addr) : "memory")
+      asm volatile ("invlpg (%0)" : : "b" (page_addr) : "memory") 
+   make as much as possible work through the VFS 
+
+low-priority
+   add in arch-specific bitwise operators
+   write oneshot for timer callback code
    add random number generator, md5 sum function
    try to boot UEFI with grub-efi
    add cpuid functions

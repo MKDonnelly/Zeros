@@ -1,6 +1,6 @@
 #pragma once
 
-#include <kernel/kmalloc.h>
+#include <kernel/mm/heap.h>
 #include <lib/abstract_ll.h>
 
 typedef struct{

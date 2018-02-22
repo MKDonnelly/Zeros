@@ -21,13 +21,13 @@ void create_ll( void **list, int count, int element_size){
    }
 
    mem_t **head = (mem_t**)list;
-   (*head) = (mem_t*)kmalloc(element_size, 0, 0);
+   (*head) = (mem_t*)k_malloc(kernel_heap, element_size, 0, 0);
 
    mem_t *next_node = (*head);
 
    while( --count > 0 ){
       //Allocate the *next pointer and jump through it.
-      next_node->next = (mem_t*)kmalloc( element_size, 0, 0 );
+      next_node->next = (mem_t*)k_malloc(kernel_heap, element_size, 0, 0 );
       next_node = next_node->next;
    }
 
@@ -45,7 +45,7 @@ void dealloc_ll(void **list){
    
    while( head != NULL ){
       next = head->next;
-      kfree( head );
+      k_free( kernel_heap, head );
       head = next;
    }
 }
