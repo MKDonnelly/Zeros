@@ -16,6 +16,10 @@ Multitasking
       create thread synchronization constructs, messages
          use xchg to implement mutexes
 
+userland
+   get ring 3 working
+   create system call interface
+
 printing/screen manipulation:
   Implement a frame buffer in 3h mode
      Add function to scroll.c to scroll both ways
@@ -42,7 +46,7 @@ printing/screen manipulation:
   use hwinfo --framebuffer to see and program video modes
     also use grub gfx directive to boot into a higher video mode
 
-utils:
+utils
    Create a basic file editor by dumping a file into the
       frame buffer and copying it back once done.
    create simple games (pong, etc)
@@ -50,15 +54,11 @@ utils:
 dynamic memory
    Create a slab allocator (have fixed size block ready)
    Stress-test kmalloc
-   Create several memory allocation algorithms
-   Abstract the heap so that multiple 
-      heaps can coexist
-      create_heap( <start addr>, size, allocator );
+   Create several memory allocation algorithms by abstracting
+      the algorithm to deal with only a range of memory addrs
+   Abstract the heap so that multiple heaps can coexist
+      create_heap( <start addr>, size, allocator_alg );
    get unify_heap working or eliminate it
-   Advanced malloc idea: have malloc return a double pointer.
-      malloc will maintain the second pointer. This way, malloc
-      can change where each piece of dynamic memory lies transparent
-      to the external process.
  
 initrd
    Add directory support to initrd and improve
@@ -68,19 +68,12 @@ initrd
       page-protect it.
    load basic binary from initrd and execute
  
-execution
+program execution
    create symbol table for dynamic linker
+   elf file parser
+   load flat binaries (c and assembly)
 
-misc:   
-   Implement APIC, HPET, user mode, ATA PIO mode driver,
-      PCI driver, network card driver,  
-   work on elf file parser
-   add in arch-specific bitwise operators
-   convert inline assembly to assembly-only file
-   Write oneshot for timer callback code
-   Write simple ext2 filesystem driver
-   Mouse driver
-   Make a cross compiler
+documentation/testing
    Unit tests for various subsystems
    Add a how-to to explain how each subsystem works
       Add examples for each subsystem for reference
@@ -88,15 +81,25 @@ misc:
    Set variables to trace dependency problems in kernel
       (i.e. make sure if the heap is not setup, we do not
       try to use it and throw an error)
-   Make as much as possible work through the VFS 
+   Make all code conform to coding style in README
+
+drivers
+   APIC, HPET, ATA PIO mode, PCI, network card
+   basic ext2 filesystem driver
+   mouse driver
+ 
+misc tasks 
+   add in arch-specific bitwise operators
+   convert inline assembly to assembly-only file
+   write oneshot for timer callback code
+   use a cross compiler
+   make as much as possible work through the VFS 
    Get proper release/press code working with keyboard
    Create /dev virtual directory
    create function to invalidate a page
       asm volatile ("invlpg (%0)" : : "b" (page_addr) : "memory")
-   Add random number generator
-   Add a basic md5 sum function
-   Try to boot UEFI with grub-efi
-   Add cpuid functions
-   Use timer channel 2 to play sound on pc speaker
-   Create system calls using interrupts
+   add random number generator, md5 sum function
+   try to boot UEFI with grub-efi
+   add cpuid functions
+   use timer channel 2 to play sound on pc speaker
    work on arm arch code with qemu-arm

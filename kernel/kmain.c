@@ -164,9 +164,9 @@ void kmain(struct multiboot_info *multiboot_info){
 //TODO map in initrd with paging
 //  fs_root = init_initrd( h->mods->start );
 
-  add_thread( k_create_thread( main_kernel_thread, NULL, thread_exit, 0x4000 ) );
+//  add_thread( k_create_thread( main_kernel_thread, NULL, thread_exit, 0x4000 ) );
 
-/*
+
   add_thread( k_create_thread( thread1, NULL, NULL, 0x1000) );  
   add_thread( k_create_thread( thread2, NULL, NULL, 0x1000) );  
   add_thread( k_create_thread( thread3, NULL, NULL, 0x1000) );  
@@ -177,9 +177,7 @@ void kmain(struct multiboot_info *multiboot_info){
   add_thread( k_create_thread( thread8, NULL, NULL, 0x1000) );  
   add_thread( k_create_thread( thread9, NULL, NULL, 0x1000) );  
   add_thread( k_create_thread( threada, NULL, NULL, 0x1000) );  
-*/
-  //add_thread( k_create_thread( demo, NULL, NULL, 0x3000, 0) );
-  //add_thread( k_create_thread( zeros_shell, NULL, NULL, 4192, 0) );
+
   
   init_threading();
   while(1);

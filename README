@@ -39,39 +39,38 @@ Directory structure
       the final kernel image. For example, a custom
       initrd generator.      
 
-Notation:
-   -> #define <something>_P = This is a port
-   -> #define <something>_C = This is a command
-   -> #define <something>_M = This is a bit mask
-
 Dependencies:
    Certain subsystems in the kernel require other
    parts to be working before it can be fully used.
 
-
 ------------------------------------------------------
-Add debugging symbols to kernel while
-   maintaining a flat binary to run
-   nasm -f elf -F dwarf -g kernel.asm
-   objcopy -O binary kernel.o kernel.bin
-   
-   qemu-system-x86_64 -s -S kernel.bin
-   gdb -q
-   -> target remote localhost:1234
-   -> symbol-file kernel.o
+                      Coding Style
 
-If global variables are not working in the kernel,
-make sure everything has been compiled like
-   gcc -fno-pie -m32 -ffreestanding -c kmain.c -o kmain.o
-   ld -m elf_i386 -o kmain.bin -T link.ld kmain.o --oformat binary
-   where link.ld contains
-   OUTPUT_FORMAT(elf32-i386)
-   ETNRY(kmain)
-   SECTIONS(
-      . = 0x1000;
-      .text : { *(.text) }
-      .data : { *(.data) }
-      .bss  : { *(.bss ) }
-   }
-   This is mainly caused by the improper address being loaded for
-   the global variable's address.   
+Notation for constants:
+   -> #define <something>_P = This is a port
+   -> #define <something>_C = This is a command
+   -> #define <something>_M = This is a bit mask
+
+Variables should be declared using snake case, not
+   camel case.
+
+Opening curly braces go at the end of the line i.e.
+   for(...){
+NOT
+   for(...)
+   {
+
+"/*" and "*/" should not be used for single line comments
+   if possible, use "//" instead as it is easier when
+   commenting out code when debugging.
+
+Functions have a standard header like 
+/*
+   This function does such and such
+   Params
+      input 1 - First input
+      input 2 - Second input
+   Return
+      Returns such and such value
+      Returns NULL on error
+*/
