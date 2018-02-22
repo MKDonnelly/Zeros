@@ -8,7 +8,7 @@ int total_alarms = 0;
 
 void timing_set_alarm(void (*alarm_function)(), int ms_period){
 
-   alarm_t *new_alarm = (alarm_t*)kmalloc( sizeof(alarm_t), KMALLOC_NO_ALIGN, 0 );
+   alarm_t *new_alarm = (alarm_t*)kmalloc( sizeof(alarm_t), 0, 0 );
    new_alarm->callback = alarm_function;
    new_alarm->callback_period = new_alarm->time_left = ms_period;
 

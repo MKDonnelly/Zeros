@@ -109,6 +109,7 @@ void test_function(void *arg){
    thread_exit( (void*)99 );
 }
 
+
 void main_kernel_thread(){
 
    k_printf("In main kernel thread\n");
@@ -134,6 +135,9 @@ void kbh(char c){
    k_printf("Key pressed\n");
 }
 
+#include <staging/heap_blocklist.h>
+#include <staging/heap.h>
+
 void kmain(struct multiboot_info *multiboot_info){
 
   //set_vga_mode( vga_3h_mode );
@@ -151,26 +155,17 @@ void kmain(struct multiboot_info *multiboot_info){
   k_clear_screen();
 
   init_heap();
+  //See heap.h for kernel_heap
+  create_heap( &kernel_heap, 0x300000, 0xf0000, blocklist_malloc, blocklist_free, blocklist_init_heap );
 
-  heapnode_t *head = (heapnode_t*)kernel_start_heap;
-  k_printf("Starting values: %x %x %d %d\n", head->next_node, (int)head->free_mem, head->size, head->allocated);
 
-  char *ptrs[10] = {0};
 
-  k_printf("Allocating: ");
-  for(int i = 0; i < 10; i++){
-     ptrs[i] = kmalloc( i * i * i, 0, 0 ); 
-     k_printf("%x, ", ptrs[i]);
-  }
+//  char *mem = (char*)kernel_heap.malloc( &kernel_heap, 100, 0x1000, 0 );
+//  k_printf("Allocated memory at %x\n", mem );
 
-  k_printf("\n");
+//  k_printf("%x %d %d\n", kernel_heap.start, kernel_heap.len, kernel_heap.size_left);
 
-  for(int i = 0; i < 10; i++){
-     kfree( ptrs[i] );
-  }
 
-  k_printf("Ending: %x %x %d %d\n", head->next_node, (int)head->free_mem, head->size, head->allocated);
-/*
   init_paging();
 
   //Timer subsystem initilization
@@ -199,6 +194,6 @@ void kmain(struct multiboot_info *multiboot_info){
   add_thread( k_create_thread( threada, NULL, NULL, 0x1000) );  
 
   
-  init_threading();*/
+  init_threading();
   while(1);
 }

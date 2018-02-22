@@ -2,6 +2,7 @@
 
 #include <lib/types.h>
 #include <arch/x86/archx86.h>
+#include <staging/heap.h>
 
 //When splitting a piece of free memory in the
 //heap, this is the minimum amount of free memory
@@ -9,12 +10,11 @@
 //and kmalloc will just merge it into the called memory.
 #define MIN_SPLIT 20
 
-extern uint32_t kernel_start_heap, kernel_end_heap;
 
-typedef struct heapnode{
+typedef struct heap_block{
    //Pointer to the next heapNode
    //in the heap 
-   struct heapnode *next_node;
+   struct heap_block *next_block;
    
    //The start address of the free memory
    //in this chunk. We need this since the first
@@ -30,13 +30,13 @@ typedef struct heapnode{
    //memory is free or allocated.
    int8_t allocated : 1; //Is this being used?
    int8_t not_used : 7; //For future information
-} heapnode_t;
+} heap_block_t;
 
 //Initilize the kernel heap
-void init_heap();
+void blocklist_init_heap(heap_t*);
 
 //Dynamically allocate memory
-void *kmalloc(uint32_t size, uint32_t align, uint32_t *phys);
+void *blocklist_malloc(heap_t*,uint32_t size, uint32_t align, uint32_t *phys);
 
 //Free dynamic memory
-void kfree(void*);
+void blocklist_free(heap_t*,void*);

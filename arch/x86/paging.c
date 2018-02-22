@@ -147,20 +147,23 @@ void init_paging(){
    framesSize = (total_frames / CHAR_BITS) + 1;
 
    //Allocate space for the bitset
-   frames = (char*)kmalloc( framesSize, 0, 0 );
+//   frames = (char*)kmalloc( framesSize, 0, 0 );
+   frames = (char*)kernel_heap.malloc( &kernel_heap, framesSize, 0, 0 );
 
    //Zero out the frame allocation table.
    memset( frames, framesSize, 0);
 
    //Make the page directory for the kernel
-   kernel_page_dir = (page_directory_t*)kmalloc(sizeof(page_directory_t), ARCH_PAGE_SIZE, 0);
+//   kernel_page_dir = (page_directory_t*)kmalloc(sizeof(page_directory_t), ARCH_PAGE_SIZE, 0);
+   kernel_page_dir = (page_directory_t*)kernel_heap.malloc( &kernel_heap, sizeof(page_directory_t), ARCH_PAGE_SIZE, 0);
 
    //Zero out the page directory
    memset( kernel_page_dir, sizeof(page_directory_t), 0);
 
    //Allocate the lower part of memory for the kernel
    int i = 0;
-   while( i < kernel_end_heap){
+   //while( i < kernel_end_heap){
+   while( i < mem_end_page){
       //Identity map each page upto the end of the heap.
       page_map(get_page(i, 1, kernel_page_dir), KERNEL_MEMORY, IS_WRITEABLE, i);
       i += ARCH_FRAME_SIZE;
@@ -194,7 +197,8 @@ page_entry_t *get_page(uint32_t address, uint8_t make, page_directory_t *dir){
       return &dir->tables[table_idx]->pages[address%1024];
    }else if(make){
       unsigned int tmp;
-      dir->tables[table_idx] = (page_table_t*)kmalloc(sizeof(page_table_t), ARCH_PAGE_SIZE, &tmp);
+//      dir->tables[table_idx] = (page_table_t*)kmalloc(sizeof(page_table_t), ARCH_PAGE_SIZE, &tmp);
+      dir->tables[table_idx] = (page_table_t*)kernel_heap.malloc(&kernel_heap, sizeof(page_table_t), ARCH_PAGE_SIZE, &tmp);
       memset(dir->tables[table_idx], 0x1000, 0);
       dir->tablesPhysical[table_idx] = tmp | 0x7;
       return &dir->tables[table_idx]->pages[address%1024];
