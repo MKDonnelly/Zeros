@@ -151,6 +151,26 @@ void kmain(struct multiboot_info *multiboot_info){
   k_clear_screen();
 
   init_heap();
+
+  heapnode_t *head = (heapnode_t*)kernel_start_heap;
+  k_printf("Starting values: %x %x %d %d\n", head->next_node, (int)head->free_mem, head->size, head->allocated);
+
+  char *ptrs[10] = {0};
+
+  k_printf("Allocating: ");
+  for(int i = 0; i < 10; i++){
+     ptrs[i] = kmalloc( i * i * i, 0, 0 ); 
+     k_printf("%x, ", ptrs[i]);
+  }
+
+  k_printf("\n");
+
+  for(int i = 0; i < 10; i++){
+     kfree( ptrs[i] );
+  }
+
+  k_printf("Ending: %x %x %d %d\n", head->next_node, (int)head->free_mem, head->size, head->allocated);
+/*
   init_paging();
 
   //Timer subsystem initilization
@@ -179,6 +199,6 @@ void kmain(struct multiboot_info *multiboot_info){
   add_thread( k_create_thread( threada, NULL, NULL, 0x1000) );  
 
   
-  init_threading();
+  init_threading();*/
   while(1);
 }

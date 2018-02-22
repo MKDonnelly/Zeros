@@ -11,6 +11,12 @@
 
 extern uint32_t kernel_start_heap, kernel_end_heap;
 
+typedef struct heap{
+   uint32_t start;
+   uint32_t len;
+   uint32_t size_left;
+}heap_t;
+
 typedef struct heapnode{
    //Pointer to the next heapNode
    //in the heap 
@@ -36,8 +42,6 @@ typedef struct heapnode{
 void init_heap();
 
 //Dynamically allocate memory
-#define KMALLOC_ALIGN 1
-#define KMALLOC_NO_ALIGN 0
 void *kmalloc(uint32_t size, uint32_t align, uint32_t *phys);
 
 //Free dynamic memory

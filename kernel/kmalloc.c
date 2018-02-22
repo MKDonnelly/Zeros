@@ -108,27 +108,24 @@ void *kmalloc(uint32_t size, uint32_t align, uint32_t *phys){
 
 //Run through the heap and merge as much
 //free memory as possible. 
-//TODO Eliminate this and have a kfree look
-//at the node before and after it.
-//THIS IS BROKEN!
 static void unify_heap(){
    heapnode_t *head = (heapnode_t*)kernel_start_heap;
 
-   while( head->next_node != NULL ){
+   while( head != NULL ){
       //If we come across two ajacent free memory segments, unify them.
       //Do NOT advance afterwards. Imagine we had three consecutive blocks
       //of dynamic memory 1 2 and 3. On the first pass, we would unify 1 and
       //2 and end up with 1 and 3. We would not want to advance until there
       //is not another block to unify after 1.
       if( head->allocated == 0 && head->next_node->allocated == 0) {
-         //Say we are at node 1 and we find that node 2 is free.
-         //First, get the next item after node 2 (node 3) and
-         //set that as our next node.
-         head->next_node = head->next_node->next_node;
-         //Then add the size of node 2, which will be whatever
-         // <node 2>->size is plus the header for it
+
+         k_printf("Unifying blocks %x and %x\n", (int)head->free_mem, (int)head->next_node->free_mem);
+
          head->size += head->next_node->size + sizeof(heapnode_t);
-      }else{
+ 
+         head->next_node = head->next_node->next_node;
+
+     }else{
          //Finally, jump to the next node and repeat.
          head = head->next_node;
       }
@@ -143,12 +140,12 @@ static void unify_heap(){
 void kfree(void *memChunk){
 
    heapnode_t *head = (heapnode_t*)kernel_start_heap;
-   char foundMem = 0;
+   char found_mem = 0;
 
-   while( head->next_node && ! foundMem){
+   while( head->next_node && ! found_mem){
 
       //See if the memChunk address falls in the free 
-      //space of the current chunk. If it does, we allocate
+      //space of the current chunk. If it does, we deallocate
       //it and break out of the loop by setting foundMem.
       uint32_t chunkStart = (uint32_t)((uint8_t*)head + sizeof(heapnode_t));
       uint32_t chunkEnd = (uint32_t)((uint8_t*)head + sizeof(heapnode_t) + head->size);
@@ -157,7 +154,8 @@ void kfree(void *memChunk){
          //If we found the chunk, all we need to do it
          //set the allocated flag to 0.
          head->allocated = 0;
-         foundMem = 1;
+         found_mem = 1;
+         k_printf("Freed block at %x\n", (int)head->free_mem );
       }else{
          head = head->next_node;
       }
@@ -165,5 +163,5 @@ void kfree(void *memChunk){
 
    //Yes, this is very inefficient, 
    //but it is simple.
-   //unify_heap();
+   unify_heap();
 }
