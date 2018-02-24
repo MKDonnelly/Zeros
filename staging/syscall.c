@@ -1,21 +1,20 @@
 #include "syscall.h"
 
-DEFN_SYSCALL1(k_putchar, 0, char);
+//DEFN_SYSCALL1(k_putchar, 0, char);
+SYSCALL1(putchar, 0, char);
 
 static void syscall_handler(registers_t regs);
 
-static void *syscalls[1] = { &k_putchar };
+static void *syscalls[] = { k_putchar };
 
 void init_syscalls(){
    arch_register_interrupt(0x50, syscall_handler );
+   //arch_register_interrupt(0x50, syscall_handler );
 }
 
 void syscall_handler(registers_t regs){
 
-   k_printf("In syscall handler!\n");
-   while(1);
-
-   if( regs.eax >= 1 )
+   if( regs.eax != 0 )
        return;
 
    void *location = syscalls[regs.eax];

@@ -29,13 +29,3 @@ void arch_create_thread_context (thread_context_t **context,
         (*context)->ebp = (uint32_t)(*context);
         (*context)->esp = (*context)->ebp;
 }
-
-//Called when first initilizing threading. 
-void arch_jump_to_thread(thread_context_t *to){
-   asm volatile("      \
-      movl %0, %%esp;  \
-      popal;          \
-      add $8, %%esp;   \
-      ret;             "
-      : : "m" (to));
-}

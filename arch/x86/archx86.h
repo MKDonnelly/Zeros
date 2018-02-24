@@ -20,4 +20,6 @@
 #include <arch/x86/drivers/vgacommon/vgacommon.h>
 #include <arch/x86/drivers/vgacommon/vgafont.h>
 
+extern void arch_jump_to_thread(thread_context_t*);
+
 void arch_init_system();

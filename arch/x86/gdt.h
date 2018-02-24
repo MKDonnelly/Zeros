@@ -2,6 +2,8 @@
 
 #include <lib/types.h>
 
+void set_kernel_stack(uint32_t);
+
 //Null, kernel data/code, userland
 //data/code, TSS
 #define GDT_ENTRIES 6
@@ -9,6 +11,7 @@
 //Our specific GDT (initilized in init_gdt()
 //will be layed out with the code segment first
 //and the data segment second.
+extern const int8_t gdt_test;
 extern const int16_t gdt_kernel_code;
 extern const int16_t gdt_kernel_data;
 
@@ -19,9 +22,9 @@ extern void srupdate();
 //TODO improve the descriptions, make a function to do each
 //gdt entry, have flags named by bit
 struct gdt_entry{
-   int16_t limit;        //Limit bits 015
-   int16_t baseLower;    //Base bits 0-15
-   int8_t  baseMiddle;    //Base bits 16-23
+   int16_t limit_low;    //Limit bits 0-15
+   int16_t base_low;       //Base bits 0-15
+   int8_t  base_mid;     //Base bits 16-23
 
 /*      flags bits description
   bit 0: present flag. Is this segment present in memory?
@@ -36,8 +39,14 @@ struct gdt_entry{
   bit 6: is this segment rw (1) or r-only (0)
   bit 7: has this segment been accessed? (1 if yes, 0 else)
 */
+  int8_t accessed : 1;
+  int8_t rw : 1;
+  int8_t conforming : 1;
+  int8_t code_or_data : 1;
+  int8_t descriptor_type : 1;
+  int8_t ring_level : 2;
+  int8_t present : 1;
 
-   int8_t  flags;         //1st flags and type flags
 
 /*     2nd group of flags description
   bit 0: granularity. are limit/base int terms of 4K (1) or 1b (0)
@@ -45,11 +54,15 @@ struct gdt_entry{
   bit 2: 1 for 64 bit mode code segment, 0 for no
   bit 3: 1 for available for system use, 0 else
 */
+   int8_t available : 1;
+   int8_t long_mode_code : 1;
+   int8_t operand_size : 1;
+   int8_t granularity : 1;
+   int8_t lim_high : 4;
 
-
-   int8_t  flagsAndLimit; //2nd flags, limit bits 16-19
-   int8_t  baseUpper;     //Base bits 24-31
-} __attribute__((packed));
+   //int8_t  flags_lim_high; //2nd flags, limit bits 16-19
+   int8_t  base_high;     //Base bits 24-31
+}__attribute__((packed));
 
 
 struct gdt_descriptor{

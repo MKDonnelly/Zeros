@@ -58,6 +58,7 @@ static int32_t first_free_frame(){
 //which allocates the first free frame with the given page_entry
 //is_kernel: 0 for kernel memory, 1 for user
 //is_wirteable: 1 for writeable, 0 for read-only
+//TODO reduce to bitmap for is_kernel and is_writeable
 uint8_t page_map(page_entry_t *page, uint8_t is_kernel, uint8_t is_writeable, uint32_t physical){
    //We will assume that the parameters are valid.
 
@@ -78,7 +79,9 @@ uint8_t page_map(page_entry_t *page, uint8_t is_kernel, uint8_t is_writeable, ui
       bitSet( frames, physical / ARCH_FRAME_SIZE );
       page->present = 1; //True, the page is present
       page->rw = is_writeable;
-      page->user = is_kernel;
+      //page->user = is_kernel;
+      //FIXME Hack for userland initial support 
+      page->user = 1;
       //the frame member is the frame address, shifted
       //up by 12 bits. To get the physical address in,
       //we will pre-shift the address down 12 bits.

@@ -8,17 +8,18 @@ dynamic memory
       before the stack, text is under the heap)
  
 userland
-   get ring 3 working
    create system call interface
+   when doing multitasking with userland, multiple system calls
+     could be in play. To prevent the stacks from clashing, each
+     userland process needs its own kernel land stack (int tss.esp_ring0)
 
 initrd
-   Add directory support to initrd and improve
-      initrd code
+   Add directory support to initrd and improve initrd code
    Page in the initrd since it currently cannot be accessed
 
 paging
    handle page faults when memory runs out
-   improve code where needed
+   revamp paging code to handle multitasking and userland
    copy a page table for fork()
 
 Multitasking
@@ -59,7 +60,6 @@ printing/screen manipulation:
       modes and record the register values. we can boot from
       a usb drive so grub is actually run and not emulated
       by qemu)
-  Get arrow keys to work on terminal
   Unify all of the screen operations into printf and have escape 
      sequences dictate cursor position, color, etc
   use hwinfo --framebuffer to see and program video modes

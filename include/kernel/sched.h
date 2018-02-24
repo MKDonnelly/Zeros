@@ -2,6 +2,7 @@
 
 #include <kernel/thread.h>
 #include <lib/abstract_ll.h>
+#include <arch/x86/archx86.h>
 
 #define SCHEDULER_INTERRUPT 50
 
