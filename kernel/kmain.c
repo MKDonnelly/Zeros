@@ -133,8 +133,14 @@ void kbh(char c){
    k_printf("Key pressed\n");
 }
 
+void test_userland(){
+   while(1);
+}
+
 #include <kernel/mm/heap_blocklist.h>
 #include <kernel/mm/heap.h>
+
+extern void userland_jump();
 
 void kmain(struct multiboot_info *multiboot_info){
 
@@ -154,24 +160,23 @@ void kmain(struct multiboot_info *multiboot_info){
 
   //See heap.h for kernel_heap
   create_heap( &kernel_heap, 0x300000, 0x200000, blocklist_malloc, blocklist_free, blocklist_init_heap );
+  //reserve space for syscall stack
+  char *syscalls = (char*)k_malloc( kernel_heap, 0x1000, 0, 0 );
 
 
-  init_paging();
+  //init_paging();
 
   //Timer subsystem initilization
   //Required dynamic memory
   timing_set_alarm( schedule, 100 );
 
-  //Serial port test
-  sp_init();
-  sp_putstr("Hello on serial!\n");
-
 //TODO map in initrd with paging
 //  fs_root = init_initrd( h->mods->start );
 
 //  add_thread( k_create_thread( main_kernel_thread, NULL, thread_exit, 0x4000 ) );
+  init_syscalls();
 
-
+/*
   add_thread( k_create_thread( thread1, NULL, NULL, 0x1000) );  
   add_thread( k_create_thread( thread2, NULL, NULL, 0x1000) );  
   add_thread( k_create_thread( thread3, NULL, NULL, 0x1000) );  
@@ -183,6 +188,32 @@ void kmain(struct multiboot_info *multiboot_info){
   add_thread( k_create_thread( thread9, NULL, NULL, 0x1000) );  
   add_thread( k_create_thread( threada, NULL, NULL, 0x1000) );  
   
-  init_threading();
+  init_threading();*/
+/*
+  asm volatile("     \
+      cli;            \
+      mov $0x23, %ax; \
+      mov %ax, %ds;   \
+      mov %ax, %es;   \
+      mov %ax, %fs;   \
+      mov %ax, %gs;   \
+      mov %esp, %eax; \
+      pushl $0x23;    \
+      pushl %eax;     \
+      pushf;          \
+      pushl $0x1B;    \
+      push $1f;       \
+      iret;           \
+     1: " :: "m"(test_userland) );
+*/
+
+   userland_jump();
+
+   asm volatile("int $0x50");
+//  syscall_k_putchar('U');
+//  int a;
+//  int number = 0;
+//  asm volatile("int $80" : "=a"(a) : "0" (number), "b"((int)'C'));
+
   while(1);
 }

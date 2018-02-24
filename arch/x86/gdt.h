@@ -2,7 +2,9 @@
 
 #include <lib/types.h>
 
-#define GDT_ENTRIES 3
+//Null, kernel data/code, userland
+//data/code, TSS
+#define GDT_ENTRIES 6
 
 //Our specific GDT (initilized in init_gdt()
 //will be layed out with the code segment first
