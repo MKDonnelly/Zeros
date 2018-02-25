@@ -136,6 +136,8 @@ void kbh(char c){
 #include <kernel/mm/heap_blocklist.h>
 #include <kernel/mm/heap.h>
 
+#include <staging/round_robin.h>
+
 void kmain(struct multiboot_info *multiboot_info){
 
   //set_vga_mode( vga_3h_mode );
@@ -162,6 +164,7 @@ void kmain(struct multiboot_info *multiboot_info){
   //Required dynamic memory
   timing_set_alarm( schedule, 100 );
 
+/*
   //Serial port test
   sp_init();
   sp_putstr("Hello on serial!\n");
@@ -183,6 +186,6 @@ void kmain(struct multiboot_info *multiboot_info){
   add_thread( k_create_thread( thread9, NULL, NULL, 0x1000) );  
   add_thread( k_create_thread( threada, NULL, NULL, 0x1000) );  
   
-  init_threading();
+  init_threading();*/
   while(1);
 }

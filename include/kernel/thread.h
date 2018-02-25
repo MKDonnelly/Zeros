@@ -26,3 +26,14 @@ typedef struct kthread{
 //work to create_thread_context
 kthread_t *k_create_thread(void *start_function,
    void *params, void *exit_function, uint32_t stack_size);
+
+//Have the thread voluntarily yield the cpu. This can also
+//be used for blocking a thread when certain system calls 
+//are used.
+void thread_yield();
+
+//Called to exit the current thread
+void thread_exit(void*);
+
+//Have one thread join up with another
+void *thread_join( kthread_t*);

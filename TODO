@@ -38,6 +38,8 @@ Multitasking
       improve scheduler (queues, priority, different algs)
       create thread synchronization constructs, messages
          use xchg to implement mutexes
+      make sure core functions (kmalloc, scheduling) cannot
+         be interrupted and corrupted using either cli/sti or locks
 
 printing/screen manipulation:
   Implement a frame buffer in 3h mode
@@ -69,6 +71,7 @@ utils
    Create a basic file editor by dumping a file into the
       frame buffer and copying it back once done.
    create simple games (pong, etc)
+   create tar, cpio parser
  
 program execution
    create symbol table for dynamic linker

@@ -1,99 +1,15 @@
 #include <kernel/sched.h>
 
-//Information about the current thread.
-//current_thread points the the thread descriptor
-//for the running thread. current_thread_index is
-//the index of current_thread in the ALL thread_list.
-//cur_context is saved by the interrupt code and passed
-//to us.
-kthread_t *current_thread = NULL;
-int current_thread_index = 0;
+struct sched_alg current_sched_alg;
 thread_context_t *cur_context = NULL;
 
-//thread_list is an ALL (abstract linked list) which is
-//used to hold every thread running on the system. 
-//we have a total of thread_count - 1 threads in the
-//list.
-kthread_t *thread_list = NULL;
-int thread_count = 0;
-
-//Insert a new thread at the end of the thread list.
-void add_thread(kthread_t *thread){
-   add_node_ll( (void**)&thread_list, thread, thread_count++);
+void scheduler_handler(){
+   cur_context = current_sched_alg.schedule( cur_context );   
 }
 
-//Called by a thread to voluntarily
-//give up processor time. 
-void thread_yield(){
-   arch_trigger_interrupt( SCHEDULER_INTERRUPT );
-}
-
-//Called by a thread when returning
-//Explicitly calling this will give the return
-//value. If this is implicitly called when the
-//thread index (when k_create_thread sets it up)
-//the return value will be undefined.
-void thread_exit(void *retval){
-   current_thread->state = THREAD_EXIT;
-   current_thread->return_value = retval;
-   thread_yield();
-}
-
-int thread_join_helper(void *element, void *ref){
-   kthread_t *current_thread = (kthread_t*)element;
-   kthread_t *reference_thread = (kthread_t*)ref;
-
-   if( current_thread->thread_id == reference_thread->thread_id && current_thread->state == THREAD_EXIT ){
-      return 1; //Return this kthread_t 
-   }else{
-      return 0; //Wrong thread
-   }
-}
-
-void *thread_join( kthread_t *thread_descriptor ){
-
-   kthread_t *thread_to_join;
-
-   do{
-      thread_to_join = (kthread_t*)find_node_ll( (void**)&thread_list, thread_descriptor, thread_join_helper );
-   }while( thread_to_join == 0 );
-
-   return thread_to_join->return_value;
-}
-
-//The default thread to run when
-//there is nothing else
-static void idle_thread(){
-   arch_enable_ints();
-   while(1){
-      arch_halt_cpu();
-   }
-}
-
-void init_threading(){
-
-   add_node_ll( (void**)&thread_list, k_create_thread(idle_thread,NULL,NULL,1024), 0 );
-   thread_count++;
-   current_thread = get_node_ll( (void**)&thread_list, 0 );
-
-   arch_register_interrupt( SCHEDULER_INTERRUPT, schedule );
-   arch_jump_to_thread( current_thread->context );
-}
-
-//*Very* simple scheduler. Runs down the list
-//of threads in a round-robin fashion. 
-void schedule(){
-
-   //Save the current context
-   current_thread->context = cur_context;
-
-   do{
-      //Go to the next thread
-      current_thread_index = (current_thread_index + 1) % thread_count;
-   
-      //Set the new current thread and set the new context
-      current_thread = get_node_ll( (void**)&thread_list, current_thread_index );
-   }while( current_thread->state == THREAD_EXIT );
-
-   cur_context = current_thread->context;
+void init_threading(struct sched_alg alg){
+  
+   current_sched_alg = alg;
+   arch_register_interrupt( SCHEDULER_INTERRUPT, scheduler_handler);
+   current_sched_alg.init_scheduler();
 }

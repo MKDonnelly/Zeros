@@ -1,7 +1,28 @@
 #pragma once 
 
+//Generic properties of a scheduler. Describes the
+//basic functions a scheduler must implement.
+
 #include <kernel/thread.h>
 #include <lib/abstract_ll.h>
+
+struct sched_alg{
+
+   //Removes and adds a thread to
+   //be run.
+   void (*add_thread)();
+   void (*rm_thread)();
+   
+   //Called when a thread exits
+   void (*exit_thread)();
+   void (*yield_thread)();
+   void (*join_thread)();
+
+   //Main routine run when scheduling
+   void (*schedule)();
+   void (*init_scheduler)();
+};
+
 
 #define SCHEDULER_INTERRUPT 50
 
@@ -10,26 +31,8 @@
 //be used by the scheduler to swap threads.
 extern thread_context_t *cur_context;
 
+struct sched_alg current_sched_alg;
+
 //Initilize the threading system
 void init_threading();
 
-//Called by interrupt (and ONLY interrupt)
-//to pick with thread to run next.
-void schedule();
-
-//Adds a thread to the list of threads to run.
-void add_thread(kthread_t*);
-
-//Removes a thread
-void rm_thread(kthread_t*);
-
-//Voluntarily stop a thread
-void thread_yield();
-
-//Called when a thread returns
-void thread_exit(void*);
-
-//Called to join with the given
-//thread with thread_id
-//void *thread_join( int thread_id );
-void *thread_join( kthread_t *descriptor );
