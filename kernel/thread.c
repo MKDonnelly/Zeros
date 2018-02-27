@@ -11,17 +11,21 @@ kthread_t *k_create_thread ( void *start_func, void *param, void *exit_func, uin
 
    //Allocate stack space for the thread
    //WE MUST ALIGN THE THREAD STACK TO PAGE_SIZE OR ELSE THE
-   //THREADS WILL GET ASYMETRIC PROCESSING TIME!
-   void *stack = k_malloc( kernel_heap, stack_size, 0x1000, 0 );
+   //THREADS WILL GET ASYMETRIC PROCESSING TIME DUE TO ALIGNMENT!
+   void *stack = k_malloc( kernel_heap, stack_size, ARCH_PAGE_SIZE, 0 );
 
    thread->stack_ptr = stack;
 
    //Create a context for the thread
+   if( exit_func == NULL )
+      exit_func = current_sched_alg->exit_thread;
+
    arch_create_thread_context( &(thread->context), start_func, param,
                                 exit_func, stack, stack_size );
 
    // Null the exit status
    thread->return_value = 0;
+   thread->state = THREAD_READY;
 
    //Add a unique thread id
    thread->thread_id = next_thread_id++;

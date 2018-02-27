@@ -1,4 +1,4 @@
-#include <staging/round_robin.h>
+#include <kernel/sched/round_robin.h>
 
 struct sched_alg rr_alg = (struct sched_alg){
    .add_thread = rr_add_thread,
@@ -20,6 +20,43 @@ int thread_count = 0;
 void rr_add_thread( kthread_t *thread){
    add_node_ll( (void**)&thread_list, thread, thread_count++);
 }
+
+int rm_thread_helper(void *node, void *ref){
+   if( (kthread_t*)node == (kthread_t*)ref )
+      return 1;
+   return 0;
+}
+
+void rr_rm_thread(kthread_t *descriptor){
+}
+
+
+//We presume the current thread calls yield
+void rr_yield_thread(){
+   arch_trigger_interrupt( SCHEDULER_INTERRUPT );
+}
+
+//We presume that the current thread is calling this if run
+void rr_exit_thread(void *return_value){
+   current_thread->state = THREAD_EXIT;
+   current_thread->return_value = return_value;
+   rr_yield_thread();
+}
+
+static int jt_helper(void *node, void *ref){
+   if( ((kthread_t*)node)->state == THREAD_EXIT && (kthread_t*)node == (kthread_t*)ref )
+      return 1;
+   return 0;
+}
+
+void *rr_join_thread(kthread_t *descriptor){
+   kthread_t *thread_to_join = NULL;
+   while( thread_to_join == NULL ){
+      thread_to_join = (kthread_t*)find_node_ll( (void**)&thread_list, descriptor, jt_helper);
+   }
+   return thread_to_join->return_value;
+}
+
 
 
 void idle_thread(){
@@ -44,14 +81,10 @@ thread_context_t *rr_schedule(thread_context_t *interrupted_thread){
    do{
       current_thread_index = (current_thread_index + 1) % thread_count;
       current_thread = get_node_ll( (void**)&thread_list, current_thread_index);
-   }while( current_thread->state == THREAD_EXIT );
+   }while( current_thread->state != THREAD_READY );
 
    return current_thread->context;
 
 }
 
-void rr_rm_thread(kthread_t *k){};
-void rr_exit_thread(){};
-void rr_yield_thread(){};
-void rr_join_thread(){};
 

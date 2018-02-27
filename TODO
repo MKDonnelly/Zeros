@@ -1,3 +1,8 @@
+paging
+   handle page faults when memory runs out
+   improve code where needed
+   copy a page table for fork()
+
 dynamic memory
    Create a slab allocator (have fixed size block ready)
    Stress-test kmalloc
@@ -8,18 +13,16 @@ dynamic memory
       before the stack, text is under the heap)
  
 userland
-   get ring 3 working
    create system call interface
+   instead of having an explicit switch to userland,
+      push the necessary values onto the stack of a thread/process
+      and have the interrupt code use them to enter userland
 
 initrd
+   Convert to using cpio or tar instead
+   Page in the initrd since it currently cannot be accessed
    Add directory support to initrd and improve
       initrd code
-   Page in the initrd since it currently cannot be accessed
-
-paging
-   handle page faults when memory runs out
-   improve code where needed
-   copy a page table for fork()
 
 Multitasking
    Move the kernel stack to the end of the heap

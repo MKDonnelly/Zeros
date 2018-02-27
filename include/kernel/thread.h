@@ -2,9 +2,10 @@
 
 #include <lib/types.h>
 #include <kernel/mm/heap.h>
+#include <kernel/sched/sched.h>
 #include <arch/x86/archx86.h>
 
-enum THREAD_STATE { THREAD_RUNNING, THREAD_EXIT };
+enum THREAD_STATE { THREAD_RUNNING, THREAD_READY, THREAD_EXIT, THREAD_BLOCKED };
 
 //This is a kernel thread. It is designed
 //to be used by an abstract linked list

@@ -13,7 +13,12 @@
 
 #include <kernel/multiboot.h>
 #include <kernel/thread.h>
-#include <kernel/sched.h>
+
+#include <kernel/mm/heap_blocklist.h>
+#include <kernel/mm/heap.h>
+
+#include <kernel/sched/round_robin.h>
+#include <kernel/sched/sched.h>
 
 #include <fs/fs.h>
 #include <fs/initrd/initrd.h>
@@ -102,10 +107,9 @@ void threada(){
    }
 }
 
-/*
 void test_function(void *arg){
    k_printf("In test function with %d!\n", (int)arg);
-   thread_exit( (void*)99 );
+   k_exit_thread( (void*)99 );
 }
 
 
@@ -114,27 +118,23 @@ void main_kernel_thread(){
    k_printf("In main kernel thread\n");
 
    kthread_t *new_thread = k_create_thread( test_function, (void*)20, thread_exit, 0x1000 );
-   add_thread( new_thread );
+   k_add_thread( new_thread );
 
-   void *val = thread_join( new_thread );
+   void *val = k_join_thread( new_thread );
 
    k_printf("Thread joined with %d\n", (int)val);
 
-
+/*
    while(1){
       if( portb_read( 0x64 ) & 0x20 ){
          k_printf("Mouse with data %x %x %x\n", portb_read( 0x60 ), portb_read(0x60), portb_read(0x60));
          for(int i = 0; i < 10000000; i++);
       }
-   }
-   thread_exit( 0 );
+   }*/
+   while(1);
+   k_exit_thread( (void*)0 );
 }
-*/
 
-#include <kernel/mm/heap_blocklist.h>
-#include <kernel/mm/heap.h>
-
-#include <staging/round_robin.h>
 
 void kmain(struct multiboot_info *multiboot_info){
 
@@ -156,20 +156,18 @@ void kmain(struct multiboot_info *multiboot_info){
   create_heap( &kernel_heap, 0x300000, 0x200000, blocklist_malloc, blocklist_free, blocklist_init_heap );
 
 
+/*           video memory test
+  uint16_t *video_memory = (uint16_t*)multiboot_info->fb_addr;
+  for(int i = 0; i < 65536 * 2; i++){
+     video_memory[i] = i;
+  }
+  while(1);*/
+  
   init_paging();
 
 
-  setup_threading( rr_alg );
-  current_sched_alg.add_thread( k_create_thread( thread1, NULL, NULL, 0x4000) );
-  current_sched_alg.add_thread( k_create_thread( thread2, NULL, NULL, 0x4000) );
+  setup_scheduler( &rr_alg );
 
-
-  start_scheduler();
-
-/*
-  //Serial port test
-  sp_init();
-  sp_putstr("Hello on serial!\n");
 
 //TODO map in initrd with paging
 //  fs_root = init_initrd( h->mods->start );
@@ -177,17 +175,18 @@ void kmain(struct multiboot_info *multiboot_info){
 //  add_thread( k_create_thread( main_kernel_thread, NULL, thread_exit, 0x4000 ) );
 
 
-  add_thread( k_create_thread( thread1, NULL, NULL, 0x1000) );  
-  add_thread( k_create_thread( thread2, NULL, NULL, 0x1000) );  
-  add_thread( k_create_thread( thread3, NULL, NULL, 0x1000) );  
-  add_thread( k_create_thread( thread4, NULL, NULL, 0x1000) );  
-  add_thread( k_create_thread( thread5, NULL, NULL, 0x1000) );
-  add_thread( k_create_thread( thread6, NULL, NULL, 0x1000) );  
-  add_thread( k_create_thread( thread7, NULL, NULL, 0x1000) );  
-  add_thread( k_create_thread( thread8, NULL, NULL, 0x1000) );  
-  add_thread( k_create_thread( thread9, NULL, NULL, 0x1000) );  
-  add_thread( k_create_thread( threada, NULL, NULL, 0x1000) );  
+  k_add_thread( k_create_thread( thread1, NULL, NULL, 0x1000) );  
+  k_add_thread( k_create_thread( thread2, NULL, NULL, 0x1000) );  
+  k_add_thread( k_create_thread( thread3, NULL, NULL, 0x1000) );  
+  k_add_thread( k_create_thread( thread4, NULL, NULL, 0x1000) );  
+  k_add_thread( k_create_thread( thread5, NULL, NULL, 0x1000) );
+  k_add_thread( k_create_thread( thread6, NULL, NULL, 0x1000) );  
+  k_add_thread( k_create_thread( thread7, NULL, NULL, 0x1000) );  
+  k_add_thread( k_create_thread( thread8, NULL, NULL, 0x1000) );  
+  k_add_thread( k_create_thread( thread9, NULL, NULL, 0x1000) );  
+  k_add_thread( k_create_thread( threada, NULL, NULL, 0x1000) );  
   
-  init_threading();*/
+  start_scheduler();
+  
   while(1);
 }
