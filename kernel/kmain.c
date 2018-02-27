@@ -102,6 +102,7 @@ void threada(){
    }
 }
 
+/*
 void test_function(void *arg){
    k_printf("In test function with %d!\n", (int)arg);
    thread_exit( (void*)99 );
@@ -119,19 +120,16 @@ void main_kernel_thread(){
 
    k_printf("Thread joined with %d\n", (int)val);
 
-/*
+
    while(1){
       if( portb_read( 0x64 ) & 0x20 ){
          k_printf("Mouse with data %x %x %x\n", portb_read( 0x60 ), portb_read(0x60), portb_read(0x60));
          for(int i = 0; i < 10000000; i++);
       }
-   }*/
+   }
    thread_exit( 0 );
 }
-
-void kbh(char c){
-   k_printf("Key pressed\n");
-}
+*/
 
 #include <kernel/mm/heap_blocklist.h>
 #include <kernel/mm/heap.h>
@@ -150,7 +148,7 @@ void kmain(struct multiboot_info *multiboot_info){
   arch_keyboard_init( keyboard_main_handler );
 
   //Keyboard system initilization
-  keyboard_register_key_callback( kbh, 'a' );
+  //keyboard_register_key_callback( kbh, 'a' );
 
   k_clear_screen();
 
@@ -160,9 +158,13 @@ void kmain(struct multiboot_info *multiboot_info){
 
   init_paging();
 
-  //Timer subsystem initilization
-  //Required dynamic memory
-  timing_set_alarm( schedule, 100 );
+
+  setup_threading( rr_alg );
+  current_sched_alg.add_thread( k_create_thread( thread1, NULL, NULL, 0x4000) );
+  current_sched_alg.add_thread( k_create_thread( thread2, NULL, NULL, 0x4000) );
+
+
+  start_scheduler();
 
 /*
   //Serial port test

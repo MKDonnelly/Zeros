@@ -15,25 +15,25 @@ kthread_t *thread_list = NULL;
 kthread_t *current_thread = NULL;
 int current_thread_index = 0;
 
-//We always have at least 1 thread (idle)
-int thread_count = 1;
+int thread_count = 0;
 
 void rr_add_thread( kthread_t *thread){
    add_node_ll( (void**)&thread_list, thread, thread_count++);
 }
 
 
-
 void idle_thread(){
-   arch_enable_ints();
    while(1) arch_halt_cpu();
 }
 
 void rr_init_scheduler(){
+
    //Add idle thread
    add_node_ll( (void**)&thread_list, k_create_thread(idle_thread, NULL, NULL, 1024), 0 );
-      
+   thread_count++;   
+   
    current_thread = get_node_ll( (void**)thread_list, 0 );
+   arch_enable_ints();
    arch_jump_to_thread( current_thread->context );
 }
 
@@ -49,3 +49,9 @@ thread_context_t *rr_schedule(thread_context_t *interrupted_thread){
    return current_thread->context;
 
 }
+
+void rr_rm_thread(kthread_t *k){};
+void rr_exit_thread(){};
+void rr_yield_thread(){};
+void rr_join_thread(){};
+

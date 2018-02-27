@@ -32,7 +32,7 @@ kthread_t *k_create_thread ( void *start_func, void *param, void *exit_func, uin
 //Called by a thread to voluntarily
 //give up processor time. 
 void thread_yield(){
-   arch_trigger_interrupt( SCHEDULER_INTERRUPT );
+   //arch_trigger_interrupt( SCHEDULER_INTERRUPT );
 }
 
 
@@ -41,9 +41,9 @@ void thread_yield(){
 //value. If this is implicitly called when the
 //thread index (when k_create_thread sets it up)
 //the return value will be undefined.
-void thread_exit(void *retval){
+void thread_exit(void *retval){/*
    current_thread->state = THREAD_EXIT;
    current_thread->return_value = retval;
-   thread_yield();
+   thread_yield();*/
 }
 

@@ -19,7 +19,7 @@ struct sched_alg{
    void (*join_thread)();
 
    //Main routine run when scheduling
-   void (*schedule)();
+   thread_context_t *(*schedule)();
    void (*init_scheduler)();
 };
 
@@ -30,9 +30,11 @@ struct sched_alg{
 //current context in this variable. This can
 //be used by the scheduler to swap threads.
 extern thread_context_t *cur_context;
-
 struct sched_alg current_sched_alg;
 
+void scheduler_handler();
+
 //Initilize the threading system
-void init_threading();
+void setup_threading();
+void start_scheduler();
 
