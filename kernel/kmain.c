@@ -12,7 +12,7 @@
 #include <lib/abstract_ll.h>
 
 #include <kernel/multiboot.h>
-#include <kernel/thread.h>
+#include <kernel/task.h>
 
 #include <kernel/mm/heap_blocklist.h>
 #include <kernel/mm/heap.h>
@@ -109,7 +109,7 @@ void threada(){
 
 void test_function(void *arg){
    k_printf("In test function with %d!\n", (int)arg);
-   k_exit_thread( (void*)99 );
+   k_exit_task( (void*)99 );
 }
 
 
@@ -117,13 +117,16 @@ void main_kernel_thread(){
 
    k_printf("In main kernel thread\n");
 
-   kthread_t *new_thread = k_create_thread( test_function, (void*)20, thread_exit, 0x1000 );
-   k_add_thread( new_thread );
+   while(1)
+      arch_stop_cpu();
+/*
+   ktask_t *new_thread = k_create_task( test_function, (void*)20, task_exit, 0x1000, kernel_page_dir );
+   k_add_task( new_thread );
 
-   void *val = k_join_thread( new_thread );
+   void *val = k_join_task( new_thread );
 
    k_printf("Thread joined with %d\n", (int)val);
-
+*/
 /*
    while(1){
       if( portb_read( 0x64 ) & 0x20 ){
@@ -131,8 +134,7 @@ void main_kernel_thread(){
          for(int i = 0; i < 10000000; i++);
       }
    }*/
-   while(1);
-   k_exit_thread( (void*)0 );
+   k_exit_task( (void*)0 );
 }
 
 
@@ -162,10 +164,26 @@ void kmain(struct multiboot_info *multiboot_info){
      video_memory[i] = i;
   }
   while(1);*/
+ 
+  //Copy over initrd before paging gets in the way
   
-  init_paging();
+  k_printf("Modules %d\n", multiboot_info->num_mods);
+  k_printf("%x\n", ((struct module*)multiboot_info->mods)->start);
+  k_printf("%x", ((struct module*)multiboot_info->mods)->end);
 
-//  page_directory_t *dir = test_clone_dir( kernel_page_dir );
+  int initrd_size = ((struct module*)multiboot_info->mods)->end - ((struct module*)multiboot_info->mods)->start;
+  char *initrd = k_malloc(kernel_heap, initrd_size, 0, 0);
+  memcpy( initrd, ((struct module*)multiboot_info->mods)->start, initrd_size);
+
+  fs_root = init_initrd( initrd );
+  fs_node_t *files = fs_root->readdir( fs_root, 1 );
+  k_printf("%s\n", files->name );
+  char *filebuf = k_malloc( kernel_heap, files->length, 0, 0);
+  files->read( files, 0, files->length, filebuf );
+  k_printf("%s\n", filebuf);
+ 
+  //init_paging();
+
 
 
   setup_scheduler( &rr_alg );
@@ -173,20 +191,20 @@ void kmain(struct multiboot_info *multiboot_info){
 //TODO map in initrd with paging
 //  fs_root = init_initrd( h->mods->start );
 
-//  add_thread( k_create_thread( main_kernel_thread, NULL, thread_exit, 0x4000 ) );
+//  k_add_task( k_create_task( main_kernel_thread, NULL, NULL, 0x4000, kernel_page_dir ) );
 
-
-  k_add_thread( k_create_thread( thread1, NULL, NULL, 0x1000) );  
-  k_add_thread( k_create_thread( thread2, NULL, NULL, 0x1000) );  
-  k_add_thread( k_create_thread( thread3, NULL, NULL, 0x1000) );  
-  k_add_thread( k_create_thread( thread4, NULL, NULL, 0x1000) );  
-  k_add_thread( k_create_thread( thread5, NULL, NULL, 0x1000) );
-  k_add_thread( k_create_thread( thread6, NULL, NULL, 0x1000) );  
-  k_add_thread( k_create_thread( thread7, NULL, NULL, 0x1000) );  
-  k_add_thread( k_create_thread( thread8, NULL, NULL, 0x1000) );  
-  k_add_thread( k_create_thread( thread9, NULL, NULL, 0x1000) );  
-  k_add_thread( k_create_thread( threada, NULL, NULL, 0x1000) );  
-  
+/*
+  k_add_task( k_create_task( thread1, NULL, NULL, 0x1000, kernel_page_dir) );  
+  k_add_task( k_create_task( thread2, NULL, NULL, 0x1000, kernel_page_dir) );  
+  k_add_task( k_create_task( thread3, NULL, NULL, 0x1000, kernel_page_dir) );  
+  k_add_task( k_create_task( thread4, NULL, NULL, 0x1000, kernel_page_dir) );  
+  k_add_task( k_create_task( thread5, NULL, NULL, 0x1000, kernel_page_dir) );
+  k_add_task( k_create_task( thread6, NULL, NULL, 0x1000, kernel_page_dir) );  
+  k_add_task( k_create_task( thread7, NULL, NULL, 0x1000, kernel_page_dir) );  
+  k_add_task( k_create_task( thread8, NULL, NULL, 0x1000, kernel_page_dir) );  
+  k_add_task( k_create_task( thread9, NULL, NULL, 0x1000, kernel_page_dir) );  
+  k_add_task( k_create_task( threada, NULL, NULL, 0x1000, kernel_page_dir) );  
+*/  
   start_scheduler();
   
   while(1);

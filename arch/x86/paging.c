@@ -3,6 +3,7 @@
 //The page table which will be visible to
 //the kernel. 
 page_directory_t *kernel_page_dir;
+page_directory_t *kernel_ref_dir;
 
 //Let the caller specify the mapping between physical
 //and virtual addresses. 
@@ -105,23 +106,33 @@ void init_paging(){
    init_frames(mem_end_page);
 
    //Make the page directory for the kernel
-   kernel_page_dir = (page_directory_t*)k_malloc( kernel_heap, sizeof(page_directory_t), ARCH_PAGE_SIZE, 0);
+   kernel_ref_dir = (page_directory_t*)k_malloc( kernel_heap, sizeof(page_directory_t), ARCH_PAGE_SIZE, 0);
 
    //Zero out the page directory
-   memset( kernel_page_dir, sizeof(page_directory_t), 0);
+   memset( kernel_ref_dir, sizeof(page_directory_t), 0);
 
    //Allocate the lower part of memory for the kernel
    int i = 0;
-   //while( i < kernel_end_heap){
+   //TEMPORARY: Map everything except for the kernel stack
+   //and a few frames below it. Save this page directory, map
+   //in the stack, and load it.
    while( i < mem_end_page){
+      if( i != 0x300000 && (i != 0x300000 - 0x1000) && (i != 0x300000 - 0x2000)){
       //Identity map each page upto the end of the heap.
-      page_map(get_page(i, 1, kernel_page_dir), KERNEL_MEMORY, IS_WRITEABLE, i);
+      page_map(get_page(i, 1, kernel_ref_dir), KERNEL_MEMORY, IS_WRITEABLE, i);
+     }
       i += ARCH_FRAME_SIZE;
    }
 
+   //Save reference page directory
+   kernel_page_dir = clone_dir( kernel_ref_dir );
+   //Now add in the kernel stack
+   page_map(get_page(0x300000, 1, kernel_page_dir), KERNEL_MEMORY, IS_WRITEABLE, 0x300000);
+   page_map(get_page(0x300000-0x1000, 1, kernel_page_dir), KERNEL_MEMORY, IS_WRITEABLE, 0x300000-0x1000);
+   page_map(get_page(0x300000-0x2000, 1, kernel_page_dir), KERNEL_MEMORY, IS_WRITEABLE, 0x300000-0x2000);
+
    //Let the processor know where our page table is
    //and enable paging.
-
    load_page_dir( kernel_page_dir );
 
    //Finally, setup the interrupt handler
@@ -155,7 +166,7 @@ page_table_t *clone_table(page_table_t *src, uint32_t *phys_addr){
 }
 
 
-page_directory_t *test_clone_dir(page_directory_t *src){
+page_directory_t *clone_dir(page_directory_t *src){
 
    uint32_t phys;
 
@@ -173,7 +184,8 @@ page_directory_t *test_clone_dir(page_directory_t *src){
       if( !src->tables[i] )
          continue;
 
-      if( kernel_page_dir->tables[i] == src->tables[i] ){
+      if( kernel_ref_dir->tables[i] == src->tables[i] ){
+      //if( kernel_page_dir->tables[i] == src->tables[i] ){
          dir->tables[i] = src->tables[i];
          dir->tablesPhysical[i] = src->tablesPhysical[i];
       }else{

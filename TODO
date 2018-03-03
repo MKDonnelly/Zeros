@@ -1,6 +1,4 @@
 paging
-   handle page faults when memory runs out
-   improve code where needed
    copy a page table for fork()
 
 dynamic memory

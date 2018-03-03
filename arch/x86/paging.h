@@ -84,6 +84,7 @@ typedef struct page_directory{
 
 //This will be visible to the kernel for use
 extern page_directory_t *kernel_page_dir;
+extern page_directory_t *kernel_ref_dir;
 
 
 //Map a virtual to physical address using paging.
@@ -105,4 +106,5 @@ void load_page_dir(page_directory_t*);
 //Handles page interrupts
 void page_int_handler(registers_t);
 
-page_directory_t *test_clone_dir(page_directory_t*);
+extern void copy_page_physical(uint32_t,uint32_t);
+page_directory_t *clone_dir(page_directory_t*);

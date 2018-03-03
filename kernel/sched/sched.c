@@ -13,14 +13,14 @@ void scheduler_handler(){
    cur_context = current_sched_alg->schedule( cur_context );   
 }
 
-//Used to setup the threading system without actually starting
+//Used to setup the scheduling system without actually starting
 //the scheduler. This is meant to be called by kmain, which can
-//then create threads to be run before starting the scheduler.
+//then create tasks to be run before starting the scheduler.
 //This must be in place before we can do anything with the scheduler.
 void setup_scheduler(struct sched_alg *alg){
    current_sched_alg = alg;
 
-   //This will be used when a thread yields. Otherwise, scheduler_handler
+   //This will be used when a task yields. Otherwise, scheduler_handler
    //will periodically be called by the timer set below.
    arch_register_interrupt( SCHEDULER_INTERRUPT, scheduler_handler);
 
