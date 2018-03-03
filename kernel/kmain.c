@@ -165,9 +165,10 @@ void kmain(struct multiboot_info *multiboot_info){
   
   init_paging();
 
+//  page_directory_t *dir = test_clone_dir( kernel_page_dir );
+
 
   setup_scheduler( &rr_alg );
-
 
 //TODO map in initrd with paging
 //  fs_root = init_initrd( h->mods->start );

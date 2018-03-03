@@ -6,6 +6,7 @@ paging
 dynamic memory
    Create a slab allocator (have fixed size block ready)
    Stress-test kmalloc
+   kzmalloc
    Create several memory allocation algorithms by abstracting
       the algorithm to deal with only a range of memory addrs
       Buddy allocator

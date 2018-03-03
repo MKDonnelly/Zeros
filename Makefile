@@ -36,5 +36,5 @@ run: all
 	@qemu-system-x86_64 -kernel build/Zeros.elf -append arg1 -initrd arch/x86/initrd &
 
 debug:
-	@qemu-system-x86_64 -serial file:serial.log -kernel kernel/kmain.elf  -append arg1 -initrd ./bootfiles/initrd -S -s &
+	@qemu-system-x86_64 -serial file:serial.log -kernel build/Zeros.elf  -append arg1 -initrd ./arch/x86/initrd -S -s &
 	@gdb -q -x .gdbdebug

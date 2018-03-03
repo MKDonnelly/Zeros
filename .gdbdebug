@@ -1,2 +1,2 @@
 target remote localhost:1234
-symbol-file kernel/kmain.elf
+symbol-file build/Zeros.elf
