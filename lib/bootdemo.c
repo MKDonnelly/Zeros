@@ -292,7 +292,7 @@ void demo(){
   k_clear_screen();
 
   //Now start the shell.
-  startShell = 1;
+//  startShell = 1;
 
   //We currently cannot exit a thread,
   //so loop forever.

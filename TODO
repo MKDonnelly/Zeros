@@ -1,6 +1,10 @@
+paging
+   copy a page table for fork()
+
 dynamic memory
    Create a slab allocator (have fixed size block ready)
    Stress-test kmalloc
+   kzmalloc
    Create several memory allocation algorithms by abstracting
       the algorithm to deal with only a range of memory addrs
       Buddy allocator
@@ -13,14 +17,18 @@ userland
      could be in play. To prevent the stacks from clashing, each
      userland process needs its own kernel land stack (int tss.esp_ring0)
 
-initrd
-   Add directory support to initrd and improve initrd code
-   Page in the initrd since it currently cannot be accessed
-
 paging
    handle page faults when memory runs out
    revamp paging code to handle multitasking and userland
    copy a page table for fork()
+   instead of having an explicit switch to userland,
+      push the necessary values onto the stack of a thread/process
+      and have the interrupt code use them to enter userland
+
+initrd
+   Convert to using cpio or tar instead
+   Add directory support to initrd and improve
+      initrd code
 
 Multitasking
    Move the kernel stack to the end of the heap
@@ -39,6 +47,8 @@ Multitasking
       improve scheduler (queues, priority, different algs)
       create thread synchronization constructs, messages
          use xchg to implement mutexes
+      make sure core functions (kmalloc, scheduling) cannot
+         be interrupted and corrupted using either cli/sti or locks
 
 printing/screen manipulation:
   Implement a frame buffer in 3h mode
@@ -69,6 +79,7 @@ utils
    Create a basic file editor by dumping a file into the
       frame buffer and copying it back once done.
    create simple games (pong, etc)
+   create tar, cpio parser
  
 program execution
    create symbol table for dynamic linker

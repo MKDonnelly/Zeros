@@ -77,6 +77,3 @@ arch_userland_jump:
    iret
 here:
    nop
-
-
-
