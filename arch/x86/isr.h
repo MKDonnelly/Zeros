@@ -27,6 +27,8 @@ extern void set_timer_count(uint16_t);
 //eflags, then returnCS, then returnEIP, then error, then
 //int_number ...
 typedef struct{
+   uint32_t gs, fs, es, ds;
+
    uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax;
 
    //int_number and error are 8 bit numbers, but the
@@ -34,7 +36,7 @@ typedef struct{
    uint32_t int_number, error; 
 
    //automatically pushed by cpu
-   uint32_t eip, cs, eflags;
+   uint32_t eip, cs, eflags, esp_pushed, ss;
 } registers_t;
 
 //This is where each handler is held when registered

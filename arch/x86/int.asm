@@ -33,7 +33,21 @@ extern gdt_kernel_code
 extern cur_context
 interrupt_common:
    ;cli   ;We cannot be interrupt during an interrupt
+
    pushad
+
+   ;Save segment registers for userland interrupt
+   push ds
+   push es
+   push fs
+   push gs
+
+   ;Load in kernel land segment registers
+   mov ax, 0x10
+   mov ds, ax
+   mov es, ax
+   mov fs, ax
+   mov gs, ax
 
    ;Save the current context
    mov [cur_context], esp
@@ -43,6 +57,13 @@ interrupt_common:
    ;Restore context after scheduler call
    mov esp, [cur_context]
 
+   ;Restore userland segment registers
+   pop gs
+   pop fs
+   pop es
+   pop ds
+
+   ;Restore register state
    popad
 
    ;This is to move the stack back

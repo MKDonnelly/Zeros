@@ -1,6 +1,5 @@
 #include "syscall.h"
 
-//DEFN_SYSCALL1(k_putchar, 0, char);
 SYSCALL1(putchar, 0, char);
 
 static void syscall_handler(registers_t regs);
@@ -14,10 +13,12 @@ void init_syscalls(){
 
 void syscall_handler(registers_t regs){
 
-   if( regs.eax != 0 )
+   k_printf("eax: %x ebx: %x\n", regs.eax, regs.ebx);
+   if( regs.eax & 0xFFFF != 0 )
        return;
 
-   void *location = syscalls[regs.eax];
+
+   void *location = syscalls[regs.eax & 0xFFFF];
 
    int ret;
    asm volatile("   \

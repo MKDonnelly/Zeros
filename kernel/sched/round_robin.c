@@ -77,12 +77,12 @@ void idle_task(){
 void rr_init_scheduler(){
 
    //Add idle task
-   add_node_ll( (void**)&task_list, k_create_task(idle_task, NULL, NULL, 1024, kernel_page_dir), 0 );
+   add_node_ll( (void**)&task_list, k_create_task(idle_task, NULL, NULL, 1024, kernel_page_dir), 1 );
    task_count++;   
    
    current_task = get_node_ll( (void**)task_list, 0 );
    arch_enable_ints();
-   arch_jump_to_thread( current_task->context );
+   //arch_jump_to_thread( current_task->context );
 }
 
 
@@ -92,7 +92,7 @@ thread_context_t *rr_schedule(thread_context_t *interrupted_task){
    do{
       current_task_index = (current_task_index + 1) % task_count;
       current_task = get_node_ll( (void**)&task_list, current_task_index);
-   }while( current_task->state != TASK_READY );
+   }while( current_task->state != TASK_READY || current_task_index == 1 );
 
    //Switch page dir if needed
    if( current_task->task_page_directory != current_page_dir ){

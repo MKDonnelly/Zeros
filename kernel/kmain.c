@@ -126,6 +126,11 @@ void main_kernel_thread(){
 extern void arch_userland_jump();
 #include <staging/syscall.h>
 
+void userland_thread(){
+   syscall_putchar('Z'); 
+   while(1);
+}
+
 void kmain(struct multiboot_info *multiboot_info){
 
   //Arch initilization
@@ -136,32 +141,52 @@ void kmain(struct multiboot_info *multiboot_info){
 
   k_clear_screen();
 
+
   //See heap.h for kernel_heap
   create_heap( &kernel_heap, 0x300000, 0x200000, blocklist_malloc, blocklist_free, blocklist_init_heap );
 
 
   //reserve space for syscall stack
-//  char *syscall_stack = (char*)k_malloc( kernel_heap, 0x1000, 0, 0 );
+  char *syscall_stack = (char*)k_malloc( kernel_heap, 0x1000, 0, 0 );
 
-  init_paging();
+  init_syscalls();
+  set_kernel_stack( (uint32_t)syscall_stack );
+
+  page_directory_t *userland_dir = clone_dir( kernel_ref_dir );
+  
+  uint32_t userland_prog = 0x600000;
+
+  //Read program from initrd
+  fs_root = init_initrd( ((struct module*)multiboot_info->mods)->start );
+  fs_node_t *first = fs_root->readdir( fs_root, 0 );
+  k_printf("%s: %d\n", first->name, first->length);
+  first->read( first, 0, first->length, (char*)userland_prog );  
+
+  void (*f)() = (void*)userland_prog;
+  //f();
+
+  init_paging();  
 
 
   setup_scheduler( &rr_alg );
 
+  k_add_task( k_create_userland_task( f, NULL, NULL, 0x1000, kernel_page_dir ) );
+
   //k_add_task( k_create_task( main_kernel_thread, NULL, NULL, 0x4000, kernel_page_dir ) );
 
 
-  k_add_task( k_create_task( thread1, NULL, NULL, 0x1000, kernel_page_dir) );  
-  k_add_task( k_create_task( thread2, NULL, NULL, 0x1000, kernel_page_dir) );  
-  k_add_task( k_create_task( thread3, NULL, NULL, 0x1000, kernel_page_dir) );  
+//  k_add_task( k_create_task( thread1, NULL, NULL, 0x1000, kernel_page_dir) );  
+//  k_add_task( k_create_task( thread2, NULL, NULL, 0x1000, kernel_page_dir) );  
+//  k_add_task( k_create_task( thread3, NULL, NULL, 0x1000, kernel_page_dir) );  
+
   k_add_task( k_create_task( thread4, NULL, NULL, 0x1000, kernel_page_dir) );  
-  k_add_task( k_create_task( thread5, NULL, NULL, 0x1000, kernel_page_dir) );
+/*  k_add_task( k_create_task( thread5, NULL, NULL, 0x1000, kernel_page_dir) );
   k_add_task( k_create_task( thread6, NULL, NULL, 0x1000, kernel_page_dir) );  
   k_add_task( k_create_task( thread7, NULL, NULL, 0x1000, kernel_page_dir) );  
   k_add_task( k_create_task( thread8, NULL, NULL, 0x1000, kernel_page_dir) );  
   k_add_task( k_create_task( thread9, NULL, NULL, 0x1000, kernel_page_dir) );  
   k_add_task( k_create_task( threada, NULL, NULL, 0x1000, kernel_page_dir) );  
-  
+  */
   start_scheduler();
   while(1);
 }
