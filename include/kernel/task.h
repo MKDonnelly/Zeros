@@ -31,6 +31,9 @@ typedef struct ktask{
 ktask_t *k_create_task(void *start_function,
    void *params, void *exit_function, uint32_t stack_size,page_directory_t*);
 
+ktask_t *k_create_userland_task(void *start_function,
+   void *params, void *exit_function, uint32_t stack_size,page_directory_t*);
+
 //Have the task voluntarily yield the cpu. This can also
 //be used for blocking a task when certain system calls 
 //are used.

@@ -29,9 +29,9 @@ uint8_t page_map(page_entry_t *page, uint8_t is_kernel, uint8_t is_writeable, ui
       //by dividing by FRAME_SIZE
       page->present = 1; //True, the page is present
       page->rw = is_writeable;
-      //page->user = is_kernel;
+      page->user = is_kernel;
       //FIXME Hack for userland initial support 
-      page->user = 1;
+      //page->user = 1;
       //the frame member is the frame address, shifted
       //up by 12 bits. To get the physical address in,
       //we will pre-shift the address down 12 bits.
@@ -118,7 +118,7 @@ void init_paging(){
    //and a few frames below it. Save this page directory, map
    //in the stack, and load it.
    while( i < mem_end_page){
-      if( i != 0x300000 && (i != 0x300000 - 0x1000) && (i != 0x300000 - 0x2000)){
+      if( i != 0x300000 && (i != 0x300000 - 0x1000) && (i != 0x300000 - 0x2000) && i != 0x600000 && i != 0x610000){
       //Identity map each page upto the end of the heap.
       page_map(get_page(i, 1, kernel_ref_dir), KERNEL_MEMORY, IS_WRITEABLE, i);
      }

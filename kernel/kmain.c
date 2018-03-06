@@ -152,9 +152,9 @@ void kmain(struct multiboot_info *multiboot_info){
   init_syscalls();
   set_kernel_stack( (uint32_t)syscall_stack );
 
-  page_directory_t *userland_dir = clone_dir( kernel_ref_dir );
   
   uint32_t userland_prog = 0x600000;
+  uint32_t userland_stack = 0x610000;
 
   //Read program from initrd
   fs_root = init_initrd( ((struct module*)multiboot_info->mods)->start );
@@ -166,11 +166,13 @@ void kmain(struct multiboot_info *multiboot_info){
   //f();
 
   init_paging();  
-
+  page_directory_t *userland_dir = clone_dir( kernel_ref_dir );
+  page_map( get_page(userland_prog, 1, userland_dir), 1, 1, userland_prog);
+  page_map( get_page(userland_stack, 1, userland_dir), 1, 1, userland_stack);
 
   setup_scheduler( &rr_alg );
 
-  k_add_task( k_create_userland_task( f, NULL, NULL, 0x1000, kernel_page_dir ) );
+  k_add_task( k_create_userland_task( f, NULL, NULL, 0x1000, userland_dir ) );
 
   //k_add_task( k_create_task( main_kernel_thread, NULL, NULL, 0x4000, kernel_page_dir ) );
 

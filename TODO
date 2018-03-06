@@ -1,5 +1,15 @@
 paging
-   copy a page table for fork()
+   layout memory better
+   make routine for mapping areas of memory, creating
+      userland page directory, copying stuff to physical
+      memory for userland process creation
+
+userland
+   create system call interface
+   when doing multitasking with userland, multiple system calls
+     could be in play. To prevent the stacks from clashing, each
+     userland process needs its own kernel land stack (int tss.esp_ring0)
+
 
 dynamic memory
    Create a slab allocator (have fixed size block ready)
@@ -11,34 +21,12 @@ dynamic memory
    Better organize the kernel memory layout (i.e. heap comes
       before the stack, text is under the heap)
  
-userland
-   create system call interface
-   when doing multitasking with userland, multiple system calls
-     could be in play. To prevent the stacks from clashing, each
-     userland process needs its own kernel land stack (int tss.esp_ring0)
-
-paging
-   handle page faults when memory runs out
-   revamp paging code to handle multitasking and userland
-   copy a page table for fork()
-   instead of having an explicit switch to userland,
-      push the necessary values onto the stack of a thread/process
-      and have the interrupt code use them to enter userland
-
 initrd
-   Convert to using cpio or tar instead
+   Add in cpio or tar support
    Add directory support to initrd and improve
       initrd code
 
 Multitasking
-   Move the kernel stack to the end of the heap
-      so that when we map the pages, we can identity
-      map up to the end of the heap, then we can do
-      page_directory_t *savedKernelMap = current_identity_mapped_dir;
-      page_directory_t *kernelMapWithStack = clone_directory(savedKernelMap)
-      load_directory( kernelMapWithStack )
-      page_map_auto( <kernel stack area> ...)
-      Then a fork() from the kernel can use the savedKernelMap
    Create a separate area for allocating thread stack
       space. Place a guard page at the end of each so that
       a page fault ocurrs if one exceeds its stack size
@@ -84,7 +72,6 @@ utils
 program execution
    create symbol table for dynamic linker
    elf file parser
-   load and exec flat binaries (c and assembly) from initrd
 
 documentation/testing
    Unit tests for various subsystems

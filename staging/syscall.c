@@ -1,24 +1,24 @@
 #include "syscall.h"
 
 SYSCALL1(putchar, 0, char);
+SYSCALL1(exit, 1, void*);
 
 static void syscall_handler(registers_t regs);
 
-static void *syscalls[] = { k_putchar };
+static void *syscalls[] = { k_putchar, rr_exit_task };
 
 void init_syscalls(){
    arch_register_interrupt(0x50, syscall_handler );
-   //arch_register_interrupt(0x50, syscall_handler );
 }
 
 void syscall_handler(registers_t regs){
 
    k_printf("eax: %x ebx: %x\n", regs.eax, regs.ebx);
-   if( regs.eax & 0xFFFF != 0 )
+   if( regs.eax != 0 && regs.eax != 1)
        return;
 
 
-   void *location = syscalls[regs.eax & 0xFFFF];
+   void *location = syscalls[regs.eax];
 
    int ret;
    asm volatile("   \

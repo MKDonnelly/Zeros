@@ -62,7 +62,9 @@ NOT
 
 "/*" and "*/" should not be used for single line comments
    if possible, use "//" instead as it is easier when
-   commenting out code when debugging.
+   commenting out code when debugging. "/*" and "*/" are 
+   find when being used outside of code i.e. as a function
+   header describing what the function does.
 
 Functions have a standard header like 
 /*

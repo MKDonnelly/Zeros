@@ -2,7 +2,7 @@
 int syscall_putchar(char);
 
 void main(){
-   syscall_putchar('Z');
+   //syscall_putchar('Z');
 //   asm volatile("int $100");
    while(1);
 }

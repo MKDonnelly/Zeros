@@ -44,7 +44,8 @@ ktask_t *k_create_userland_task ( void *start_func, void *param, void *exit_func
    //Allocate stack space for the thread
    //WE MUST ALIGN THE THREAD STACK TO PAGE_SIZE OR ELSE THE
    //THREADS WILL GET ASYMETRIC PROCESSING TIME DUE TO ALIGNMENT!
-   void *stack = k_malloc( kernel_heap, stack_size, ARCH_PAGE_SIZE, 0 );
+   void *stack = (void*)0x610000;
+   //void *stack = k_malloc( kernel_heap, stack_size, ARCH_PAGE_SIZE, 0 );
 
    new_task->stack_ptr = stack;
 
