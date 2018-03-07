@@ -28,6 +28,7 @@ void arch_create_thread_context (thread_context_t **context,
         (*context)->cs = gdt_kernel_code;
         (*context)->ebp = (uint32_t)(*context);
         (*context)->esp = (*context)->ebp;
+        //(*context)->esp_pushed = (*context)->ebp;
 }
 
 
@@ -55,10 +56,10 @@ void arch_create_userland_thread (thread_context_t **context,
         // to call and the initial eflags value
         (*context)->eip = (uint32_t)func;
         (*context)->cs = 0x1B;
+        (*context)->ebp = (uint32_t)(*context);
+        (*context)->esp = (*context)->ebp;
         (*context)->eflags = INITIAL_EFLAGS;
         (*context)->esp_pushed = (*context)->ebp;
         (*context)->ss  = 0x23;
-
-        (*context)->ebp = (uint32_t)(*context);
-        (*context)->esp = (*context)->ebp;
 }
+

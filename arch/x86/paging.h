@@ -96,6 +96,8 @@ uint8_t page_map(page_entry_t*,uint8_t,uint8_t,uint32_t);
 //Get a page from the page table
 page_entry_t *get_page(uint32_t, uint8_t, page_directory_t*);
 
+uint32_t get_frame(page_entry_t*);
+
 //Initilized the paging structure
 void init_paging();
 

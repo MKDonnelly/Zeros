@@ -13,7 +13,6 @@ void init_syscalls(){
 
 void syscall_handler(registers_t regs){
 
-   k_printf("eax: %x ebx: %x\n", regs.eax, regs.ebx);
    if( regs.eax != 0 && regs.eax != 1)
        return;
 

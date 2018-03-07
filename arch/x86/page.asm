@@ -32,3 +32,20 @@ copy_page_physical:
    ret
 
 
+global arch_disable_paging
+arch_disable_paging:
+   push edx
+   mov edx, cr0
+   and edx, 0x7fffffff
+   mov cr0, edx
+   pop edx
+   ret
+
+global arch_enable_paging
+arch_enable_paging:
+   push edx
+   mov edx, cr0
+   or edx, 0x80000000
+   mov cr0, edx
+   pop edx
+   ret

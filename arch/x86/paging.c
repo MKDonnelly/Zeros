@@ -94,7 +94,11 @@ page_entry_t *get_page(uint32_t address, uint8_t make, page_directory_t *dir){
    return 0;
 }
 
-
+//Given a page, return its frame's address. This effectively turns
+//a virtual into a physical address.
+uint32_t get_frame( page_entry_t *page ){
+   return page->frame * ARCH_FRAME_SIZE;
+}
 
 void init_paging(){
 

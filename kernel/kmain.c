@@ -131,6 +131,39 @@ void userland_thread(){
    while(1);
 }
 
+extern void arch_disable_paging();
+extern void arch_enable_paging();
+
+//Copies a buffer to a physical address in memory
+//Used when loading in userland processes
+void copy_to_physical(char *buf, int amount, uint32_t addr){
+   //Get physical address of buffer
+   //Note that this requires two steps.
+   //  (1) First we translate the virtual page address to a physical
+   //      frame address using get_page and get_frame.
+   //  (2) We then find the offset of the buffer in the virtual address
+   //      (i.e. how far away it is from the smallest page that is 
+   //       the next lowest) and presume that the physical offset
+   //      has the same offset within the frame.
+   uint32_t buf_physical_frame = get_frame( get_page( (uint32_t*)buf, 0, kernel_page_dir));
+
+   //The tricky bitmask is taking all of the lower 0's and turning them
+   //into 1's. For example, 0x1000 -> 0xFFF
+   uint32_t buf_physical_offset = (uint32_t)buf & ~( -ARCH_FRAME_SIZE );
+  
+   //We can now construct the physical location of the buffer
+   uint32_t buf_physical = buf_physical_frame | buf_physical_offset; 
+
+   //Disable paging
+   arch_disable_paging();
+
+   //Copy over buffer
+   memcpy( (char*)addr, (char*)buf_physical, amount );
+
+   //Re-enable paging
+   arch_enable_paging();
+}
+
 void kmain(struct multiboot_info *multiboot_info){
 
   //Arch initilization
@@ -156,16 +189,22 @@ void kmain(struct multiboot_info *multiboot_info){
   uint32_t userland_prog = 0x600000;
   uint32_t userland_stack = 0x610000;
 
+  char *userland_copy = (char*)k_malloc( kernel_heap, 500, 0, 0 );
+
   //Read program from initrd
   fs_root = init_initrd( ((struct module*)multiboot_info->mods)->start );
   fs_node_t *first = fs_root->readdir( fs_root, 0 );
-  k_printf("%s: %d\n", first->name, first->length);
-  first->read( first, 0, first->length, (char*)userland_prog );  
+  k_printf("%s: %d, %x\n", first->name, first->length, userland_copy);
+//  first->read( first, 0, first->length, (char*)userland_prog );  
+  first->read( first, 0, first->length, userland_copy );
+  //first->read( first, 0, first->length, (char*)userland_prog );  
 
   void (*f)() = (void*)userland_prog;
   //f();
 
   init_paging();  
+  copy_to_physical( userland_copy, first->length, userland_prog );
+
   page_directory_t *userland_dir = clone_dir( kernel_ref_dir );
   page_map( get_page(userland_prog, 1, userland_dir), 1, 1, userland_prog);
   page_map( get_page(userland_stack, 1, userland_dir), 1, 1, userland_stack);
