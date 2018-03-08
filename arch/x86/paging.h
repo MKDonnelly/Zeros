@@ -38,8 +38,8 @@ used.
 //PD = page directory
 //PT = page table
 //PE = page entry
-#define PT_PER_PD 1024
-#define PE_PER_PT 1024
+#define PT_IN_PD 1024
+#define PE_IN_PT 1024
 
 
 //This describes an individual page
@@ -63,7 +63,7 @@ typedef struct page{
 
 //A page table is an array of page entries 
 typedef struct page_table{
-   page_entry_t pages[1024];
+   page_entry_t pages[PE_IN_PT];
 } page_table_t;
 
 
@@ -71,11 +71,11 @@ typedef struct page_table{
 //this is what two-level paging is.
 typedef struct page_directory{
    //Array of page tables
-   page_table_t *tables[1024];
+   page_table_t *tables[PT_IN_PD];
 
    //Physical address of the page tables
    //above for use when loading into CR3
-   uint32_t tablesPhysical[1024];
+   uint32_t tablesPhysical[PT_IN_PD];
 
    //The physical address of tablesPhysical
    uint32_t physicalAddr;
@@ -83,9 +83,9 @@ typedef struct page_directory{
 
 
 //This will be visible to the kernel for use
+//Userland processes will start with a clone of
+//this page table as well.
 extern page_directory_t *kernel_page_dir;
-extern page_directory_t *kernel_ref_dir;
-
 
 //Map a virtual to physical address using paging.
 //Contrast this to <next function> which maps the

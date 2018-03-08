@@ -1,9 +1,6 @@
 #pragma once
 
 #include <lib/types.h>
-#include <arch/x86/archx86.h>
-
-//#define kmalloc_test( heap_descriptor, size, alignment, phys ) heap_descriptor.malloc( &heap_descriptor, size, alignment, phys )
 
 typedef struct heap{
    uint32_t start;

@@ -77,15 +77,16 @@ void idle_task(){
 void rr_init_scheduler(){
 
    //Add idle task
+   //TODO does not work if idle is in position 0
+   //     this seems to destroy the task it is pointed to. ll problem?
    add_node_ll( (void**)&task_list, k_create_task(idle_task, NULL, NULL, 1024, kernel_page_dir), 1 );
    task_count++;   
    
    current_task = get_node_ll( (void**)task_list, 0 );
    arch_enable_ints();
-   //arch_jump_to_thread( current_task->context );
 }
 
-
+//The main scheduler. Routinely called to manage tasks
 thread_context_t *rr_schedule(thread_context_t *interrupted_task){
    current_task->context = interrupted_task;
 

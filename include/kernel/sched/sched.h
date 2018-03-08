@@ -6,6 +6,7 @@
 #include <kernel/task.h>
 #include <lib/timing.h>
 #include <lib/abstract_ll.h>
+#include <arch/x86/archx86.h>
 
 struct sched_alg{
 

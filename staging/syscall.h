@@ -2,6 +2,7 @@
 
 #include <arch/x86/archx86.h>
 #include <kernel/sched/round_robin.h>
+#include <kernel/mm/heap.h>
 
 #define SYSCALL_INT 0x50
 

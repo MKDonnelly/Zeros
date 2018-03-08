@@ -1,7 +1,7 @@
 #include <arch/x86/context.h>
 
 //A thread context is identical to the interrupt stack layout
-void arch_create_thread_context (thread_context_t **context, 
+void arch_create_kernel_context (thread_context_t **context, 
    void (*func)(void *), void *param, void (*thread_exit)(), void *stack, uint32_t stack_size ){
 
         //Pointer to the head of the thread's stack
@@ -32,7 +32,7 @@ void arch_create_thread_context (thread_context_t **context,
 }
 
 
-void arch_create_userland_thread (thread_context_t **context, 
+void arch_create_userland_context(thread_context_t **context, 
    void (*func)(void *), void *param, void (*thread_exit)(), void *stack, uint32_t stack_size ){
 
         //Pointer to the head of the thread's stack

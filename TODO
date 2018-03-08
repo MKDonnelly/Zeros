@@ -1,8 +1,9 @@
 paging
    layout memory better
+   use page faults better (i.e. put in memory if a stack overflows,
+      kill processes that make illegal memory access, etc)
    make routine for mapping areas of memory, creating
-      userland page directory, copying stuff to physical
-      memory for userland process creation
+      userland page directory
 
 userland
    create system call interface
@@ -10,13 +11,11 @@ userland
      could be in play. To prevent the stacks from clashing, each
      userland process needs its own kernel land stack (int tss.esp_ring0)
 
-
 dynamic memory
    Create a slab allocator (have fixed size block ready)
    Stress-test kmalloc
    kzmalloc
-   Create several memory allocation algorithms by abstracting
-      the algorithm to deal with only a range of memory addrs
+   Implement memory allocation algorithms
       Buddy allocator
    Better organize the kernel memory layout (i.e. heap comes
       before the stack, text is under the heap)
@@ -50,9 +49,6 @@ printing/screen manipulation:
   Work on VGA 13h mode driver
      Implement basic shape drawing
      Later on, implement a frame buffer
-  Create better print output (BUG,LOG,ASSERT,etc)
-      and catch errors by using __FILE__ and __LINE__
-      use assert more in code 
   Get a dump of the vga font and create custom font 
   Add more vga register modes (have grub boot into various
       modes and record the register values. we can boot from
@@ -82,11 +78,15 @@ documentation/testing
       (i.e. make sure if the heap is not setup, we do not
       try to use it and throw an error)
    Make all code conform to coding style in README
+   Create better print output (BUG,LOG,ASSERT,etc)
+      and catch errors by using __FILE__ and __LINE__
+      use assert more in code 
+ 
 
 drivers
    APIC, HPET, ATA PIO mode, PCI, network card
    basic ext2 filesystem
-   mouse, CMOS, serial,  
+   mouse, CMOS
  
 misc tasks 
    convert inline assembly to assembly-only file

@@ -3,7 +3,6 @@
 //The page table which will be visible to
 //the kernel. 
 page_directory_t *kernel_page_dir;
-page_directory_t *kernel_ref_dir;
 
 //Let the caller specify the mapping between physical
 //and virtual addresses. 
@@ -66,7 +65,7 @@ page_entry_t *get_page(uint32_t address, uint8_t make, page_directory_t *dir){
    //page entry is correct. 
 
    //Find the page table containing this address
-   unsigned int page_table_idx = address / PT_PER_PD;
+   unsigned int page_table_idx = address / PT_IN_PD;
 
    //We can now directly use page_table_idx when accessing
    //the page table array within the page directory
@@ -74,7 +73,7 @@ page_entry_t *get_page(uint32_t address, uint8_t make, page_directory_t *dir){
    //If the directory already exists, then the page must exist
    if( dir->tables[ page_table_idx ] ){
       //return the page
-      return &dir->tables[ page_table_idx ]->pages[address % PE_PER_PT];
+      return &dir->tables[ page_table_idx ]->pages[address % PE_IN_PT];
    }else if(make){
       //Else if we request a page to be made, create the page. We actually
       //do not create an individual page entry; we create a page table 
@@ -89,7 +88,7 @@ page_entry_t *get_page(uint32_t address, uint8_t make, page_directory_t *dir){
       memset(dir->tables[ page_table_idx ], TABLE_SIZE, 0);
       dir->tablesPhysical[ page_table_idx ] = tmp | 0x7;
 
-      return &dir->tables[ page_table_idx ]->pages[address % PE_PER_PT];
+      return &dir->tables[ page_table_idx ]->pages[address % PE_IN_PT];
    }
    return 0;
 }
@@ -103,46 +102,37 @@ uint32_t get_frame( page_entry_t *page ){
 void init_paging(){
 
    //Assume we have only 16MB of available memory
-   //We will extend this later to use the BIOS RAM size
-   //returned when booting.
-   unsigned int mem_end_page = 0x1000000;
+   //Let the kernel manage memory from 0..5M and
+   //leave 5M..16M unmapped for userland processes
+   unsigned int mem_end_page =    0x1000000;
+   unsigned int kernel_end_page = 0x500000;
 
    //Initilize frame management system
    init_frames(mem_end_page);
 
    //Make the page directory for the kernel
-   kernel_ref_dir = (page_directory_t*)k_malloc( kernel_heap, sizeof(page_directory_t), ARCH_PAGE_SIZE, 0);
+   kernel_page_dir = (page_directory_t*)k_malloc( kernel_heap, sizeof(page_directory_t), ARCH_PAGE_SIZE, 0);
 
    //Zero out the page directory
-   memset( kernel_ref_dir, sizeof(page_directory_t), 0);
+   memset( kernel_page_dir, sizeof(page_directory_t), 0);
 
    //Allocate the lower part of memory for the kernel
    int i = 0;
-   //TEMPORARY: Map everything except for the kernel stack
-   //and a few frames below it. Save this page directory, map
-   //in the stack, and load it.
-   while( i < mem_end_page){
-      if( i != 0x300000 && (i != 0x300000 - 0x1000) && (i != 0x300000 - 0x2000) && i != 0x600000 && i != 0x610000){
+
+   while( i < kernel_end_page){
       //Identity map each page upto the end of the heap.
-      page_map(get_page(i, 1, kernel_ref_dir), KERNEL_MEMORY, IS_WRITEABLE, i);
-     }
+      page_map(get_page(i, 1, kernel_page_dir), KERNEL_MEMORY, IS_WRITEABLE, i);
       i += ARCH_FRAME_SIZE;
    }
 
-   //Save reference page directory
-   kernel_page_dir = clone_dir( kernel_ref_dir );
-   //Now add in the kernel stack
-   page_map(get_page(0x300000, 1, kernel_page_dir), KERNEL_MEMORY, IS_WRITEABLE, 0x300000);
-   page_map(get_page(0x300000-0x1000, 1, kernel_page_dir), KERNEL_MEMORY, IS_WRITEABLE, 0x300000-0x1000);
-   page_map(get_page(0x300000-0x2000, 1, kernel_page_dir), KERNEL_MEMORY, IS_WRITEABLE, 0x300000-0x2000);
+   //Setup the interrupt handler for paging BEFORE enabling paging
+   arch_register_interrupt( PAGE_INTERRUPT, page_int_handler);
 
    //Let the processor know where our page table is
    //and enable paging.
    load_page_dir( kernel_page_dir );
-
-   //Finally, setup the interrupt handler
-   arch_register_interrupt( PAGE_INTERRUPT, page_int_handler);
 }
+
 
 page_table_t *clone_table(page_table_t *src, uint32_t *phys_addr){
 
@@ -184,13 +174,12 @@ page_directory_t *clone_dir(page_directory_t *src){
 
 
    //Clone page directory from src 
-   for(int i = 0; i < PT_PER_PD; i++){
+   for(int i = 0; i < PT_IN_PD; i++){
       //Make sure table is present
       if( !src->tables[i] )
          continue;
 
-      if( kernel_ref_dir->tables[i] == src->tables[i] ){
-      //if( kernel_page_dir->tables[i] == src->tables[i] ){
+      if( kernel_page_dir->tables[i] == src->tables[i] ){
          dir->tables[i] = src->tables[i];
          dir->tablesPhysical[i] = src->tablesPhysical[i];
       }else{

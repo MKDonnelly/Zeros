@@ -8,6 +8,11 @@ static void syscall_handler(registers_t regs);
 static void *syscalls[] = { k_putchar, rr_exit_task };
 
 void init_syscalls(){
+
+   //Reserve space for systemcall stack
+   char *syscall_stack = k_malloc( kernel_heap, 0x1000, 0, 0 );
+   set_kernel_stack( (uint32_t)syscall_stack );
+
    arch_register_interrupt(0x50, syscall_handler );
 }
 
