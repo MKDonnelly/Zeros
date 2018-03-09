@@ -21,7 +21,7 @@ typedef struct heap{
 //Used by kernel and initilized in kmain
 heap_t kernel_heap;
 
-#define k_malloc(heap_descriptor, size, alignment, physical) heap_descriptor.malloc( &heap_descriptor, size, alignment, physical )
+#define k_malloc(heap_descriptor, size, alignment) heap_descriptor.malloc( &heap_descriptor, size, alignment )
 
 #define k_free(heap_descriptor, memblock) heap_descriptor.free( &heap_descriptor, memblock)
 

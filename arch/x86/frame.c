@@ -8,14 +8,14 @@ int8_t *frames;
 uint32_t total_frames;
 
 int get_frame_stat( uint32_t frame_addr ){
-   return bitGet( &frames, frame_addr / ARCH_FRAME_SIZE );
+   return bit_get( &frames, frame_addr / ARCH_FRAME_SIZE );
 }
 
 //Specifically allocate a frame. Return -1 if
 //the frame is already allocated
 int allocate_frame( uint32_t frame_addr ){
-   if( bitGet( frames, frame_addr / ARCH_FRAME_SIZE ) == 0 ){
-      bitSet( frames, frame_addr / ARCH_FRAME_SIZE );
+   if( bit_get( frames, frame_addr / ARCH_FRAME_SIZE ) == 0 ){
+      bit_set( frames, frame_addr / ARCH_FRAME_SIZE );
       return 0;
    }else{
       return -1;
@@ -30,9 +30,9 @@ int32_t first_free_frame(){
 
    //Loop over each bit in frames
    for(int offset = 0; offset < total_frames; offset++){
-      if( bitGet( frames, offset ) == 0 ){
+      if( bit_get( frames, offset ) == 0 ){
          //Found a free frame! Return it and set it as allocated
-         bitSet( frames, offset );
+         bit_set( frames, offset );
          return offset * ARCH_FRAME_SIZE;
       }
    }
@@ -45,7 +45,7 @@ int32_t first_free_frame(){
 void free_frame(uint32_t addr){
     //Free the frame for use by clearing
     //its allocated bit in *frames.
-    bitClear( frames, addr / ARCH_FRAME_SIZE );
+    bit_clear( frames, addr / ARCH_FRAME_SIZE );
 }
 
 //We will presume that we are managing memory from
@@ -62,7 +62,7 @@ void init_frames(uint32_t memory_max){
    int frames_length = (total_frames / 8) + 1;
 
    //Allocate memory for the bitfield
-   frames = (char*)k_malloc(kernel_heap, frames_length, 0, 0);
+   frames = (char*)k_malloc(kernel_heap, frames_length, 0);
 
    //Zero out the frames bitfield
    memset( frames, frames_length, 0 );

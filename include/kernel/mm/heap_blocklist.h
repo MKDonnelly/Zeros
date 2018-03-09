@@ -36,7 +36,7 @@ typedef struct heap_block{
 void blocklist_init_heap(heap_t*);
 
 //Dynamically allocate memory
-void *blocklist_malloc(heap_t*,uint32_t size, uint32_t align, uint32_t *phys);
+void *blocklist_malloc(heap_t*,uint32_t size, uint32_t align);
 
 //Free dynamic memory
 void blocklist_free(heap_t*,void*);

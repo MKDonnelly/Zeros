@@ -10,7 +10,7 @@ void init_interrupts(){
    //interrupt enabled array, just to
    //be safe
    for(int i = 0; i < TOTAL_INTERRUPTS; i++){
-      bitClear( &int_present, i);
+      bit_clear( &int_present, i);
    }
 
    //This does x = 0..255
@@ -25,14 +25,14 @@ void init_interrupts(){
 //This is exported to general kernel code.
 void arch_register_interrupt( uint8_t int_number, void (*handler)(registers_t)){
   //Mark the interrupt as present
-  bitSet( &int_present, int_number );
+  bit_set( &int_present, int_number );
   int_handlers[int_number] = handler;
 }
 
 void arch_unregister_interrupt( uint8_t int_number ){
    //Mark the interrupt as not present
    //and null out the function pointer
-   bitClear( &int_present, int_number);
+   bit_clear( &int_present, int_number);
 
    //Null out function pointer to handler
    int_handlers[int_number] = 0;
@@ -53,7 +53,7 @@ void main_interrupt_handler(registers_t r){
    }
 
    //check to see if there is a registered interrupt
-   if( bitGet( &int_present, r.int_number ) ){ 
+   if( bit_get( &int_present, r.int_number ) ){ 
       //If there is, call the function handler
       int_handlers[ r.int_number ]( r );
    }else{

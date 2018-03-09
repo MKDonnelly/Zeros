@@ -140,6 +140,10 @@ void kmain(struct multiboot_info *multiboot_info){
   //See heap.h for kernel_heap
   create_heap( &kernel_heap, 0x300000, 0x200000, blocklist_malloc, blocklist_free, blocklist_init_heap );
 
+
+  init_paging();
+
+/*
   init_syscalls();
   
   uint32_t userland_prog = 0x600000;
@@ -163,21 +167,21 @@ void kmain(struct multiboot_info *multiboot_info){
 
   setup_scheduler( &rr_alg );
 
-  k_add_task( k_create_userland_task( (void*)userland_prog, NULL, NULL, 0x1000, userland_stack, userland_dir ) );
+  //k_add_task( k_create_userland_task( (void*)userland_prog, NULL, NULL, 0x1000, userland_stack, userland_dir ) );
 
 
-//  k_add_task( k_create_task( thread1, NULL, NULL, 0x1000, kernel_page_dir) );  
-//  k_add_task( k_create_task( thread2, NULL, NULL, 0x1000, kernel_page_dir) );  
+  k_add_task( k_create_task( thread1, NULL, NULL, 0x1000, kernel_page_dir) );  
+  k_add_task( k_create_task( thread2, NULL, NULL, 0x1000, kernel_page_dir) );  
 //  k_add_task( k_create_task( thread3, NULL, NULL, 0x1000, kernel_page_dir) );  
 
   k_add_task( k_create_task( thread4, NULL, NULL, 0x1000, kernel_page_dir) );  
-/*  k_add_task( k_create_task( thread5, NULL, NULL, 0x1000, kernel_page_dir) );
+  k_add_task( k_create_task( thread5, NULL, NULL, 0x1000, kernel_page_dir) );
   k_add_task( k_create_task( thread6, NULL, NULL, 0x1000, kernel_page_dir) );  
   k_add_task( k_create_task( thread7, NULL, NULL, 0x1000, kernel_page_dir) );  
   k_add_task( k_create_task( thread8, NULL, NULL, 0x1000, kernel_page_dir) );  
   k_add_task( k_create_task( thread9, NULL, NULL, 0x1000, kernel_page_dir) );  
   k_add_task( k_create_task( threada, NULL, NULL, 0x1000, kernel_page_dir) );  
-  */
-  start_scheduler();
+  
+  start_scheduler();*/
   while(1);
 }

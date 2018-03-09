@@ -1,10 +1,24 @@
 #pragma once
 
-/*                        Paging
-The paging structure is setup so that the page directory
-contains 1024 page tables, which in turn contains 1024 page entries.
-Page tables and page entries can be null to indicate that it is not
-used. 
+/*                  Paging
+  The page table is arranged in a hierarchical structure.
+  At the top is the page directory (page_directory_t). This
+  structure contains a certain amount of page table descriptors.
+  Each of these descriptors points to a page table.
+
+  The next structure in the hierarchy is the page table (page_table_t).
+  This structure contains a set of mappings between virtual and physical
+  addresses using page_table_entry_t (also called a page descriptor)
+
+
+
+   page_directory_t:
+      page_dir_entry_t (points to) page_table_t ---|
+                                                   |
+|--------------------------------------------------|
+=> page_table_t:
+      page_table_entry_t (maps virt to phys) 
+     
 */
 
 
@@ -21,11 +35,6 @@ used.
 #define ARCH_PAGE_SIZE  0x1000
 #define TABLE_SIZE 0x1000
 
-#define KERNEL_MEMORY 0
-#define USER_MEMORY   1
-#define IS_WRITEABLE  1
-#define NOT_WRITEABLE 0
-
 #define PAGE_INTERRUPT 14
 
 //Masks for page error
@@ -35,52 +44,107 @@ used.
 #define PAGE_RES_M     0x8
 #define PAGE_ID_M      0x10
 
-//PD = page directory
-//PT = page table
-//PE = page entry
-#define PT_IN_PD 1024
-#define PE_IN_PT 1024
+//PDES = Page descriptor
+//PT = Page Table
+//PTDES = Page table descriptors
+//PD = Page directory
+#define PDES_IN_PT 1024
+#define PTDES_IN_PD 1024
+
+//The upper 10 bits of the address specifies the 
+//offset within the page directory.
+#define offset_in_pd(addr) (addr >> 22)
+
+//After the first 10 bits, the next 10 bits specifies
+//the offset within the page table.
+#define offset_in_pt(addr) ((addr >> 12) & 0x3ff)
 
 
-//This describes an individual page
-//which maps virtual addresses to physical
-//addresses.
-typedef struct page{
-   uint32_t present  : 1; //Present in memory
-   uint32_t rw       : 1; //Read-write if set
-   uint32_t user     : 1; //Ring 0 if clear
-   uint32_t accessed : 1; //Has page been accessed?
-   uint32_t dirty    : 1; //Has the page been written to?
-   uint32_t unused   : 7; //Unused and reserved bits
-   uint32_t frame    : 20; //Frame address w/ 12 bit shift
-   //!!IMPORTANT!! That 12 bit shift means that the frame
-   //              is now an INDEX
-   //This is the physical address of memory mapped to this page.
-   //Only 20 bits are used as every page must begin on 4K boundaries.
-} page_entry_t;
+//This represents an individual page<->frame allocation.
+struct page_descriptor{
+   uint8_t present          : 1; //Present in memory
+   uint8_t rw               : 1; //Read-write if set
+   uint8_t user             : 1; //Ring 0 if clear
+   uint8_t write_through    : 1; //
+   uint8_t cache_disable    : 1; //Has the page been written to?
+   uint8_t accessed         : 1; //Has page been accessed?
+   uint8_t dirty            : 1; 
+   uint8_t zero_not_used    : 1;
+   uint8_t global_page      : 1;
+   uint8_t available        : 3; 
+
+   //Since a page MUST be aligned to 4K, only the upper 20 bits
+   //matter. This is the frame address >> 12 
+   uint32_t frame_addr      : 20; 
+} __attribute__((packed));
+typedef struct page_descriptor page_desc_t;
+
+//A page table is composed of page table entires.
+//Each of these page entries maps a virtual to physical
+//address using a page_table_entry_t.
+struct page_table{
+
+   page_desc_t page_descriptors[ PDES_IN_PT ];
+
+}__attribute__((packed));
+typedef struct page_table page_table_t;
 
 
+//Each of these points to a single page_table_t,
+//The address of which is in table_addr.
+struct page_table_desc{
+   int8_t present          : 1;
+   int8_t rw               : 1;
+   int8_t user_access      : 1;
+   int8_t write_through    : 1;
+   int8_t cache_disabled   : 1;
+   int8_t accessed         : 1;
+   int8_t not_used         : 1;
+   int8_t page_size        : 1;
+   int8_t global_page      : 1;
+   int8_t available        : 3;
 
-//A page table is an array of page entries 
-typedef struct page_table{
-   page_entry_t pages[PE_IN_PT];
-} page_table_t;
+   int32_t table_addr      : 20;
+
+} __attribute__((packed));
+typedef struct page_table_desc page_table_desc_t;
 
 
-//A page directory is an array of page tables
-//this is what two-level paging is.
-typedef struct page_directory{
-   //Array of page tables
-   page_table_t *tables[PT_IN_PD];
+//A page directory is composed of page table descriptors.
+struct page_directory{
 
-   //Physical address of the page tables
-   //above for use when loading into CR3
-   uint32_t tablesPhysical[PT_IN_PD];
+   page_table_desc_t pt_descriptors[PTDES_IN_PD];
 
-   //The physical address of tablesPhysical
-   uint32_t physicalAddr;
-} page_directory_t;
+}__attribute__((packed));
+typedef struct page_directory page_directory_t;
 
+
+//This points to the current page directory being used
+//for address translation. It is null if not page table
+//is in effect.
+extern page_directory_t *current_directory;
+
+
+//Given a virtual address and page directory, get the page table that
+//the address resides in.
+page_table_t *get_page_table(uint32_t addr, page_directory_t *dir);
+
+//Given a virtual address and a page table, retrieve the page
+//descriptor that maps the virtual address to a physical address.
+page_desc_t *get_page_desc(uint32_t addr, page_table_t *table);
+
+//Given a page table descriptor, get the frame address from it.
+uint32_t get_frame(page_desc_t *page);
+
+//Given a virtual address and a page directory, find the physical
+//address that the virtual address maps to
+uint32_t virt_to_phys(uint32_t addr, page_directory_t *dir);
+
+//Loads the given page directory into CR3 for use. 
+void load_page_dir(page_directory_t*);
+
+
+/////////////////////////////////////////////
 
 //This will be visible to the kernel for use
 //Userland processes will start with a clone of
@@ -91,22 +155,20 @@ extern page_directory_t *kernel_page_dir;
 //Contrast this to <next function> which maps the
 //given virtual address to the next free physcial
 //address. This allows greater control.
-uint8_t page_map(page_entry_t*,uint8_t,uint8_t,uint32_t);
+uint8_t page_map(page_desc_t*,uint8_t,uint8_t,uint32_t);
 
 //Get a page from the page table
-page_entry_t *get_page(uint32_t, uint8_t, page_directory_t*);
+//page_table_entry_t *get_page(uint32_t, uint8_t, page_directory_t*);
 
-uint32_t get_frame(page_entry_t*);
+//Get the frame address from the page
+//uint32_t get_frame(page_desc_t*);
 
 //Initilized the paging structure
 void init_paging();
 
-//Creates the page directory and
-//loads it into CR3.
-void load_page_dir(page_directory_t*);
 
 //Handles page interrupts
 void page_int_handler(registers_t);
 
-extern void copy_page_physical(uint32_t,uint32_t);
-page_directory_t *clone_dir(page_directory_t*);
+//extern void copy_page_physical(uint32_t,uint32_t);
+//page_directory_t *clone_dir(page_directory_t*);

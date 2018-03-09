@@ -6,7 +6,7 @@
 //bit in a chunk of memory (regardless
 //of the char* type).
 
-void bitSet( void *mem, int bitNum ){
+void bit_set( void *mem, int bitNum ){
    //Due to how dereferencing works, we
    //need to find the index and offset
    //of the bit in memory (with regard
@@ -23,7 +23,7 @@ void bitSet( void *mem, int bitNum ){
 
 }
 
-void bitClear( void *mem, int bitNum ){
+void bit_clear( void *mem, int bitNum ){
    //Due to how dereferencing works, we
    //need to find the index and offset
    //of the bit in memory (with regard
@@ -42,7 +42,7 @@ void bitClear( void *mem, int bitNum ){
 //We will return a char as it is the smallest
 //natural data type. We really only get a
 //1 or 0.
-uint8_t bitGet( void *mem, int bitNum ){
+uint8_t bit_get( void *mem, int bitNum ){
    //Due to how dereferencing works, we
    //need to find the index and offset
    //of the bit in memory (with regard

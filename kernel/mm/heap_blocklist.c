@@ -18,7 +18,7 @@ void blocklist_init_heap(heap_t *heap_descriptor){
 //Allocate "size" piece of memory on the heap. If align is non-zero
 //align the memory to it's size. If phys is non-null, return the physical
 //address of the allocate memory (different when using paging)
-void *blocklist_malloc(heap_t *heap_descriptor, uint32_t size, uint32_t align, uint32_t *phys){
+void *blocklist_malloc(heap_t *heap_descriptor, uint32_t size, uint32_t align){
 
    heap_block_t* head = (heap_block_t*)heap_descriptor->start;
 
@@ -68,9 +68,6 @@ void *blocklist_malloc(heap_t *heap_descriptor, uint32_t size, uint32_t align, u
 
          current_node->allocated = 1;
 
-         if( phys )
-            *phys = (int)current_node->free_mem;
-
          return current_node->free_mem;
 
      }else{
@@ -88,12 +85,8 @@ void *blocklist_malloc(heap_t *heap_descriptor, uint32_t size, uint32_t align, u
             head->free_mem = ( (int8_t*)head + sizeof(heap_block_t) );
          }
 
-
          head->allocated = 1;
 
-         if( phys )
-            *phys = (int)head->free_mem;
- 
          return head->free_mem;
       }
    }

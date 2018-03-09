@@ -4,6 +4,8 @@ paging
       kill processes that make illegal memory access, etc)
    make routine for mapping areas of memory, creating
       userland page directory
+   remove the physical address from kmalloc. paging should do any
+      virtual to physical conversions.
 
 userland
    create system call interface
