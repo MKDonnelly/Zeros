@@ -9,7 +9,7 @@
 
 //Allocate the first free frame and return
 //its address for use.
-int32_t first_free_frame();
+uint32_t first_free_frame();
 
 //Free the frame given its address
 void free_frame(uint32_t addr);
@@ -23,4 +23,4 @@ int allocate_frame(uint32_t);
 //Initilize the frame global variables.
 //This handles calculating memory requirements
 //for the bitfield.
-void init_frames(uint32_t);
+void init_frames(uint32_t,uint32_t);

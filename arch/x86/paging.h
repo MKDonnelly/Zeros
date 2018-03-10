@@ -1,27 +1,5 @@
 #pragma once
 
-/*                  Paging
-  The page table is arranged in a hierarchical structure.
-  At the top is the page directory (page_directory_t). This
-  structure contains a certain amount of page table descriptors.
-  Each of these descriptors points to a page table.
-
-  The next structure in the hierarchy is the page table (page_table_t).
-  This structure contains a set of mappings between virtual and physical
-  addresses using page_table_entry_t (also called a page descriptor)
-
-
-
-   page_directory_t:
-      page_dir_entry_t (points to) page_table_t ---|
-                                                   |
-|--------------------------------------------------|
-=> page_table_t:
-      page_table_entry_t (maps virt to phys) 
-     
-*/
-
-
 #include <arch/x86/drivers/vgacommon/vgacommon.h>
 #include <arch/x86/isr.h>
 #include <arch/x86/frame.h>
@@ -144,31 +122,22 @@ uint32_t virt_to_phys(uint32_t addr, page_directory_t *dir);
 void load_page_dir(page_directory_t*);
 
 
-/////////////////////////////////////////////
-
 //This will be visible to the kernel for use
 //Userland processes will start with a clone of
 //this page table as well.
 extern page_directory_t *kernel_page_dir;
 
-//Map a virtual to physical address using paging.
-//Contrast this to <next function> which maps the
-//given virtual address to the next free physcial
-//address. This allows greater control.
-uint8_t page_map(page_desc_t*,uint8_t,uint8_t,uint32_t);
-
-//Get a page from the page table
-//page_table_entry_t *get_page(uint32_t, uint8_t, page_directory_t*);
-
-//Get the frame address from the page
-//uint32_t get_frame(page_desc_t*);
-
 //Initilized the paging structure
 void init_paging();
-
 
 //Handles page interrupts
 void page_int_handler(registers_t);
 
+page_directory_t *clone_page_dir(page_directory_t*);
+
 //extern void copy_page_physical(uint32_t,uint32_t);
-//page_directory_t *clone_dir(page_directory_t*);
+page_directory_t *clone_dir(page_directory_t*);
+
+void copy_to_physical(char*,int,uint32_t);
+
+void map_page( uint32_t addr, page_directory_t *dir);

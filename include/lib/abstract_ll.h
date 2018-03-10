@@ -1,5 +1,6 @@
 #pragma once 
 
+#include <lib/types.h>
 #include <kernel/mm/heap.h>
 
 //Creates a linked list. Callers would do something like
@@ -33,6 +34,9 @@ void *set_node_ll(void **list, void *new_node, int index);
 //by having compare_function always return 0.
 void *find_node_ll( void **list, void *reference, int (*compare_function)(void*,void*) );
 
+//Used to get rid of ugly (void**)&list
+#define allist(list) ((void**)&list)
+
 //Create a lambda function.
 #define LAMBDA( rettype, params, func )  \
         ({                               \
@@ -44,5 +48,5 @@ void *find_node_ll( void **list, void *reference, int (*compare_function)(void*,
 
 
 //Iterate through each member of the linked list and apply the
-//given operation. ANON_F above is really useful for this.
+//given operation. ANON_F above is really useful for this
 void apply_op_ll( void **list, void (*operator_function)(void*) );

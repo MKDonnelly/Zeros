@@ -1,4 +1,4 @@
-#include <include/lib/abstract_ll.h>
+#include <lib/abstract_ll.h>
 
 //Internally used by create_ll
 //NEVER used by outside code.
@@ -45,7 +45,7 @@ void dealloc_ll(void **list){
    
    while( head != NULL ){
       next = head->next;
-      k_free( kernel_heap, head );
+      k_free(kernel_heap, head );
       head = next;
    }
 }
