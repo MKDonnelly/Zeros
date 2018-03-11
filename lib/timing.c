@@ -12,7 +12,7 @@ void timing_set_alarm(void (*alarm_function)(), int ms_period){
    new_alarm->callback = alarm_function;
    new_alarm->callback_period = new_alarm->time_left = ms_period;
 
-   add_node_ll( (void**)&alarm_list, new_alarm, 0);
+   add_node_ll( allist(alarm_list), new_alarm, 0);
    total_alarms++;
 }
 

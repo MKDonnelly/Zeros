@@ -7,18 +7,18 @@
 
 #define ARCH_FRAME_SIZE 0x1000
 
+//Free the frame given its address
+void free_frame(uint32_t addr);
+
+//Allocate a frame at a particular address
+int8_t allocate_frame(uint32_t);
+
 //Allocate the first free frame and return
 //its address for use.
 uint32_t first_free_frame();
 
-//Free the frame given its address
-void free_frame(uint32_t addr);
-
 //Get the allocation status of a frame
 int get_frame_stat(uint32_t);
-
-//Allocate a frame at a particular address
-int allocate_frame(uint32_t);
 
 //Initilize the frame global variables.
 //This handles calculating memory requirements

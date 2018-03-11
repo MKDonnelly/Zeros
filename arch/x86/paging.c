@@ -1,8 +1,9 @@
 #include <arch/x86/paging.h>
 
+extern void arch_enable_paging();
+
 //Points to current page directory in use
 page_directory_t *current_directory = NULL;
-
 
 //Given a page directory and an address, return a pointer to 
 //the page table (the PAGE TABLE, not the PAGE DIR ENTRY). 
@@ -70,17 +71,6 @@ uint32_t get_frame( page_desc_t *page ){
 }
 
 
-//Load the given page_directory into cr3
-//TODO convert to assembly file
-void load_page_dir(page_directory_t *dir){
-   asm volatile("mov %0, %%cr3" :: "r"(dir->pt_descriptors) );
-   unsigned int cr0;
-   asm volatile("mov %%cr0, %0" : "=r"(cr0));
-   cr0 |= 0x80000000; //Enable paging
-   asm volatile("mov %0, %%cr0" :: "r"(cr0));
-}
-
-
 void setup_page( page_desc_t *page, uint8_t is_kernel, uint8_t is_rw, uint32_t frame_addr ){
    //Assume frame address is properly aligned   
    //Only allocate a frame if the page does not have one  
@@ -92,16 +82,33 @@ void setup_page( page_desc_t *page, uint8_t is_kernel, uint8_t is_rw, uint32_t f
    }
 }
 
+void setup_page_desc( page_desc_t *page, uint8_t is_kernel, uint8_t is_rw, uint32_t frame_addr ){
+   //Assume frame address is properly aligned   
+   //Only allocate a frame if the page does not have one  
+   if( ! page->frame_addr ){
+      page->present = 1;
+      page->rw = is_rw;
+      page->user = is_kernel;
+      page->frame_addr = frame_addr / ARCH_FRAME_SIZE;
+   }
+}
 
-///////////////////////////////////////////////////////////
 page_directory_t *kernel_page_dir;
 
-void identity_map_page( uint32_t addr, page_directory_t *dir ){
-   //Get the page table and create it.
-   make_page_table( addr, dir );
-   page_table_t *pt = get_page_table( addr, dir );
-   page_desc_t *pe = get_page_desc( addr, pt );
-   setup_page( pe, 1, 1, addr );
+void map_page(uint32_t vaddr, uint32_t paddr, page_directory_t *dir){
+
+   //Make sure the table exists before we reference it. If it already
+   //exists, this will do nothing.
+   make_page_table( vaddr, dir );
+
+   //Get the page table
+   page_table_t *page_table = get_page_table( vaddr, dir );
+
+   //Get the page descriptor within the page table
+   page_desc_t *page_descriptor = get_page_desc( vaddr, page_table );
+
+   //Map the virtual to physical address
+   setup_page_desc( page_descriptor, 1, 1, paddr );
 }
  
 
@@ -119,23 +126,17 @@ void init_paging(){
 
    for(int i = 0; i < kernel_end_page; i += 0x1000 ){
       //Get the page table and create it.
-      make_page_table( i, kernel_page_dir );
-      page_table_t *pt = get_page_table( i, kernel_page_dir );
-      page_desc_t *pe = get_page_desc( i, pt );
-      setup_page( pe, 1, 1, i );
-
+      map_page( i, i, kernel_page_dir );
    }
+
 
    //Setup the interrupt handler for paging BEFORE enabling paging
    arch_register_interrupt( PAGE_INTERRUPT, page_int_handler);
 
    //Let the processor know where our page table is
    //and enable paging.
-   load_page_dir( kernel_page_dir );
+   load_page_dir_asm( kernel_page_dir );
 }
-
-extern void arch_disable_paging();
-extern void arch_enable_paging();
 
 //Copies the contents of one page to another. Both are physical
 //addresses.
@@ -223,6 +224,7 @@ page_directory_t *clone_page_dir(page_directory_t *copy_from){
 
 void page_int_handler(registers_t r){
    int fault_addr;
+   //TODO convert to assembly
    asm volatile("mov %%cr2, %0" : "=r" (fault_addr));
 
    uint8_t present = !(r.error & PAGE_PRESENT_M);

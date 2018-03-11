@@ -4,7 +4,7 @@
 //a unique id to every task
 int next_task_id = 0;
 
-ktask_t *k_create_task ( void *start_func, void *param, void *exit_func, uint32_t stack_size, page_directory_t *task_page_dir){
+ktask_t *k_create_kernel_task ( void *start_func, void *param, void *exit_func, uint32_t stack_size, page_directory_t *task_page_dir){
 
    //Create a thread descriptor
    ktask_t *new_task = k_malloc( kernel_heap, sizeof(ktask_t), 0 );

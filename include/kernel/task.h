@@ -28,7 +28,7 @@ typedef struct ktask{
 
 //Initilize a task descriptor. Currently, it passes most of the
 //work to create_thread_context
-ktask_t *k_create_task(void *start_function,
+ktask_t *k_create_kernel_task(void *start_function,
    void *params, void *exit_function, uint32_t stack_size,page_directory_t*);
 
 ktask_t *k_create_userland_task(void *start_function,

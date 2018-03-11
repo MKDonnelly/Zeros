@@ -58,9 +58,10 @@ void *rr_join_task(ktask_t *descriptor){
    return task_to_join->return_value;
 }
 
-/*//Fork the calling task
+//Fork the calling task
+/*
 void scheduler_fork(){
-   ktask_t *forked_task = k_malloc( kernel_heap, sizeof(ktask_t), 0, 0 );
+   ktask_t *forked_task = k_malloc( kernel_heap, sizeof(ktask_t), 0 );
    forked_task->context = current_task->context;
    forked_task->stack_ptr = current_task->stack_ptr;
    forked_task->task_page_directory = clone_dir( current_task->task_page_directory );
@@ -78,7 +79,7 @@ void idle_task(){
 void rr_init_scheduler(){
 
    //Add idle task
-   add_node_ll( (void**)&task_list, k_create_task(idle_task, NULL, NULL, 1024, kernel_page_dir), 0 );
+   add_node_ll( (void**)&task_list, k_create_kernel_task(idle_task, NULL, NULL, 1024, kernel_page_dir), 0 );
    task_count++;   
    
    current_task = get_node_ll( (void**)&task_list, 0 );
@@ -97,7 +98,7 @@ thread_context_t *rr_schedule(thread_context_t *interrupted_task){
    //Switch page dir if needed
    if( current_task->task_page_directory != current_page_dir ){
       current_page_dir = current_task->task_page_directory;
-      load_page_dir( current_page_dir );
+      load_page_dir_asm( current_page_dir );
    }
 
    return current_task->context;

@@ -23,6 +23,9 @@
 #include <fs/fs.h>
 #include <fs/initrd/initrd.h>
 
+#include <staging/syscall.h>
+
+
 void thread1(){
    int t1count = 0;
    while(1){
@@ -41,6 +44,7 @@ void thread2(){
 
 void thread3(){
    int t3count = 0;
+   task_yield();
    while(1){
       k_printf_at("3", t3count++, 2);
       for(int i = 0; i < 50000000; i++);
@@ -113,7 +117,7 @@ void main_kernel_thread(){
 
    k_printf("In main kernel thread\n");
 
-   ktask_t *new_thread = k_create_task( test_function, (void*)20, task_exit, 0x1000, kernel_page_dir );
+   ktask_t *new_thread = k_create_kernel_task( test_function, (void*)20, task_exit, 0x1000, kernel_page_dir );
    k_add_task( new_thread );
 
    void *val = k_join_task( new_thread );
@@ -123,7 +127,6 @@ void main_kernel_thread(){
    k_exit_task( (void*)0 );
 }
 
-#include <staging/syscall.h>
 
 
 void kmain(struct multiboot_info *multiboot_info){
@@ -160,20 +163,19 @@ void kmain(struct multiboot_info *multiboot_info){
   copy_to_physical( userland_copy, first->length, userland_prog );
 
   page_directory_t *userland_dir = clone_page_dir( kernel_page_dir );
-  identity_map_page( userland_prog, userland_dir );
-  identity_map_page( userland_stack, userland_dir );
-//  page_map( get_page(userland_prog, 1, userland_dir), 1, 1, userland_prog);
-//  page_map( get_page(userland_stack, 1, userland_dir), 1, 1, userland_stack);
+  map_page( userland_prog, userland_prog, userland_dir );
+  map_page( userland_stack, userland_stack, userland_dir );
 
   setup_scheduler( &rr_alg );
 
-  k_add_task( k_create_userland_task( (void*)userland_prog, NULL, NULL, 0x1000, userland_stack, userland_dir ) );
+  //k_add_task( k_create_userland_task( (void*)userland_prog, NULL, NULL, 0x1000, userland_stack, userland_dir ) );
+  k_add_task( k_create_kernel_task( main_kernel_thread, NULL, NULL, 0x1000 , kernel_page_dir) );
 
 
 //  k_add_task( k_create_task( thread1, NULL, NULL, 0x1000, kernel_page_dir) );  
 //  k_add_task( k_create_task( thread2, NULL, NULL, 0x1000, kernel_page_dir) );  
 
-  k_add_task( k_create_task( thread3, NULL, NULL, 0x1000, kernel_page_dir) );  
+  //k_add_task( k_create_task( thread3, NULL, NULL, 0x1000, kernel_page_dir) );  
 /*
   k_add_task( k_create_task( thread4, NULL, NULL, 0x1000, kernel_page_dir) );  
   k_add_task( k_create_task( thread5, NULL, NULL, 0x1000, kernel_page_dir) );

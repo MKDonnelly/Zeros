@@ -12,28 +12,38 @@ uint32_t total_frames;
 //frame addresses
 uint32_t first_frame_addr;
 
+
+//Given a frame address, deallocate it in the frames bitfield 
+void free_frame(uint32_t addr){
+    uint32_t index = (addr - first_frame_addr) / ARCH_FRAME_SIZE;
+
+    //Free the frame for use by clearing
+    //its allocated bit in *frames.
+    bit_clear( frames, index );
+}
+
+//Specifically allocate a frame. Return -1 if
+//the frame is already allocated
+int8_t allocate_frame( uint32_t frame_addr ){
+   uint32_t index = (frame_addr - first_frame_addr) / ARCH_FRAME_SIZE;
+   if( bit_get( frames, index ) == 0 ){
+      bit_set( frames, index );
+      return 0;
+   }else{
+      return -1;
+   }
+}
+
 int get_frame_stat( uint32_t frame_addr ){
    uint32_t index = (frame_addr - first_frame_addr) / ARCH_FRAME_SIZE;
    return bit_get( frames, index );
 }
 
-//Specifically allocate a frame. Return -1 if
-//the frame is already allocated
-/*
-int allocate_frame( uint32_t frame_addr ){
-   if( bit_get( frames, frame_addr / ARCH_FRAME_SIZE ) == 0 ){
-      bit_set( frames, frame_addr / ARCH_FRAME_SIZE );
-      return 0;
-   }else{
-      return -1;
-   }
-}*/
-
 
 //Loop over *frames to find the first unset bit,
-//which will indicate a free frame. Return -1
+//which will indicate a free frame. Returns 0
 //if no frames are present. This returns the address
-//of the frame.
+//of the frame if successful.
 uint32_t first_free_frame(){
 
    //Loop over each bit in frames
@@ -47,13 +57,6 @@ uint32_t first_free_frame(){
    //No free frames!
    return 0;
 }
-
-//Given a frame address, deallocate it in the frames bitfield 
-/*void free_frame(uint32_t addr){
-    //Free the frame for use by clearing
-    //its allocated bit in *frames.
-    bit_clear( frames, addr / ARCH_FRAME_SIZE );
-}*/
 
 //Caller specifies the starting address and length
 //in frames to manager
@@ -70,7 +73,7 @@ void init_frames(uint32_t start_addr, uint32_t frames_len){
    int frames_length = (total_frames / 8) + 1;
 
    //Allocate memory for the bitfield
-   frames = (char*)k_malloc(kernel_heap, frames_length, 0);
+   frames = k_malloc(kernel_heap, frames_length, 0);
 
    //Zero out the frames bitfield
    memset( frames, frames_length, 0 );

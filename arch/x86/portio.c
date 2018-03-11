@@ -1,5 +1,7 @@
 #include <arch/x86/portio.h>
 
+//TODO convert to pure assembly
+
 int8_t portb_read(uint16_t port) {
 
    //"=a" (result) means put AL register in variable result when done

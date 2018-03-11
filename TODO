@@ -27,19 +27,21 @@ Multitasking
    Create a separate area for allocating thread stack
       space. Place a guard page at the end of each so that
       a page fault ocurrs if one exceeds its stack size
+   SMP
    Work on threading code
       improve scheduler (queues, priority, different algs)
       create thread synchronization constructs, messages
          use xchg to implement mutexes
       make sure core functions (kmalloc, scheduling) cannot
          be interrupted and corrupted using either cli/sti or locks
+   program execution
+      create symbol table for dynamic linker
+      elf file parser
 
 printing/screen manipulation:
   Implement a frame buffer in 3h mode
      Add function to scroll.c to scroll both ways
   Abstract printf from out of the arch code
-  Use vfs to have printf operate through screen and serial
-     the same
   Better utilize vga colors in 3h mode
       (see https://github.com/JonathanSalwan/Kaminou-Kernel/blob/master/kernel/includes/sys/video.h)
      Allow arrow keys to scroll through buffer 
@@ -55,6 +57,7 @@ printing/screen manipulation:
      sequences dictate cursor position, color, etc
   use hwinfo --framebuffer to see and program video modes
     also use grub gfx directive to boot into a higher video mode
+  make routines for 1024x768 graphics mode (set by multiboot header)
 
 utils
    Create a basic file editor by dumping a file into the
@@ -62,10 +65,6 @@ utils
    create simple games (pong, etc)
    create tar, cpio parser
  
-program execution
-   create symbol table for dynamic linker
-   elf file parser
-
 documentation/testing
    Unit tests for various subsystems
    Add a how-to to explain how each subsystem works

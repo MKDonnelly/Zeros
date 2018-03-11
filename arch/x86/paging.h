@@ -102,6 +102,7 @@ typedef struct page_directory page_directory_t;
 //is in effect.
 extern page_directory_t *current_directory;
 
+/////////////////Get information from paging structures
 
 //Given a virtual address and page directory, get the page table that
 //the address resides in.
@@ -113,14 +114,30 @@ page_desc_t *get_page_desc(uint32_t addr, page_table_t *table);
 
 //Given a page table descriptor, get the frame address from it.
 uint32_t get_frame(page_desc_t *page);
+//////////////////
+
+
+/////////////////Cloning page directory
+page_directory_t *clone_page_dir(page_directory_t*);
+
+//extern void copy_page_physical(uint32_t,uint32_t);
+page_directory_t *clone_dir(page_directory_t*);
+/////////////////
+
 
 //Given a virtual address and a page directory, find the physical
 //address that the virtual address maps to
 uint32_t virt_to_phys(uint32_t addr, page_directory_t *dir);
 
+
 //Loads the given page directory into CR3 for use. 
 void load_page_dir(page_directory_t*);
 
+//Given a buffer, length, and physical address, copy the
+//buffer to the physical address.
+void copy_to_physical(char*,int,uint32_t);
+
+void map_page(uint32_t vaddr, uint32_t paddr, page_directory_t *dir);
 
 //This will be visible to the kernel for use
 //Userland processes will start with a clone of
@@ -132,12 +149,3 @@ void init_paging();
 
 //Handles page interrupts
 void page_int_handler(registers_t);
-
-page_directory_t *clone_page_dir(page_directory_t*);
-
-//extern void copy_page_physical(uint32_t,uint32_t);
-page_directory_t *clone_dir(page_directory_t*);
-
-void copy_to_physical(char*,int,uint32_t);
-
-void map_page( uint32_t addr, page_directory_t *dir);

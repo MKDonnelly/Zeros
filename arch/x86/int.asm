@@ -50,6 +50,8 @@ interrupt_common:
    mov gs, ax
 
    ;Save the current context
+   ;TODO maybe pass this as an argument 
+   ;instead of having this magic variable
    mov [cur_context], esp
 
    call main_interrupt_handler 

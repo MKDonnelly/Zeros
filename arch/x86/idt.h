@@ -32,8 +32,8 @@ typedef struct{
 
 //The Interrupt descriptor table and 
 //interrupt descriptor
-idt_entry_t IDT_TABLE[ TOTAL_INTERRUPTS ];
-idt_descriptor_t IDT_DESCRIPTOR;
+idt_entry_t idt_table[ TOTAL_INTERRUPTS ];
+idt_descriptor_t idt_descriptor;
 
 //Given an interrupt number and a 
 //function handler, place it into
