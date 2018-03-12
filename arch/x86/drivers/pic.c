@@ -23,8 +23,8 @@ void remap_pic(){
   portb_write( SLAVE_PIC_DATA_P, PIC_ICW4_8086_MODE_C );
 
   //Mask all interrupts by setting every bit to 1
-  portb_write( MASTER_PIC_DATA_P, 0xff );
-  portb_write( SLAVE_PIC_DATA_P, 0xff );
+  portb_write( MASTER_PIC_DATA_P, 0x00 );
+  portb_write( SLAVE_PIC_DATA_P, 0x00 );
 }
 
 //When telling the PIC to enable/disable an IRQ, we must

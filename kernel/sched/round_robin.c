@@ -98,7 +98,7 @@ thread_context_t *rr_schedule(thread_context_t *interrupted_task){
    //Switch page dir if needed
    if( current_task->task_page_directory != current_page_dir ){
       current_page_dir = current_task->task_page_directory;
-      load_page_dir_asm( current_page_dir );
+      load_page_dir( current_page_dir );
    }
 
    return current_task->context;

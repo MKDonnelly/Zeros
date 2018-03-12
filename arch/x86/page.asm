@@ -24,8 +24,8 @@ arch_enable_paging:
 ; Used to load a page directory
 ; First argument is pointer to page
 ; table descriptors, page_directory_t*
-global load_page_dir_asm
-load_page_dir_asm:
+global load_page_dir
+load_page_dir:
    ;eax is all that is used
    push eax 
    

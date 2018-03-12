@@ -135,7 +135,7 @@ void init_paging(){
 
    //Let the processor know where our page table is
    //and enable paging.
-   load_page_dir_asm( kernel_page_dir );
+   load_page_dir( kernel_page_dir );
 }
 
 //Copies the contents of one page to another. Both are physical

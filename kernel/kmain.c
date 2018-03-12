@@ -24,6 +24,7 @@
 #include <fs/initrd/initrd.h>
 
 #include <staging/syscall.h>
+#include <arch/x86/drivers/mouse.h>
 
 
 void thread1(){
@@ -127,6 +128,20 @@ void main_kernel_thread(){
    k_exit_task( (void*)0 );
 }
 
+int y_offset = 0;
+int x_offset = 0;
+
+void m( mouse_packet_t p ){
+//   k_clear_screen();
+   //As we go down the screen, y increases.
+   //as we go up the screen, y decreases.
+   //But the delta_y is exactly the opposite:
+   //negative values go down and positive values
+   //go up, so negate delta_y.
+   y_offset += (-p.delta_y) / 2;
+   x_offset += p.delta_x / 2;
+   k_printf_at("*", x_offset, y_offset);
+}
 
 
 void kmain(struct multiboot_info *multiboot_info){
@@ -143,6 +158,11 @@ void kmain(struct multiboot_info *multiboot_info){
   //See heap.h for kernel_heap
   create_heap( &kernel_heap, 0x300000, 0x200000, blocklist_malloc, blocklist_free, blocklist_init_heap );
 
+
+  mouse_init();
+  register_mouse_handler( m );
+  arch_enable_ints();
+  /*
 
   init_syscalls();
   
@@ -176,7 +196,7 @@ void kmain(struct multiboot_info *multiboot_info){
 //  k_add_task( k_create_task( thread2, NULL, NULL, 0x1000, kernel_page_dir) );  
 
   //k_add_task( k_create_task( thread3, NULL, NULL, 0x1000, kernel_page_dir) );  
-/*
+
   k_add_task( k_create_task( thread4, NULL, NULL, 0x1000, kernel_page_dir) );  
   k_add_task( k_create_task( thread5, NULL, NULL, 0x1000, kernel_page_dir) );
   k_add_task( k_create_task( thread6, NULL, NULL, 0x1000, kernel_page_dir) );  
@@ -184,7 +204,7 @@ void kmain(struct multiboot_info *multiboot_info){
   k_add_task( k_create_task( thread8, NULL, NULL, 0x1000, kernel_page_dir) );  
   k_add_task( k_create_task( thread9, NULL, NULL, 0x1000, kernel_page_dir) );  
   k_add_task( k_create_task( threada, NULL, NULL, 0x1000, kernel_page_dir) );  
-  */
-  start_scheduler();
+  
+  start_scheduler();*/
   while(1);
 }

@@ -77,12 +77,10 @@ documentation/testing
    Create better print output (BUG,LOG,ASSERT,etc)
       and catch errors by using __FILE__ and __LINE__
       use assert more in code 
- 
 
 drivers
    APIC, HPET, ATA PIO mode, PCI, network card
-   basic ext2 filesystem
-   mouse, CMOS
+   basic ext2 filesystem, mouse, CMOS
  
 misc tasks 
    convert inline assembly to assembly-only file
@@ -94,7 +92,7 @@ misc tasks
    make as much as possible work through the VFS 
 
 low-priority
-   add in arch-specific bitwise operators
+   add in arch-specific bitwise operators, optimizations (AVX, SIMD, etc)
    write oneshot for timer callback code
    add random number generator, md5 sum function
    try to boot UEFI with grub-efi
