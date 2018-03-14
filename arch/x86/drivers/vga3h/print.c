@@ -34,6 +34,7 @@ char vga3h_color_array[] = {
 //Print a character to the screen. Automatically
 //keep track of which spaces have been used and move
 //the cursor forward
+//TODO have bounds checking
 void vga3h_putchar(char character){
 
    int colorToUse = vga3h_make_color( VGA3H_CUR_FG_COLOR,

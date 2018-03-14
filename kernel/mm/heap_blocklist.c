@@ -143,7 +143,6 @@ void blocklist_free(heap_t *heap_descriptor, void *memChunk){
          //set the allocated flag to 0.
          head->allocated = 0;
          found_mem = 1;
-         k_printf("Freed block at %x\n", (int)head->free_mem );
       }else{
          head = head->next_block;
       }

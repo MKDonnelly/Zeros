@@ -12,6 +12,7 @@ arch_stop_cpu:
 global arch_halt_cpu
 arch_halt_cpu:
    hlt
+   ret
 
 global arch_enable_ints
 arch_enable_ints:

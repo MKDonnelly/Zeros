@@ -28,7 +28,8 @@ void arch_create_kernel_context (thread_context_t **context,
         (*context)->cs = gdt_kernel_code;
         (*context)->ebp = (uint32_t)(*context);
         (*context)->esp = (*context)->ebp;
-        //(*context)->esp_pushed = (*context)->ebp;
+        (*context)->esp_pushed = (*context)->ebp;
+        (*context)->ss = (*context)->gs = (*context)->fs = (*context)->es = (*context)->ds = gdt_kernel_data;
 }
 
 

@@ -21,7 +21,3 @@ typedef struct tss tss_t;
 //TSS used for system
 tss_t tss_entry;
 
-//Assembly function to load the tss into the tr
-//register after it is in the gdt. In asm_functions.asm
-extern void load_tss(void);
-

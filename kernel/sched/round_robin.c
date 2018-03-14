@@ -1,13 +1,14 @@
 #include <kernel/sched/round_robin.h>
 
 struct sched_alg rr_alg = (struct sched_alg){
-   .add_task       =   rr_add_task,
-   .rm_task        =   rr_rm_task,
-   .exit_task      =   rr_exit_task,
-   .yield_task     =   rr_yield_task,
-   .join_task      =   rr_join_task,
-   .schedule       =   rr_schedule,
-   .init_scheduler =   rr_init_scheduler
+   .add_task        =   rr_add_task,
+   .rm_task         =   rr_rm_task,
+   .exit_task       =   rr_exit_task,
+   .yield_task      =   rr_yield_task,
+   .join_task       =   rr_join_task,
+   .schedule        =   rr_schedule,
+   .init_scheduler  =   rr_init_scheduler,
+   .start_scheduler =   rr_start_scheduler,
 };
 
 ktask_t *task_list = NULL;
@@ -72,18 +73,34 @@ void scheduler_fork(){
 }*/
 
 void idle_task(){
-   while(1) arch_halt_cpu();
+   arch_enable_ints();
+   //while(1) arch_halt_cpu();
+   while(1){
+      asm volatile("hlt");
+   }
 }
 
-//Never returns
+//Init scheduler just sets up the scheduler
+//so that kmain may add tasks to it. The actual
+//scheduling is not done until rr_start_scheduler
+//is called.
 void rr_init_scheduler(){
-
    //Add idle task
-   add_node_ll( (void**)&task_list, k_create_kernel_task(idle_task, NULL, NULL, 1024, kernel_page_dir), 0 );
+   ktask_t *idle = k_create_kernel_task(idle_task, NULL, NULL, 1024, kernel_page_dir);
+   add_node_ll( (void**)&task_list, idle, 0 );
    task_count++;   
-   
+}   
+
+//Start the scheduler by jumping to the first task (idle)
+//We take the approach that after jumping into idle, the timer
+//interrupt will be called and the context will be saved. This
+//simplifies a more complicated init system for getting the first
+//task going.
+void rr_start_scheduler(){
+   //Index 0 is for the idle thread
    current_task = get_node_ll( (void**)&task_list, 0 );
-   arch_jump_to_thread( current_task->context );
+   load_page_dir( current_task->task_page_directory );
+   idle_task();
 }
 
 //The main scheduler. Routinely called to manage tasks

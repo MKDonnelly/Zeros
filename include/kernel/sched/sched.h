@@ -21,7 +21,15 @@ struct sched_alg{
 
    //Main routine run when scheduling
    thread_context_t *(*schedule)();
+
+   //init_scheduler sets up the scheduler 
+   //so that tasks may be added before the 
+   //actual scheduling happens.
    void (*init_scheduler)();
+
+   //When this is called, the scheduler is
+   //started and tasks begin executing
+   void (*start_scheduler)();
 };
 
 
@@ -40,7 +48,8 @@ struct sched_alg *current_sched_alg;
 #define k_yield_task()          current_sched_alg->yield_task()
 #define k_join_task( ktask )  current_sched_alg->join_task( ktask )
 #define k_init_scheduler()      current_sched_alg->init_scheduler()
+#define k_start_scheduler()     current_sched_alg->start_scheduler()
 
 //Initilize the scheduler system
-void setup_scheduler();
+void init_scheduler();
 void start_scheduler();

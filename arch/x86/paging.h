@@ -129,7 +129,6 @@ page_directory_t *clone_dir(page_directory_t*);
 //address that the virtual address maps to
 uint32_t virt_to_phys(uint32_t addr, page_directory_t *dir);
 
-
 //Loads the given page directory into CR3 for use. 
 void load_page_dir(page_directory_t*);
 
@@ -149,3 +148,8 @@ void init_paging();
 
 //Handles page interrupts
 void page_int_handler(registers_t);
+
+//Defined in page.asm
+void arch_disable_paging();
+void arch_enable_paging();
+void load_page_dir(page_directory_t*);

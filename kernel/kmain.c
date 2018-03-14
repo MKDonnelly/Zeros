@@ -108,26 +108,6 @@ void threada(){
    }
 }
 
-void test_function(void *arg){
-   k_printf("In test function with %d!\n", (int)arg);
-   k_exit_task( (void*)99 );
-}
-
-
-void main_kernel_thread(){
-
-   k_printf("In main kernel thread\n");
-
-   ktask_t *new_thread = k_create_kernel_task( test_function, (void*)20, task_exit, 0x1000, kernel_page_dir );
-   k_add_task( new_thread );
-
-   void *val = k_join_task( new_thread );
-
-   k_printf("Thread joined with %d\n", (int)val);
-
-   k_exit_task( (void*)0 );
-}
-
 int y_offset = 0;
 int x_offset = 0;
 
@@ -142,6 +122,68 @@ void m( mouse_packet_t p ){
    x_offset += p.delta_x / 2;
    k_printf_at("*", x_offset, y_offset);
 }
+
+uint16_t start_state = 0xACF1;
+uint16_t lfsr = 0xACF1;
+uint16_t bit;
+int period = 0;
+
+int random(){
+   bit = ((lfsr >> 0) ^ (lfsr >> 2) ^ (lfsr >> 3) ^ (lfsr >> 5)) & 1;
+   lfsr = (lfsr >> 1) | (bit << 15);
+   ++period;
+   return lfsr;
+}
+
+
+long long int global = 0;
+
+int f1_ready = 0;
+int f2_ready = 0;
+
+void f1(){
+   f1_ready = 1;
+   while( ! (f1_ready && f2_ready ) );
+   for(int i = 0; i < 100000000; i++){
+//      char *ptr = k_malloc( kernel_heap, 100, 0 );
+      long long int a = global;
+      a++;
+      global = a;
+//      k_free( kernel_heap, ptr );
+   }
+   k_exit_task((void*)0);
+}
+
+void f2(){
+   f2_ready = 1;
+   while( !( f1_ready && f2_ready));
+   for(int i = 0; i < 100000000; i++){
+//      char *ptr = k_malloc( kernel_heap, 200, 0 );
+      global++;
+//      k_free( kernel_heap, ptr );
+   }
+   k_exit_task((void*)0);
+}
+
+
+void main_kernel_thread(){
+
+  k_printf("HERE!\n");
+
+//  ktask_t *t1 = k_create_kernel_task( f1, NULL, NULL, 0x1000, kernel_page_dir);
+//  ktask_t *t2 = k_create_kernel_task( f2, NULL, NULL, 0x1000, kernel_page_dir);
+
+//  k_add_task( t1 );
+//  k_add_task( t2 );
+
+//  k_join_task( t1 );
+//  k_join_task( t2 );
+
+  k_printf("Value is %d\n", global);
+
+  k_exit_task((void*)0);
+}
+
 
 
 void kmain(struct multiboot_info *multiboot_info){
@@ -159,11 +201,10 @@ void kmain(struct multiboot_info *multiboot_info){
   create_heap( &kernel_heap, 0x300000, 0x200000, blocklist_malloc, blocklist_free, blocklist_init_heap );
 
 
-  mouse_init();
-  register_mouse_handler( m );
-  arch_enable_ints();
-  /*
-
+  //mouse_init();
+  //register_mouse_handler( m );
+  //arch_enable_ints();
+  
   init_syscalls();
   
   uint32_t userland_prog = 0x600000;
@@ -175,7 +216,7 @@ void kmain(struct multiboot_info *multiboot_info){
   fs_root = init_initrd( ((struct module*)multiboot_info->mods)->start );
   fs_node_t *first = fs_root->readdir( fs_root, 0 );
 
-  k_printf("%s: %d, %x\n", first->name, first->length, userland_copy);
+  //k_printf("%s: %d, %x\n", first->name, first->length, userland_copy);
   first->read( first, 0, first->length, userland_copy );
 
   init_paging();  
@@ -186,25 +227,26 @@ void kmain(struct multiboot_info *multiboot_info){
   map_page( userland_prog, userland_prog, userland_dir );
   map_page( userland_stack, userland_stack, userland_dir );
 
-  setup_scheduler( &rr_alg );
+  init_scheduler( &rr_alg );
 
   //k_add_task( k_create_userland_task( (void*)userland_prog, NULL, NULL, 0x1000, userland_stack, userland_dir ) );
   k_add_task( k_create_kernel_task( main_kernel_thread, NULL, NULL, 0x1000 , kernel_page_dir) );
 
 
-//  k_add_task( k_create_task( thread1, NULL, NULL, 0x1000, kernel_page_dir) );  
-//  k_add_task( k_create_task( thread2, NULL, NULL, 0x1000, kernel_page_dir) );  
+/*
+  k_add_task( k_create_kernel_task( thread1, NULL, NULL, 0x1000, kernel_page_dir) );  
+  k_add_task( k_create_kernel_task( thread2, NULL, NULL, 0x1000, kernel_page_dir) );  
 
-  //k_add_task( k_create_task( thread3, NULL, NULL, 0x1000, kernel_page_dir) );  
+  k_add_task( k_create_kernel_task( thread3, NULL, NULL, 0x1000, kernel_page_dir) );  
 
-  k_add_task( k_create_task( thread4, NULL, NULL, 0x1000, kernel_page_dir) );  
-  k_add_task( k_create_task( thread5, NULL, NULL, 0x1000, kernel_page_dir) );
-  k_add_task( k_create_task( thread6, NULL, NULL, 0x1000, kernel_page_dir) );  
-  k_add_task( k_create_task( thread7, NULL, NULL, 0x1000, kernel_page_dir) );  
-  k_add_task( k_create_task( thread8, NULL, NULL, 0x1000, kernel_page_dir) );  
-  k_add_task( k_create_task( thread9, NULL, NULL, 0x1000, kernel_page_dir) );  
-  k_add_task( k_create_task( threada, NULL, NULL, 0x1000, kernel_page_dir) );  
-  
-  start_scheduler();*/
-  while(1);
+  k_add_task( k_create_kernel_task( thread4, NULL, NULL, 0x1000, kernel_page_dir) );  
+  k_add_task( k_create_kernel_task( thread5, NULL, NULL, 0x1000, kernel_page_dir) );
+  k_add_task( k_create_kernel_task( thread6, NULL, NULL, 0x1000, kernel_page_dir) );  
+  k_add_task( k_create_kernel_task( thread7, NULL, NULL, 0x1000, kernel_page_dir) );  
+  k_add_task( k_create_kernel_task( thread8, NULL, NULL, 0x1000, kernel_page_dir) );  
+  k_add_task( k_create_kernel_task( thread9, NULL, NULL, 0x1000, kernel_page_dir) );  
+  k_add_task( k_create_kernel_task( threada, NULL, NULL, 0x1000, kernel_page_dir) );  
+ */ 
+  start_scheduler();
+  while(1) arch_halt_cpu();
 }

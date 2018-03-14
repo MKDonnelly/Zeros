@@ -268,6 +268,6 @@ void copy_to_physical(char *buf, int amount, uint32_t addr){
 
    //Re-enable paging
    arch_enable_paging();
-   arch_enable_ints();
+   //arch_enable_ints();
 }
 

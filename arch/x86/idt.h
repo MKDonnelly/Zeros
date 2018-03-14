@@ -35,6 +35,9 @@ typedef struct{
 idt_entry_t idt_table[ TOTAL_INTERRUPTS ];
 idt_descriptor_t idt_descriptor;
 
+//Defined in descriptors.asm
+void arch_load_idt(idt_descriptor_t*);
+
 //Given an interrupt number and a 
 //function handler, place it into
 //the IDT.

@@ -1,6 +1,8 @@
 #pragma once
 
 #include <lib/types.h>
+#include <lib/memory.h>
+#include <arch/x86/tss.h>
 
 void set_kernel_stack(uint32_t);
 
@@ -8,19 +10,6 @@ void set_kernel_stack(uint32_t);
 //data/code, TSS
 #define GDT_ENTRIES 6
 
-//Our specific GDT (initilized in init_gdt()
-//will be layed out with the code segment first
-//and the data segment second.
-extern const int8_t gdt_test;
-extern const int16_t gdt_kernel_code;
-extern const int16_t gdt_kernel_data;
-
-//Used to update the Segment Registers
-//when initilizing the GDT.
-extern void srupdate();
-
-//TODO improve the descriptions, make a function to do each
-//gdt entry, have flags named by bit
 struct gdt_entry{
    int16_t limit_low;    //Limit bits 0-15
    int16_t base_low;       //Base bits 0-15
@@ -60,18 +49,29 @@ struct gdt_entry{
    int8_t granularity : 1;
    int8_t lim_high : 4;
 
-   //int8_t  flags_lim_high; //2nd flags, limit bits 16-19
    int8_t  base_high;     //Base bits 24-31
 }__attribute__((packed));
+typedef struct gdt_entry gdt_entry_t;
 
 
 struct gdt_descriptor{
    uint16_t length;
    uint32_t *address;
 } __attribute__((packed));
+typedef struct gdt_descriptor gdt_descriptor_t;
 
-extern struct gdt_entry GDT[GDT_ENTRIES];
-extern struct gdt_descriptor GDT_DES;
+extern const int16_t gdt_kernel_code;
+extern const int16_t gdt_kernel_data;
+extern const int16_t gdt_userland_code;
+extern const int16_t gdt_userland_data;
+extern const int16_t gdt_userland_code_rpl;
+extern const int16_t gdt_userland_data_rpl;
+
+//Defined in descriptors.asm
+void load_tss();
+
+//Defined in descriptors.asm
+void load_gdt(gdt_descriptor_t*);
 
 //We will just automatically set
 //the GDT entries.

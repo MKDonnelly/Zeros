@@ -1,3 +1,21 @@
+Multitasking
+   Create a separate area for allocating thread stack
+      space. Place a guard page at the end of each so that
+      a page fault ocurrs if one exceeds its stack size
+   SMP
+   Work on threading code
+      improve scheduler (queues, priority, different algs)
+      create thread synchronization constructs, messages
+         use xchg to implement mutexes
+      make sure core functions (kmalloc, scheduling) cannot
+         be interrupted and corrupted using either cli/sti or locks
+      get a task exit without an explicit call to exit_task to work
+   program execution
+      create symbol table for dynamic linker
+      elf file parser
+
+enter long mode
+
 paging
    layout memory better
    use page faults better (i.e. map in page if a stack overflows,
@@ -23,20 +41,6 @@ initrd
    Add directory support to initrd and improve
       initrd code
 
-Multitasking
-   Create a separate area for allocating thread stack
-      space. Place a guard page at the end of each so that
-      a page fault ocurrs if one exceeds its stack size
-   SMP
-   Work on threading code
-      improve scheduler (queues, priority, different algs)
-      create thread synchronization constructs, messages
-         use xchg to implement mutexes
-      make sure core functions (kmalloc, scheduling) cannot
-         be interrupted and corrupted using either cli/sti or locks
-   program execution
-      create symbol table for dynamic linker
-      elf file parser
 
 printing/screen manipulation:
   Implement a frame buffer in 3h mode
@@ -77,6 +81,7 @@ documentation/testing
    Create better print output (BUG,LOG,ASSERT,etc)
       and catch errors by using __FILE__ and __LINE__
       use assert more in code 
+   Clean up all of the circular #includes
 
 drivers
    APIC, HPET, ATA PIO mode, PCI, network card

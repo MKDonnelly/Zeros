@@ -122,7 +122,7 @@ void mouse_init(){
 }
 
 //Pass null to unregister handler
-void register_mouse_handler( void (*new_handler)(mouse_packet_) ){
+void register_mouse_handler( void (*new_handler)(mouse_packet_t) ){
    mouse_handler = new_handler;
 }
 

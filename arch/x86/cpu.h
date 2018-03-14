@@ -5,6 +5,7 @@
 //when passed to the assembly.
 #define arch_trigger_interrupt(num) asm volatile("int %0" :: "i"(num));
 
+//Defined in cpu.asm
 void arch_stop_cpu();
 void arch_halt_cpu();
 void arch_enable_ints();
