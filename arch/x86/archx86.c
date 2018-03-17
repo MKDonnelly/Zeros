@@ -1,5 +1,7 @@
 #include <arch/x86/archx86.h>
 
+
+
 void arch_init_system(int video_mode){
 
    //Initilize descriptors

@@ -1,3 +1,5 @@
+Fix build system to be easier to extend
+
 Multitasking
    Create a separate area for allocating thread stack
       space. Place a guard page at the end of each so that

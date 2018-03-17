@@ -23,7 +23,6 @@ void syscall_handler(registers_t regs){
 
 
    void *location = syscalls[regs.eax];
-
    int ret;
    asm volatile("   \
       push %1;      \
@@ -37,6 +36,5 @@ void syscall_handler(registers_t regs){
       pop %%ebx;    \
       pop %%ebx;    \
       pop %%ebx;" : "=a" (ret) : "r" (regs.edi), "r"(regs.esi), "r"(regs.edx), "r"(regs.ecx), "r"(regs.ebx), "r"(location));
-
 }
 

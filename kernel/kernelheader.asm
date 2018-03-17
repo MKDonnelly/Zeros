@@ -1,4 +1,3 @@
-[extern kmain]
 
 ;Load boot modules on a page boundary
 PAGE_ALIGN    equ             1 << 0 
@@ -28,9 +27,29 @@ multiboot_header:
 
 KERNEL_STACK_START equ 0x300000
 
+[extern enter_long_mode]
+[extern kmain]
+
 arch_start:
     mov ebp, KERNEL_STACK_START
     mov esp, ebp
+
+    ;Pass multiboot header to kmain
+    ;mov [mb_temp], ebx
+
+    ;call enter_long_mode
+
+    ;mov ebx, [mb_temp]
+    ;push ebx
+    ;call kmain
+;    call setup_page_tables
+;    call enable_paging
+
+;    lgdt [gdt64.pointer]
+    ;jmp gdt64.code:long_mode_start
+
+;    mov dword [0xb8000], 0x2f4b2f4f
+;    hlt
 
     ;Make sure to pass the multiboot header
     ;AFTER setting the stack
@@ -41,3 +60,6 @@ stop:
     cli
     hlt
     jmp stop
+
+section .bss
+mb_temp: resb 8 

@@ -165,7 +165,6 @@ void f2(){
    k_exit_task((void*)0);
 }
 
-
 void main_kernel_thread(){
 
   k_printf("HERE!\n");
@@ -183,8 +182,6 @@ void main_kernel_thread(){
 
   k_exit_task((void*)0);
 }
-
-
 
 void kmain(struct multiboot_info *multiboot_info){
 
