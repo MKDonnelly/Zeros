@@ -1,8 +1,7 @@
 CPROGS := $(shell find . -name '*\.c')
 COUTPUT := $(CPROGS:.c=.o)
 
-
-fs_build: $(COUTPUT) 
+kernel_build: $(COUTPUT) 
 
 %.o: %.c
 	@-mkdir -p $(dir $(PREFIX)/$@)

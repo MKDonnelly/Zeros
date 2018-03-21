@@ -1,7 +1,7 @@
 #pragma once
 
 #include <arch/x86/drivers/vgacommon/vgacommon.h>
-#include <arch/x86/isr.h>
+#include <arch/x86/pmode/isr.h>
 #include <arch/x86/frame.h>
 
 #include <kernel/mm/heap.h>

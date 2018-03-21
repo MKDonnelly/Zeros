@@ -1,4 +1,4 @@
-#include <arch/x86/gdt.h>
+#include <arch/x86/pmode/gdt.h>
 
 //Our global descriptor table
 gdt_entry_t gdt_table[GDT_ENTRIES];

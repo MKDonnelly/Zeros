@@ -1,4 +1,4 @@
-#include <arch/x86/isr.h>
+#include <arch/x86/pmode/isr.h>
 
 //This function initilizes the
 //whole interrupt system. It creates

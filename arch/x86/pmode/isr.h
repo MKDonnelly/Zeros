@@ -1,6 +1,6 @@
 #pragma once
 
-#include <arch/x86/idt.h>
+#include <arch/x86/pmode/idt.h>
 #include <arch/x86/drivers/vgacommon/vgacommon.h>
 #include <arch/x86/drivers/pic.h>
 

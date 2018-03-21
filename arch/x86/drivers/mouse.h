@@ -3,7 +3,7 @@
 #include <lib/types.h>
 #include <arch/x86/portio.h>
 #include <arch/x86/drivers/vgacommon/vgacommon.h>
-#include <arch/x86/isr.h>
+#include <arch/x86/pmode/isr.h>
 
 #define MOUSE_ISR 12
 #define MOUSE_INTERRUPT 44

@@ -1,4 +1,4 @@
-#include <arch/x86/paging.h>
+#include <arch/x86/pmode/paging.h>
 
 extern void arch_enable_paging();
 

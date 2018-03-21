@@ -2,7 +2,7 @@
 
 #include <lib/types.h>
 #include <lib/memory.h>
-#include <arch/x86/tss.h>
+#include <arch/x86/pmode/tss.h>
 
 void set_kernel_stack(uint32_t);
 

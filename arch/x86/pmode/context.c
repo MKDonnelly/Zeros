@@ -1,4 +1,4 @@
-#include <arch/x86/context.h>
+#include <arch/x86/pmode/context.h>
 
 //A thread context is identical to the interrupt stack layout
 void arch_create_kernel_context (thread_context_t **context, 

@@ -1,40 +1,37 @@
 
-#Default target is x86
-ARCH ?= x86
+BUILDDIR = $(shell realpath ./build)
+ROOTDIR = $(shell realpath .)
+include arch/x86/x86_config.mk
 
-ARCH_CONFIG = arch/$(ARCH)/config.ini
+all: build_arch build_kernel build_fs build_lib build_staging link 
 
-include $(ARCH_CONFIG)
+link:
+	@echo $(shell find $(BUILDDIR) -name '*\.o' -and ! -name $(KERNEL_HEADER) ) > /dev/null
+	@echo $(shell find $(BUILDDIR) -name $(KERNEL_HEADER) ) > /dev/null
+	@ld $(LDFLAGS) -o $(BUILDDIR)/Zeros.elf $(shell find $(BUILDDIR) -name $(KERNEL_HEADER)) $(shell find $(BUILDDIR) -name '*\.o' -and ! -name $(KERNEL_HEADER))
+	
 
-KERNEL_NAME = $(OS_NAME).elf
-BINFILE = $(BUILDDIR)/$(KERNEL_NAME)
+build_arch:
+	@PREFIX=$(BUILDDIR)/arch/x86 make -C arch/x86 --no-print-directory 
 
-CFILES = $(shell find . -name '*\.c' -not -path "./tools/*")
-COUTPUT = $(CFILES:.c=.o)
-ASMFILES = $(shell find . -name '*\.asm' -not -path "./tools/*")
-ASMOUTPUT = $(ASMFILES:.asm=.o)
+build_kernel:
+	@PREFIX=$(BUILDDIR)/kernel/ make -C kernel/ --no-print-directory
 
-all: $(COUTPUT) $(ASMOUTPUT) link
+build_fs:
+	@PREFIX=$(BUILDDIR)/fs/ make -C fs/ --no-print-directory
 
-#NOTE: We make sure the asm files are first, since the multiboot
-#header needs to be at the head
-link: $(COUTPUT) $(ASMOUTPUT)
-	@ld -m elf_i386 -o $(BUILDDIR)/$(KERNEL_NAME) -T arch/$(ARCH)/link.ld $(addprefix $(BUILDDIR)/,$(ASMOUTPUT)) $(addprefix $(BUILDDIR)/,$(COUTPUT))
+build_lib:
+	@PREFIX=$(BUILDDIR)/lib/ make -C lib/ --no-print-directory
 
-%.o: %.asm
-	@-mkdir -p $(BUILDDIR)/$(dir $@)
-	@nasm -f elf32 -o $(BUILDDIR)/$@ $<
-
-.c.o: 
-	@-mkdir -p $(BUILDDIR)/$(dir $@)
-	@$(CC) $(CFLAGS) -c $< -o $(BUILDDIR)/$@
-
-clean:
-	@-\rm -Rf ./build/*
+build_staging:
+	@PREFIX=$(BUILDDIR)/staging/ make -C staging/ --no-print-directory
 
 run: all
 	@qemu-system-x86_64 -kernel build/Zeros.elf -append arg1 -initrd arch/x86/initrd &
 
 debug: all
-	@qemu-system-x86_64 -serial file:serial.log -kernel build/Zeros.elf  -append arg1 -initrd ./arch/x86/initrd -S -s &
+	@qemu-system-x86_64 -kernel build/Zeros.elf -append arg1 -initrd arch/x86/initrd -S -s &
 	@gdb -q -x .gdbdebug
+
+clean:
+	@\rm -Rf ./build/

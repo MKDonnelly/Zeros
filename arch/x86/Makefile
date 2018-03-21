@@ -1,13 +1,14 @@
+CPROGS = $(shell find . -name '*\.c' -not -path './lmode/*')
+COUTPUT = $(CPROGS:.c=.o)
+ASMPROGS = $(shell find . -name '*\.asm' -not -path './lmode/*')
+ASMOUTPUT  =$(ASMPROGS:.asm=.o)
 
-ARCH ?= x86
+arch_build: $(COUTPUT) $(ASMOUTPUT)
 
-CFLAGS = -fno-pie -m32 -ffreestanding -fno-stack-protector -nostdlib -nostdinc -fno-builtin -Wall -g -Iinclude/ -I.
+%.o: %.c
+	@-mkdir -p $(dir $(PREFIX)/$@)
+	@$(CC) $(CFLAGS) -c $< -o $(PREFIX)/$@
 
-ASMFILES = $(shell find . -name '*\.asm' )
-ASMOUTPUT = $(ASMFILES:.asm:.o)
-CFILES = $(shell find . -name '*\.c' )
-COUTPUT = $(CFILES:.c:.o)
-
-arch_all: $(ASMOUTPUT) $(COUTPUT)
-
-
+%.o: %.asm
+	@-mkdir -p $(dir $(PREFIX)/$@)
+	@nasm $(NASMFLAGS) -o $(PREFIX)/$@ $<

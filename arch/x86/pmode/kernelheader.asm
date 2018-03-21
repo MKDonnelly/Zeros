@@ -34,23 +34,6 @@ arch_start:
     mov ebp, KERNEL_STACK_START
     mov esp, ebp
 
-    ;Pass multiboot header to kmain
-    ;mov [mb_temp], ebx
-
-    ;call enter_long_mode
-
-    ;mov ebx, [mb_temp]
-    ;push ebx
-    ;call kmain
-;    call setup_page_tables
-;    call enable_paging
-
-;    lgdt [gdt64.pointer]
-    ;jmp gdt64.code:long_mode_start
-
-;    mov dword [0xb8000], 0x2f4b2f4f
-;    hlt
-
     ;Make sure to pass the multiboot header
     ;AFTER setting the stack
     push ebx 
@@ -60,6 +43,3 @@ stop:
     cli
     hlt
     jmp stop
-
-section .bss
-mb_temp: resb 8 

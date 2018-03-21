@@ -1,7 +1,7 @@
 [bits 32]
 
-global enter_long_mode
-enter_long_mode:
+global long_mode_jump
+long_mode_jump:
    call setup_page_tables
    call enable_paging
 
@@ -33,7 +33,7 @@ enable_paging:
 setup_page_tables:
    ;map first p4 entry to p3 table
    mov eax, p3_table
-   or eax, 0b11 ; present + rw
+   or eax, 0b11 
    mov [p4_table], eax
 
    ;map first p3 entry to p2 table
