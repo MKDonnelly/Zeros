@@ -42,8 +42,6 @@ ktask_t *k_create_userland_task ( void *start_func, void *param, void *exit_func
    ktask_t *new_task = k_malloc( kernel_heap, sizeof(ktask_t), 0 );
 
    //Allocate stack space for the thread
-   //WE MUST ALIGN THE THREAD STACK TO PAGE_SIZE OR ELSE THE
-   //THREADS WILL GET ASYMETRIC PROCESSING TIME DUE TO ALIGNMENT!
    void *stack = (void*)stack_addr;
 
    //Used to free the memory allocated 
@@ -68,26 +66,3 @@ ktask_t *k_create_userland_task ( void *start_func, void *param, void *exit_func
 
    return new_task;
 }
-
-
-
-
-
-//Called by a task to voluntarily
-//give up processor time. 
-void task_yield(){
-//   arch_trigger_interrupt( SCHEDULER_INTERRUPT );
-}
-
-
-//Called by a task when returning
-//Explicitly calling this will give the return
-//value. If this is implicitly called when the
-//task index (when k_create_task sets it up)
-//the return value will be undefined.
-void task_exit(void *retval){/*
-   current_thread->state = THREAD_EXIT;
-   current_thread->return_value = retval;
-   thread_yield();*/
-}
-

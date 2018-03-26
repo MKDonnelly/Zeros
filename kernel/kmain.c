@@ -45,7 +45,6 @@ void thread2(){
 
 void thread3(){
    int t3count = 0;
-   task_yield();
    while(1){
       k_printf_at("3", t3count++, 2);
       for(int i = 0; i < 50000000; i++);
@@ -135,53 +134,7 @@ int random(){
    return lfsr;
 }
 
-
-long long int global = 0;
-
-int f1_ready = 0;
-int f2_ready = 0;
-
-void f1(){
-   f1_ready = 1;
-   while( ! (f1_ready && f2_ready ) );
-   for(int i = 0; i < 100000000; i++){
-//      char *ptr = k_malloc( kernel_heap, 100, 0 );
-      long long int a = global;
-      a++;
-      global = a;
-//      k_free( kernel_heap, ptr );
-   }
-   k_exit_task((void*)0);
-}
-
-void f2(){
-   f2_ready = 1;
-   while( !( f1_ready && f2_ready));
-   for(int i = 0; i < 100000000; i++){
-//      char *ptr = k_malloc( kernel_heap, 200, 0 );
-      global++;
-//      k_free( kernel_heap, ptr );
-   }
-   k_exit_task((void*)0);
-}
-
-void main_kernel_thread(){
-
-  k_printf("HERE!\n");
-
-//  ktask_t *t1 = k_create_kernel_task( f1, NULL, NULL, 0x1000, kernel_page_dir);
-//  ktask_t *t2 = k_create_kernel_task( f2, NULL, NULL, 0x1000, kernel_page_dir);
-
-//  k_add_task( t1 );
-//  k_add_task( t2 );
-
-//  k_join_task( t1 );
-//  k_join_task( t2 );
-
-  k_printf("Value is %d\n", global);
-
-  k_exit_task((void*)0);
-}
+#include <lib/elf.h>
 
 void kmain(struct multiboot_info *multiboot_info){
 
@@ -213,21 +166,44 @@ void kmain(struct multiboot_info *multiboot_info){
   fs_root = init_initrd( ((struct module*)multiboot_info->mods)->start );
   fs_node_t *first = fs_root->readdir( fs_root, 0 );
 
-  //k_printf("%s: %d, %x\n", first->name, first->length, userland_copy);
   first->read( first, 0, first->length, userland_copy );
 
+  //elf file now in userland_copy
+  struct elf_header *elf_hdr = (struct elf_header*)userland_copy;
+  struct elf_prog_header *prog_hdr = (struct elf_prog_header*)(userland_copy + elf_hdr->e_phoff );
+  
+//  k_printf("%x %d\n", elf_hdr->e_entry, elf_hdr->e_ehsize);
+//  k_printf("%x\n", prog_hdr->p_vaddr);
+
   init_paging();  
-
-  copy_to_physical( userland_copy, first->length, userland_prog );
-
-  page_directory_t *userland_dir = clone_page_dir( kernel_page_dir );
-  map_page( userland_prog, userland_prog, userland_dir );
-  map_page( userland_stack, userland_stack, userland_dir );
-
   init_scheduler( &rr_alg );
 
+  page_directory_t *userland_dir = clone_page_dir( kernel_page_dir );
+  copy_to_physical( userland_copy, first->length, userland_prog );
+  map_page( prog_hdr->p_vaddr, userland_prog, userland_dir );
+  map_page( userland_stack, userland_stack, userland_dir );
+  k_add_task( k_create_userland_task( (void*)elf_hdr->e_entry, NULL, NULL, 0x1000, userland_stack, userland_dir ) );
+/*
+  for(int i = 0; i < elf_hdr->e_phnum; i++){
+    prog_hdr = (struct elf_prog_hreader*)(userland_copy + elf_hdr->e_phoff + i * elf_hdr->e_phentsize);
+    copy_to_physical( userland_copy + prog_hdr->p_offset, 
+                      prog_hdr->p_filesize,
+                      userland_prog );
+    k_printf("%x %x %d\n", prog_hdr->p_vaddr, userland_copy + prog_hdr->p_offset, prog_hdr->p_filesize);
+  }
+ 
+  //copy_to_physical( userland_copy, first->length, userland_prog );
+*/
+//  page_directory_t *userland_dir = clone_page_dir( kernel_page_dir );
+//  map_page( elf_, userland_prog, userland_dir );
+//  map_page( userland_stack, userland_stack, userland_dir );
+  //map_page( userland_prog, userland_prog, userland_dir );
+  //map_page( userland_stack, userland_stack, userland_dir );
+
+  //init_scheduler( &rr_alg );
+
   //k_add_task( k_create_userland_task( (void*)userland_prog, NULL, NULL, 0x1000, userland_stack, userland_dir ) );
-  k_add_task( k_create_kernel_task( main_kernel_thread, NULL, NULL, 0x1000 , kernel_page_dir) );
+  //k_add_task( k_create_kernel_task( main_kernel_thread, NULL, NULL, 0x1000 , kernel_page_dir) );
 
 
 /*
