@@ -13,7 +13,6 @@ Multitasking
    program execution
       create symbol table for dynamic linker
       elf file parser
-   use syscall/leave instead of interrupt
 
 paging
    layout memory better
@@ -24,9 +23,8 @@ paging
 
 userland
    create system call interface
-   when doing multitasking with userland, multiple system calls
-     could be in play. To prevent the stacks from clashing, each
-     userland process needs its own kernel land stack (int tss.esp_ring0)
+   move some drivers to userland
+   use syscall/sysret instead of interrupt
 
 dynamic memory
    Stress-test kmalloc
@@ -37,37 +35,20 @@ dynamic memory
  
 initrd
    Add in cpio or tar support
-   Add directory support to initrd and improve
-      initrd code
-
+   Add directory support to initrd and improve code
 
 printing/screen manipulation:
-  Implement a frame buffer in 3h mode
-     Add function to scroll.c to scroll both ways
-  Abstract printf from out of the arch code
-  Better utilize vga colors in 3h mode
-      (see https://github.com/JonathanSalwan/Kaminou-Kernel/blob/master/kernel/includes/sys/video.h)
-     Allow arrow keys to scroll through buffer 
+  Double buffering
+  Add escape sequences for vga colors in 3h mode
   Work on VGA 13h mode driver
      Implement basic shape drawing
      Later on, implement a frame buffer
   Get a dump of the vga font and create custom font 
-  Add more vga register modes (have grub boot into various
-      modes and record the register values. we can boot from
-      a usb drive so grub is actually run and not emulated
-      by qemu)
-  Unify all of the screen operations into printf and have escape 
-     sequences dictate cursor position, color, etc
+  Add more vga register modes (get higher res dumps using qemu)
   use hwinfo --framebuffer to see and program video modes
     also use grub gfx directive to boot into a higher video mode
   make routines for 1024x768 graphics mode (set by multiboot header)
 
-utils
-   Create a basic file editor by dumping a file into the
-      frame buffer and copying it back once done.
-   create simple games (pong, etc)
-   create tar, cpio parser
- 
 documentation/testing
    Unit tests for various subsystems
    Add a how-to to explain how each subsystem works
@@ -87,7 +68,6 @@ drivers
    basic ext2 filesystem, CMOS
  
 misc tasks 
-   convert inline assembly to assembly-only file
    use a cross compiler
    Create /dev virtual directory
    Get proper release/press code working with keyboard
@@ -96,13 +76,13 @@ misc tasks
    make as much as possible work through the VFS 
    port zeros to xen
    make BGA driver
-   setup and use SSE
+   add in arch-specific bitwise operators, optimizations (AVX, SIMD, etc)
+   port over a c library (newlib, uClib, or something else small)
 
 advanced os examples:
    dragonfly bsd, minix, plan9, genode, haiku, helenos, redox
 
 low-priority
-   add in arch-specific bitwise operators, optimizations (AVX, SIMD, etc)
    write oneshot for timer callback code
    add random number generator, md5 sum function
    try to boot UEFI with grub-efi

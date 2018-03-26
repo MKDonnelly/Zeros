@@ -29,7 +29,7 @@
 #define PIC_MASTER_START 0x20
 #define PIC_MASTER_END   0x27
 #define PIC_SLAVE_START  0x28
-#define PIC_SLAVE_END    0x35
+#define PIC_SLAVE_END    0x30
 
 //Remap the PIC to non-handware
 //interrupt numbers

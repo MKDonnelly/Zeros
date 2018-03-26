@@ -8,7 +8,7 @@ void add_idt_entry( uint8_t intNumber, uint32_t handlerFunction) {
    idt_table[intNumber].zeroed = 0;
 
    //This is a hack for system call interrupt
-   if( intNumber == 0x50 )
+   if( intNumber == 0x31 )
       idt_table[intNumber].flags = 0b11101110;
    else
       idt_table[intNumber].flags = 0x8E; //1 00 0 1110, see idt.h

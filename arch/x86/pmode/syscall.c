@@ -1,28 +1,26 @@
 #include "syscall.h"
 
-SYSCALL1(putchar, 0, char);
-SYSCALL1(exit, 1, void*);
-
 static void syscall_handler(registers_t regs);
 
-static void *syscalls[] = { k_putchar, rr_exit_task };
+static void *syscall_table[TOTAL_SYSCALLS];
 
 void init_syscalls(){
 
-   //Reserve space for systemcall stack
-   char *syscall_stack = k_malloc( kernel_heap, 0x1000, 0 );
-   set_kernel_stack( (uint32_t)syscall_stack );
-
-   arch_register_interrupt(0x50, syscall_handler );
+   arch_register_interrupt(SYSCALL_INT, syscall_handler );
 }
+
+void register_syscall( void (*syscall)(), int syscall_number ){
+   if( syscall_number >= 0 && syscall_number < TOTAL_SYSCALLS )
+      syscall_table[syscall_number] = syscall;
+}
+
 
 void syscall_handler(registers_t regs){
 
-   if( regs.eax != 0 && regs.eax != 1)
-       return;
+   if( regs.eax < 0 || regs.eax > TOTAL_SYSCALLS )
+      return;
 
-
-   void *location = syscalls[regs.eax];
+   void *location = syscall_table[regs.eax];
    int ret;
    asm volatile("   \
       push %1;      \

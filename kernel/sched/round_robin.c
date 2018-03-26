@@ -19,6 +19,7 @@ int current_task_index = 0;
 
 int task_count = 0;
 
+
 void rr_add_task( ktask_t *new_task){
    add_node_ll( (void**)&task_list, new_task, task_count++);
 }
@@ -117,6 +118,10 @@ thread_context_t *rr_schedule(thread_context_t *interrupted_task){
       current_page_dir = current_task->task_page_directory;
       load_page_dir( current_page_dir );
    }
+
+   //Switch interrupt stack if needed
+   if( ! current_task->is_kernel_task )
+      set_kernel_stack( (uint32_t)current_task->interrupt_stack + 0x1000 );
 
    return current_task->context;
 }

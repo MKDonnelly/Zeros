@@ -23,7 +23,7 @@
 #include <fs/fs.h>
 #include <fs/initrd/initrd.h>
 
-#include <staging/syscall.h>
+#include <arch/x86/pmode/syscall.h>
 #include <arch/x86/drivers/mouse.h>
 
 
@@ -156,6 +156,7 @@ void kmain(struct multiboot_info *multiboot_info){
   //arch_enable_ints();
   
   init_syscalls();
+  register_syscall( k_putchar, 0 );
   
   uint32_t userland_prog = 0x600000;
   uint32_t userland_stack = 0x610000;
@@ -172,9 +173,6 @@ void kmain(struct multiboot_info *multiboot_info){
   struct elf_header *elf_hdr = (struct elf_header*)userland_copy;
   struct elf_prog_header *prog_hdr = (struct elf_prog_header*)(userland_copy + elf_hdr->e_phoff );
   
-//  k_printf("%x %d\n", elf_hdr->e_entry, elf_hdr->e_ehsize);
-//  k_printf("%x\n", prog_hdr->p_vaddr);
-
   init_paging();  
   init_scheduler( &rr_alg );
 
@@ -202,14 +200,12 @@ void kmain(struct multiboot_info *multiboot_info){
 
   //init_scheduler( &rr_alg );
 
-  //k_add_task( k_create_userland_task( (void*)userland_prog, NULL, NULL, 0x1000, userland_stack, userland_dir ) );
+ // k_add_task( k_create_userland_task( (void*)userland_prog, NULL, NULL, 0x1000, userland_stack, userland_dir ) );
   //k_add_task( k_create_kernel_task( main_kernel_thread, NULL, NULL, 0x1000 , kernel_page_dir) );
-
 
 /*
   k_add_task( k_create_kernel_task( thread1, NULL, NULL, 0x1000, kernel_page_dir) );  
   k_add_task( k_create_kernel_task( thread2, NULL, NULL, 0x1000, kernel_page_dir) );  
-
   k_add_task( k_create_kernel_task( thread3, NULL, NULL, 0x1000, kernel_page_dir) );  
 
   k_add_task( k_create_kernel_task( thread4, NULL, NULL, 0x1000, kernel_page_dir) );  
@@ -219,7 +215,7 @@ void kmain(struct multiboot_info *multiboot_info){
   k_add_task( k_create_kernel_task( thread8, NULL, NULL, 0x1000, kernel_page_dir) );  
   k_add_task( k_create_kernel_task( thread9, NULL, NULL, 0x1000, kernel_page_dir) );  
   k_add_task( k_create_kernel_task( threada, NULL, NULL, 0x1000, kernel_page_dir) );  
- */ 
+*/  
   start_scheduler();
   while(1) arch_halt_cpu();
 }

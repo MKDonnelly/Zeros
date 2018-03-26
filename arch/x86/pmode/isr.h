@@ -27,6 +27,9 @@ extern void init_idt();
 typedef struct{
    uint32_t gs, fs, es, ds;
 
+   //TODO rename esp as useless_value_of_esp_never_use since
+   //     this is the esp value in the interrupt code. The only
+   //     good value of esp we have is esp_pushed.
    uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax;
 
    //int_number and error are 8 bit numbers, but the

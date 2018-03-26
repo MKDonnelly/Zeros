@@ -16,6 +16,8 @@ typedef struct ktask{
    //Pointer to stack with context
    thread_context_t *context;
    void *stack_ptr; //For freeing dynamic memory
+   void *interrupt_stack; //Stack when interrupted. Only for
+                          //userland tasks
 
    page_directory_t *task_page_directory;
 
@@ -23,7 +25,7 @@ typedef struct ktask{
    void *return_value;
    int task_id;
    int priority;
-
+   uint8_t is_kernel_task;
 } ktask_t;
 
 //Initilize a task descriptor. Currently, it passes most of the

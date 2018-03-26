@@ -26,9 +26,8 @@ void arch_create_kernel_context (thread_context_t **context,
         (*context)->eip = (uint32_t)func;
         (*context)->eflags = INITIAL_EFLAGS;
         (*context)->cs = gdt_kernel_code;
-        (*context)->ebp = (uint32_t)(*context);
-        (*context)->esp = (*context)->ebp;
-        (*context)->esp_pushed = (*context)->ebp;
+        (*context)->ebp = (*context)->esp = 
+           (*context)->esp_pushed = (uint32_t)(*context);
         (*context)->ss = (*context)->gs = (*context)->fs = (*context)->es = (*context)->ds = gdt_kernel_data;
 }
 
@@ -56,11 +55,17 @@ void arch_create_userland_context(thread_context_t **context,
         // Initilize the thread context by setting the function
         // to call and the initial eflags value
         (*context)->eip = (uint32_t)func;
+        //See gdt.c/h for what this value is for
         (*context)->cs = 0x1B;
+        (*context)->ss  = 0x23;
+        (*context)->eflags = INITIAL_EFLAGS;
+        (*context)->ebp = (*context)->esp =
+           (*context)->esp_pushed = (uint32_t)(*context);
+
+/*
         (*context)->ebp = (uint32_t)(*context);
         (*context)->esp = (*context)->ebp;
         (*context)->eflags = INITIAL_EFLAGS;
-        (*context)->esp_pushed = (*context)->ebp;
-        (*context)->ss  = 0x23;
+        (*context)->esp_pushed = (*context)->ebp;*/
 }
 

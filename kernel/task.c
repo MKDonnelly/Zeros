@@ -23,7 +23,7 @@ ktask_t *k_create_kernel_task ( void *start_func, void *param, void *exit_func, 
    arch_create_kernel_context( &(new_task->context), start_func, param,
                                 exit_func, stack, stack_size );
 
-   //Add in page structure
+   //Add in page directory 
    new_task->task_page_directory = task_page_dir;
 
    // Null the exit status
@@ -32,6 +32,7 @@ ktask_t *k_create_kernel_task ( void *start_func, void *param, void *exit_func, 
 
    //Add a unique task id
    new_task->task_id = next_task_id++;
+   new_task->is_kernel_task = 1;
 
    return new_task;
 }
@@ -43,6 +44,10 @@ ktask_t *k_create_userland_task ( void *start_func, void *param, void *exit_func
 
    //Allocate stack space for the thread
    void *stack = (void*)stack_addr;
+
+   //Allocate stack space for the interrupt stack
+   void *interrupt_stack = k_malloc( kernel_heap, 0x1000, 0 );
+   new_task->interrupt_stack = interrupt_stack;
 
    //Used to free the memory allocated 
    new_task->stack_ptr = (void*)stack_addr;
@@ -63,6 +68,7 @@ ktask_t *k_create_userland_task ( void *start_func, void *param, void *exit_func
 
    //Add a unique task id
    new_task->task_id = next_task_id++;
+   new_task->is_kernel_task = 0;
 
    return new_task;
 }
