@@ -37,6 +37,8 @@
 //the offset within the page table.
 #define offset_in_pt(addr) ((addr >> 12) & 0x3ff)
 
+//TODO Revise naming of structures to be consistent 
+//     with intel/AMD manuals
 
 //This represents an individual page<->frame allocation.
 struct page_descriptor{

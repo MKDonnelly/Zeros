@@ -1,4 +1,3 @@
-
 ;Load boot modules on a page boundary
 PAGE_ALIGN    equ             1 << 0 
 
@@ -11,10 +10,20 @@ MEMORY_INFO   equ             1 << 1
 
 MULTIBOOT_HEADER_MAGIC equ 0x1BADB002
 MULTIBOOT_HEADER_FLAGS equ PAGE_ALIGN | MEMORY_INFO ;| VIDEO_INFO 
+KERNEL_VIRT_ADDR equ 0xC0000000
+KERNEL_PAGE equ (KERNEL_VIRT_ADDR >> 22)
+KERNEL_STACK_START equ 0x300000 + KERNEL_VIRT_ADDR
+
+section .data
+align 0x1000
+page_directory_table:
+   dd 0x00000083
+   times (KERNEL_PAGE - 1) dd 0
+   dd 0x00000083
+   times (1024 - KERNEL_PAGE - 1) dd 0
 
 [bits 32]
-
-global arch_start
+section .text
 
 align 4
 multiboot_header:
@@ -25,20 +34,51 @@ multiboot_header:
 ;    dd 0 ;0 = set graphics mode
 ;    dd 1024, 768, 16 ;Width, height, and depth for display
 
-KERNEL_STACK_START equ 0x300000
 
-[extern enter_long_mode]
+global arch_start
+global loader
+loader equ (arch_start - KERNEL_VIRT_ADDR )
+
 [extern kmain]
 
 arch_start:
+
+    ;Setup a temporary page directory so that 
+    ;we can map and jump to the higher-half kernel.
+    ;This is meant to be replaced by a different page 
+    ;directory when the higher half starts to run.
+
+    ;CR4.PSE = 1, CR4.PAE = 0, PDE.PS = 1
+
+    ;Identity map first 4M using a single 4M page so that
+    ;after we enable paging, this code can still run.
+
+    
+    ;Load in address of page directory
+    mov eax, page_directory_table - KERNEL_VIRT_ADDR
+    mov cr3, eax
+ 
+    ;Set CR4.PSE
+    mov eax, cr4
+    or eax, 0x10
+    mov cr4, eax
+   
+    ;Enable paging
+    mov eax, cr0
+    or eax, 0x80000000
+    mov cr0, eax
+
     mov ebp, KERNEL_STACK_START
     mov esp, ebp
 
     ;Make sure to pass the multiboot header
     ;AFTER setting the stack
     push ebx 
-    call kmain
+    lea ecx, [kmain]
+    call ecx
 
+    ;We should never get here, but in the case that kmain
+    ;exits, at least we do not crash
 stop:
     cli
     hlt

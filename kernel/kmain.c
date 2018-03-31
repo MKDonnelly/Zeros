@@ -138,6 +138,11 @@ int random(){
 
 void kmain(struct multiboot_info *multiboot_info){
 
+  char *mem = (char*)(0xb8000 + 0xC0000000);
+  *mem = 'Z';
+  *(mem + 2) = 'U';
+
+/*
   //Arch initilization
   arch_init_system();
   arch_disable_ints();
@@ -180,7 +185,7 @@ void kmain(struct multiboot_info *multiboot_info){
   copy_to_physical( userland_copy, first->length, userland_prog );
   map_page( prog_hdr->p_vaddr, userland_prog, userland_dir );
   map_page( userland_stack, userland_stack, userland_dir );
-  k_add_task( k_create_userland_task( (void*)elf_hdr->e_entry, NULL, NULL, 0x1000, userland_stack, userland_dir ) );
+  k_add_task( k_create_userland_task( (void*)elf_hdr->e_entry, NULL, NULL, 0x1000, userland_stack, userland_dir ) );*/
 /*
   for(int i = 0; i < elf_hdr->e_phnum; i++){
     prog_hdr = (struct elf_prog_hreader*)(userland_copy + elf_hdr->e_phoff + i * elf_hdr->e_phentsize);
@@ -216,6 +221,6 @@ void kmain(struct multiboot_info *multiboot_info){
   k_add_task( k_create_kernel_task( thread9, NULL, NULL, 0x1000, kernel_page_dir) );  
   k_add_task( k_create_kernel_task( threada, NULL, NULL, 0x1000, kernel_page_dir) );  
 */  
-  start_scheduler();
+  //start_scheduler();
   while(1) arch_halt_cpu();
 }
