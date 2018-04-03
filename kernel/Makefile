@@ -9,4 +9,3 @@ kernel_build: $(COUTPUT)
 
 clean:
 	@find . -name '*\.o' -exec rm -Rf {} \;
-

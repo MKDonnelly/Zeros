@@ -64,7 +64,7 @@ documentation/testing
    Clean up all of the circular #includes
 
 drivers
-   APIC, HPET, ATA PIO mode, PCI, network card
+   APIC, HPET, PCI, network card
    basic ext2 filesystem, CMOS
  
 misc tasks 
