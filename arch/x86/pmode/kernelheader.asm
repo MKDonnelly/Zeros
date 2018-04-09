@@ -16,6 +16,7 @@ KERNEL_STACK_START equ 0x300000 + KERNEL_VIRT_ADDR
 
 section .data
 align 0x1000
+global page_directory_table
 page_directory_table:
    dd 0x00000083
    times (KERNEL_PAGE - 1) dd 0
@@ -36,10 +37,15 @@ multiboot_header:
 
 
 global arch_start
+
+;We are telling the linker to link to KERNEL_VIRT_ADDR,
+;so before we start executing at that address, we need the
+;physical address we are at
 global loader
 loader equ (arch_start - KERNEL_VIRT_ADDR )
 
 [extern kmain]
+[extern current_directory]
 
 arch_start:
 
@@ -52,9 +58,9 @@ arch_start:
 
     ;Identity map first 4M using a single 4M page so that
     ;after we enable paging, this code can still run.
-
     
-    ;Load in address of page directory
+    ;Load in address of page directory. remember, we are linked
+    ;to KERNEL_VIRT_ADDR and must adjust the memory reference.
     mov eax, page_directory_table - KERNEL_VIRT_ADDR
     mov cr3, eax
  
@@ -68,6 +74,14 @@ arch_start:
     or eax, 0x80000000
     mov cr0, eax
 
+
+    ;The paging code used current_directory.
+    ;We need to set that here
+    mov eax, page_directory_table
+    mov [current_directory], eax
+    
+
+    ;Set the kernel stack
     mov ebp, KERNEL_STACK_START
     mov esp, ebp
 

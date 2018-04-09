@@ -1,6 +1,7 @@
 #include <arch/x86/drivers/vga3h/vga3h.h>
 
-char *VGA3H_VIDEO_MEMORY = (char*)0xb8000;
+//0xC0000000 is the kernel virtual start addr
+char *VGA3H_VIDEO_MEMORY = (char*)(0xb8000 + 0xC0000000);
 //Current screen offset as linear offset
 int VGA3H_CUR_CURSOR_OFFSET = 0;
 int VGA3H_CUR_SCREEN_OFFSET = 0;

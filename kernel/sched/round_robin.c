@@ -100,7 +100,7 @@ void rr_init_scheduler(){
 void rr_start_scheduler(){
    //Index 0 is for the idle thread
    current_task = get_node_ll( (void**)&task_list, 0 );
-   load_page_dir( current_task->task_page_directory );
+//   load_page_dir( current_task->task_page_directory );
    idle_task();
 }
 
@@ -116,7 +116,7 @@ thread_context_t *rr_schedule(thread_context_t *interrupted_task){
    //Switch page dir if needed
    if( current_task->task_page_directory != current_page_dir ){
       current_page_dir = current_task->task_page_directory;
-      load_page_dir( current_page_dir );
+//      load_page_dir( current_page_dir );
    }
 
    //Switch interrupt stack if needed

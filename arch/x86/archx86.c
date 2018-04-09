@@ -1,7 +1,5 @@
 #include <arch/x86/archx86.h>
 
-
-
 void arch_init_system(int video_mode){
 
    //Initilize descriptors
@@ -14,4 +12,6 @@ void arch_init_system(int video_mode){
    //Setup the function points to use
    //the screen
    init_vga(0);
+
+   arch_disable_ints();
 }

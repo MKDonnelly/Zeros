@@ -4,6 +4,7 @@ extern void arch_enable_paging();
 
 //Points to current page directory in use
 page_directory_t *current_directory = NULL;
+page_directory_t *kernel_page_dir;
 
 //Given a page directory and an address, return a pointer to 
 //the page table (the PAGE TABLE, not the PAGE DIR ENTRY). 
@@ -11,7 +12,6 @@ page_table_t *get_page_table( uint32_t addr, page_directory_t *dir ){
 
    //First, get the page directory entry in the page directory
    page_table_desc_t *ptd = &( dir->pt_descriptors[ offset_in_pd( addr ) ]);
-
    //If the page entry is not null (not used), calculate its address
    //from the table_addr member and return it.
    if( ptd != 0 ){
@@ -27,7 +27,9 @@ page_desc_t *get_page_desc( uint32_t addr, page_table_t *table){
 
 
 uint32_t virt_to_phys( uint32_t addr, page_directory_t *dir ){
-
+   //FIXME hack to get higher-half working
+   return addr - 0xC0000000;
+/*
    //This is meant to happen if, before paging is enabled, we
    //pass in current_directory.
    if( dir == NULL )
@@ -35,13 +37,13 @@ uint32_t virt_to_phys( uint32_t addr, page_directory_t *dir ){
 
    //Check to make sure directory exists before we dereference it
    page_table_t *pg_table = get_page_table( addr, dir );
-   if(  pg_table != 0 ){
-      //temporary hack. fix later
+   if( pg_table != 0 ){
+      //TODO temporary hack. fix later
       return get_frame( get_page_desc( addr, pg_table ) ) | ( addr & 0xFFF );
    }else{
       //Page not mapped, return 0
       return 0;
-   }
+   }*/
 }
 
 //Create a page table for the given virtual address.
@@ -93,7 +95,6 @@ void setup_page_desc( page_desc_t *page, uint8_t is_kernel, uint8_t is_rw, uint3
    }
 }
 
-page_directory_t *kernel_page_dir;
 
 void map_page(uint32_t vaddr, uint32_t paddr, page_directory_t *dir){
 
@@ -111,31 +112,27 @@ void map_page(uint32_t vaddr, uint32_t paddr, page_directory_t *dir){
    setup_page_desc( page_descriptor, 1, 1, paddr );
 }
  
-
 void init_paging(){
-
-   //Assume we have only 16MB of available memory
-   //Let the kernel manage memory from 0..5M and
-   //leave 5M..16M unmapped for userland processes
-   //unsigned int mem_end_page =    0x1000000;
-   unsigned int kernel_end_page = 0x500000;
+   //FIXME
+   //We will assume that we are loaded at 0xC0000000
+   //and that we can manage 5MB of physical memory.
+   unsigned int kernel_end_page = 0x500000 + 0xC0000000;
 
    //Make the page directory for the kernel
    kernel_page_dir = (page_directory_t*)k_malloc( kernel_heap, sizeof(page_directory_t), ARCH_PAGE_SIZE );
    memset( kernel_page_dir, sizeof(page_directory_t), 0 );
 
-   for(int i = 0; i < kernel_end_page; i += 0x1000 ){
-      //Get the page table and create it.
-      map_page( i, i, kernel_page_dir );
+   for(int i = 0xC0000000; i < kernel_end_page; i += 0x1000 ){
+      map_page( i, i - 0xC0000000, kernel_page_dir );
    }
-
 
    //Setup the interrupt handler for paging BEFORE enabling paging
    arch_register_interrupt( PAGE_INTERRUPT, page_int_handler);
 
    //Let the processor know where our page table is
    //and enable paging.
-   load_page_dir( kernel_page_dir );
+   uint32_t phys = (uint32_t)kernel_page_dir - 0xC0000000;
+   load_page_dir( phys );
 }
 
 //Copies the contents of one page to another. Both are physical

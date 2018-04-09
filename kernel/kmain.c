@@ -138,28 +138,19 @@ int random(){
 
 void kmain(struct multiboot_info *multiboot_info){
 
-  char *mem = (char*)(0xb8000 + 0xC0000000);
-  *mem = 'Z';
-  *(mem + 2) = 'U';
-
-/*
-  //Arch initilization
   arch_init_system();
-  arch_disable_ints();
   arch_timer_init( timing_main_handler );
   arch_keyboard_init( keyboard_main_handler );
-
   k_clear_screen();
 
-
-  //See heap.h for kernel_heap
-  create_heap( &kernel_heap, 0x300000, 0x200000, blocklist_malloc, blocklist_free, blocklist_init_heap );
-
+  create_heap( &kernel_heap, 0x300000+0xC0000000, 0x200000, blocklist_malloc, blocklist_free, blocklist_init_heap );
 
   //mouse_init();
   //register_mouse_handler( m );
   //arch_enable_ints();
   
+  k_printf("Working");
+
   init_syscalls();
   register_syscall( k_putchar, 0 );
   
@@ -178,9 +169,10 @@ void kmain(struct multiboot_info *multiboot_info){
   struct elf_header *elf_hdr = (struct elf_header*)userland_copy;
   struct elf_prog_header *prog_hdr = (struct elf_prog_header*)(userland_copy + elf_hdr->e_phoff );
   
+  //load_page_dir( (page_directory_t*)0x109000);
   init_paging();  
   init_scheduler( &rr_alg );
-
+/*
   page_directory_t *userland_dir = clone_page_dir( kernel_page_dir );
   copy_to_physical( userland_copy, first->length, userland_prog );
   map_page( prog_hdr->p_vaddr, userland_prog, userland_dir );
@@ -193,10 +185,10 @@ void kmain(struct multiboot_info *multiboot_info){
                       prog_hdr->p_filesize,
                       userland_prog );
     k_printf("%x %x %d\n", prog_hdr->p_vaddr, userland_copy + prog_hdr->p_offset, prog_hdr->p_filesize);
-  }
+  }*/
  
   //copy_to_physical( userland_copy, first->length, userland_prog );
-*/
+
 //  page_directory_t *userland_dir = clone_page_dir( kernel_page_dir );
 //  map_page( elf_, userland_prog, userland_dir );
 //  map_page( userland_stack, userland_stack, userland_dir );
@@ -220,7 +212,7 @@ void kmain(struct multiboot_info *multiboot_info){
   k_add_task( k_create_kernel_task( thread8, NULL, NULL, 0x1000, kernel_page_dir) );  
   k_add_task( k_create_kernel_task( thread9, NULL, NULL, 0x1000, kernel_page_dir) );  
   k_add_task( k_create_kernel_task( threada, NULL, NULL, 0x1000, kernel_page_dir) );  
-*/  
-  //start_scheduler();
+ */ 
+  start_scheduler();
   while(1) arch_halt_cpu();
 }

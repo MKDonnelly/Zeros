@@ -80,7 +80,7 @@ misc tasks
    port zeros to xen
    make BGA driver
    add in arch-specific bitwise operators, optimizations (AVX, SIMD, etc)
-   port over a c library (newlib, uClib, or something else small)
+   port over a c library (newlib, uClib, musl)
 
 advanced os examples:
    dragonfly bsd, minix, plan9, genode, haiku, helenos, redox
