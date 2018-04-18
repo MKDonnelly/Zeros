@@ -2,14 +2,12 @@
 
 #include <lib/keyboard.h>
 #include <lib/string.h>
-#include <lib/bcd.h>
 #include <lib/types.h>
 #include <lib/bitwise.h>
-#include <lib/delay.h>
 #include <lib/debug.h>
-#include <lib/bootdemo.h>
 #include <lib/timing.h>
 #include <lib/abstract_ll.h>
+#include <lib/elf.h>
 
 #include <kernel/multiboot.h>
 #include <kernel/task.h>
@@ -23,10 +21,76 @@
 #include <fs/fs.h>
 #include <fs/initrd/initrd.h>
 
-#include <arch/x86/pmode/syscall.h>
-#include <arch/x86/drivers/mouse.h>
+void thread1(){
+   int t1count = 0;
+   while(1){
+      k_printf_at("1", t1count++, 0);
+      for(int i = 0; i < 50000000; i++);
+   }
+}
 
+void thread2(){
+   int t2count = 0;
+   while(1){
+      k_printf_at("2", t2count++, 1);
+      for(int i = 0; i < 50000000; i++);
+   }
+}
 
+void kmain(struct multiboot_info *multiboot_info){
+
+  arch_init_system();
+  arch_timer_init( timing_main_handler );
+  arch_keyboard_init( keyboard_main_handler );
+  k_clear_screen();
+
+  create_heap( &kernel_heap, 0x300000+0xC0000000, 0x200000, blocklist_malloc, blocklist_free, blocklist_init_heap );
+
+  k_printf("Working");
+
+  init_syscalls();
+  register_syscall( k_putchar, 0 );
+  
+  char *userland_copy = (char*)k_malloc( kernel_heap, 5000, 0 );
+
+  //Read program from initrd
+  fs_root = init_initrd( ((struct module*)multiboot_info->mods)->start );
+  k_printf("Initrd at %x\n", ((struct module*)multiboot_info->mods)->start);
+  fs_node_t *first = fs_root->readdir( fs_root, 0 );
+  first->read( first, 0, first->length, userland_copy );
+
+  //elf file now in userland_copy
+  struct elf_header *elf_hdr = (struct elf_header*)userland_copy;
+  struct elf_prog_header *prog_hdr = (struct elf_prog_header*)(userland_copy + elf_hdr->e_phoff );
+ 
+  init_paging();  
+
+  for(int i = 0; i < elf_hdr->e_phnum; i++){
+    prog_hdr = (struct elf_prog_header*)(userland_copy + elf_hdr->e_phoff + i * elf_hdr->e_phentsize);
+    copy_to_physical( userland_copy + prog_hdr->p_offset, 
+                      0x600000,
+                      prog_hdr->p_filesize);
+    k_printf("%x %x %d\n", prog_hdr->p_vaddr, userland_copy + prog_hdr->p_offset, prog_hdr->p_filesize);
+  }
+
+  char *ustack = k_malloc(kernel_heap, 0x1000, 0);
+  pd_t *userland_pd = clone_pd( kernel_page_dir );
+  map_page( 0x1000, 0x600000, userland_pd );
+
+  init_scheduler( &rr_alg );
+  register_syscall( current_sched_alg->exit_task, 1 );
+
+  k_add_task( k_create_userland_task( (void*)0x1000, NULL, NULL, 0x1000, (uint32_t)ustack, userland_pd ));
+
+/*
+  k_add_task( k_create_kernel_task( thread1, NULL, NULL, 0x1000, kernel_page_dir) );  
+  k_add_task( k_create_kernel_task( thread2, NULL, NULL, 0x1000, kernel_page_dir) );  
+ */
+  start_scheduler();
+  while(1) arch_halt_cpu();
+}
+
+/*
 void thread1(){
    int t1count = 0;
    while(1){
@@ -132,10 +196,10 @@ int random(){
    lfsr = (lfsr >> 1) | (bit << 15);
    ++period;
    return lfsr;
-}
+}*/
 
-#include <lib/elf.h>
 
+/*
 void kmain(struct multiboot_info *multiboot_info){
 
   arch_init_system();
@@ -154,6 +218,7 @@ void kmain(struct multiboot_info *multiboot_info){
   init_syscalls();
   register_syscall( k_putchar, 0 );
   
+
   uint32_t userland_prog = 0x600000;
   uint32_t userland_stack = 0x610000;
 
@@ -161,6 +226,8 @@ void kmain(struct multiboot_info *multiboot_info){
 
   //Read program from initrd
   fs_root = init_initrd( ((struct module*)multiboot_info->mods)->start );
+  k_printf("Initram at %x\n", ((struct module*)multiboot_info->mods)->start);
+  arch_stop_cpu();
   fs_node_t *first = fs_root->readdir( fs_root, 0 );
 
   first->read( first, 0, first->length, userland_copy );
@@ -169,38 +236,27 @@ void kmain(struct multiboot_info *multiboot_info){
   struct elf_header *elf_hdr = (struct elf_header*)userland_copy;
   struct elf_prog_header *prog_hdr = (struct elf_prog_header*)(userland_copy + elf_hdr->e_phoff );
   
-  //load_page_dir( (page_directory_t*)0x109000);
   init_paging();  
   init_scheduler( &rr_alg );
-/*
-  page_directory_t *userland_dir = clone_page_dir( kernel_page_dir );
-  copy_to_physical( userland_copy, first->length, userland_prog );
-  map_page( prog_hdr->p_vaddr, userland_prog, userland_dir );
-  map_page( userland_stack, userland_stack, userland_dir );
-  k_add_task( k_create_userland_task( (void*)elf_hdr->e_entry, NULL, NULL, 0x1000, userland_stack, userland_dir ) );*/
-/*
+//  char *ustack = (char*)k_malloc(kernel_heap, 0x1000, 0x1000);
+//  k_add_task( k_create_userland_task( userland, NULL, NULL, 0x1000, (uint32_t)ustack, kernel_page_dir ));
+
+  //pd_t *userland_dir = clone_pd( kernel_page_dir );
+  //copy_to_physical( userland_copy, userland_prog, first->length );
+  ///map_page( prog_hdr->p_vaddr, userland_prog, userland_dir );
+  //map_page( userland_stack, userland_stack, userland_dir );
+  //k_add_task( k_create_userland_task( (void*)elf_hdr->e_entry, NULL, NULL, 0x1000, userland_stack, userland_dir ) );
+
   for(int i = 0; i < elf_hdr->e_phnum; i++){
     prog_hdr = (struct elf_prog_hreader*)(userland_copy + elf_hdr->e_phoff + i * elf_hdr->e_phentsize);
     copy_to_physical( userland_copy + prog_hdr->p_offset, 
                       prog_hdr->p_filesize,
                       userland_prog );
     k_printf("%x %x %d\n", prog_hdr->p_vaddr, userland_copy + prog_hdr->p_offset, prog_hdr->p_filesize);
-  }*/
+  }
  
-  //copy_to_physical( userland_copy, first->length, userland_prog );
 
-//  page_directory_t *userland_dir = clone_page_dir( kernel_page_dir );
-//  map_page( elf_, userland_prog, userland_dir );
-//  map_page( userland_stack, userland_stack, userland_dir );
-  //map_page( userland_prog, userland_prog, userland_dir );
-  //map_page( userland_stack, userland_stack, userland_dir );
 
-  //init_scheduler( &rr_alg );
-
- // k_add_task( k_create_userland_task( (void*)userland_prog, NULL, NULL, 0x1000, userland_stack, userland_dir ) );
-  //k_add_task( k_create_kernel_task( main_kernel_thread, NULL, NULL, 0x1000 , kernel_page_dir) );
-
-/*
   k_add_task( k_create_kernel_task( thread1, NULL, NULL, 0x1000, kernel_page_dir) );  
   k_add_task( k_create_kernel_task( thread2, NULL, NULL, 0x1000, kernel_page_dir) );  
   k_add_task( k_create_kernel_task( thread3, NULL, NULL, 0x1000, kernel_page_dir) );  
@@ -212,7 +268,7 @@ void kmain(struct multiboot_info *multiboot_info){
   k_add_task( k_create_kernel_task( thread8, NULL, NULL, 0x1000, kernel_page_dir) );  
   k_add_task( k_create_kernel_task( thread9, NULL, NULL, 0x1000, kernel_page_dir) );  
   k_add_task( k_create_kernel_task( threada, NULL, NULL, 0x1000, kernel_page_dir) );  
- */ 
+ 
   start_scheduler();
   while(1) arch_halt_cpu();
-}
+}*/

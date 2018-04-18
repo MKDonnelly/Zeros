@@ -1,4 +1,5 @@
-start:
+global _start
+_start:
    mov eax, 0x0
    mov ebx, 'H'
    int 0x31

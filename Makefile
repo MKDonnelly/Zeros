@@ -27,7 +27,7 @@ build_staging:
 	@PREFIX=$(BUILDDIR)/staging/ make -C staging/ --no-print-directory
 
 run: all
-	@qemu-system-x86_64 -kernel build/Zeros.elf -append arg1 -initrd arch/x86/initrd &
+	@qemu-system-x86_64 -kernel build/Zeros.elf -append kernel_cmdline_argunments -initrd arch/x86/initrd &
 
 debug: all
 	@qemu-system-x86_64 -kernel build/Zeros.elf -append arg1 -initrd arch/x86/initrd -S -s &

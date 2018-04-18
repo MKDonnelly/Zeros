@@ -21,11 +21,18 @@ arch_enable_paging:
    pop edx
    ret
 
+;Invalidate a page. Needed whenever we change
+;the page mapping without switching out CR3
+global inval_page
+inval_page:
+   invlpg [esp+0x8]
+   ret
+   
+
 ; Used to load a page directory
-; First argument is pointer to page
-; table descriptors, page_directory_t*
-global load_page_dir
-load_page_dir:
+; First argument is pointer to pd_t*
+global load_pd
+load_pd:
    ;eax is all that is used
    push eax 
    
@@ -38,4 +45,3 @@ load_page_dir:
 
    pop eax
    ret
-

@@ -6,7 +6,8 @@
 #include <kernel/task.h>
 #include <lib/timing.h>
 #include <lib/abstract_ll.h>
-#include <arch/x86/archx86.h>
+
+#define SCHEDULER_INTERRUPT 50
 
 struct sched_alg{
 
@@ -31,9 +32,6 @@ struct sched_alg{
    //started and tasks begin executing
    void (*start_scheduler)();
 };
-
-
-#define SCHEDULER_INTERRUPT 50
 
 //The arch interrupt handler will put the
 //current context in this variable. This can

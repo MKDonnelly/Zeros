@@ -60,12 +60,6 @@ void arch_create_userland_context(thread_context_t **context,
         (*context)->ss  = 0x23;
         (*context)->eflags = INITIAL_EFLAGS;
         (*context)->ebp = (*context)->esp =
-           (*context)->esp_pushed = (uint32_t)(*context);
-
-/*
-        (*context)->ebp = (uint32_t)(*context);
-        (*context)->esp = (*context)->ebp;
-        (*context)->eflags = INITIAL_EFLAGS;
-        (*context)->esp_pushed = (*context)->ebp;*/
+        (*context)->esp_pushed = (uint32_t)(*context);
 }
 

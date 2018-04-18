@@ -14,7 +14,7 @@ struct sched_alg rr_alg = (struct sched_alg){
 ktask_t *task_list = NULL;
 
 ktask_t *current_task = NULL;
-page_directory_t *current_page_dir = NULL;
+pd_t *current_pdir = NULL;
 int current_task_index = 0;
 
 int task_count = 0;
@@ -75,10 +75,7 @@ void scheduler_fork(){
 
 void idle_task(){
    arch_enable_ints();
-   //while(1) arch_halt_cpu();
-   while(1){
-      asm volatile("hlt");
-   }
+   while(1) arch_halt_cpu();
 }
 
 //Init scheduler just sets up the scheduler
@@ -100,7 +97,7 @@ void rr_init_scheduler(){
 void rr_start_scheduler(){
    //Index 0 is for the idle thread
    current_task = get_node_ll( (void**)&task_list, 0 );
-//   load_page_dir( current_task->task_page_directory );
+   load_pd( (uint32_t*)VIRT_TO_PHYS(current_task->task_page_directory) );
    idle_task();
 }
 
@@ -114,9 +111,9 @@ thread_context_t *rr_schedule(thread_context_t *interrupted_task){
    }while( current_task->state != TASK_READY );
 
    //Switch page dir if needed
-   if( current_task->task_page_directory != current_page_dir ){
-      current_page_dir = current_task->task_page_directory;
-//      load_page_dir( current_page_dir );
+   if( current_task->task_page_directory != current_pdir ){
+      current_pdir = current_task->task_page_directory;
+      load_pd( (uint32_t*)VIRT_TO_PHYS(current_pdir) );
    }
 
    //Switch interrupt stack if needed

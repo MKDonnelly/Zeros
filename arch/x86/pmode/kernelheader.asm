@@ -16,6 +16,10 @@ KERNEL_STACK_START equ 0x300000 + KERNEL_VIRT_ADDR
 
 section .data
 align 0x1000
+;A fixed page table for the early boot environment. This identity
+;maps the first 4M and maps 3G to the first 4M as well. This helps
+;when transitioning to a higher-half kernel. As soon as kmain is 
+;loaded, this page table is no longer used
 global page_directory_table
 page_directory_table:
    dd 0x00000083
@@ -45,7 +49,7 @@ global loader
 loader equ (arch_start - KERNEL_VIRT_ADDR )
 
 [extern kmain]
-[extern current_directory]
+[extern current_page_dir]
 
 arch_start:
 
@@ -74,12 +78,10 @@ arch_start:
     or eax, 0x80000000
     mov cr0, eax
 
-
     ;The paging code used current_directory.
     ;We need to set that here
     mov eax, page_directory_table
-    mov [current_directory], eax
-    
+    mov [current_page_dir], eax
 
     ;Set the kernel stack
     mov ebp, KERNEL_STACK_START
@@ -89,6 +91,8 @@ arch_start:
     ;AFTER setting the stack
     push ebx 
     lea ecx, [kmain]
+    ;TODO Why does this break when using jmp?
+    ;     Maybe multiboot header access?
     call ecx
 
     ;We should never get here, but in the case that kmain

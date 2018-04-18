@@ -1,126 +1,161 @@
 #include <arch/x86/pmode/paging.h>
 
-extern void arch_enable_paging();
+//Points to current page directory in use as well
+//as the page directory used by the kernel.
+pd_t *current_page_dir = NULL;
+pd_t *kernel_page_dir;
 
-//Points to current page directory in use
-page_directory_t *current_directory = NULL;
-page_directory_t *kernel_page_dir;
+static pte_t *get_page( uint32_t vaddr, bool create_pt, pd_t *page_directory){
 
-//Given a page directory and an address, return a pointer to 
-//the page table (the PAGE TABLE, not the PAGE DIR ENTRY). 
-page_table_t *get_page_table( uint32_t addr, page_directory_t *dir ){
-
-   //First, get the page directory entry in the page directory
-   page_table_desc_t *ptd = &( dir->pt_descriptors[ offset_in_pd( addr ) ]);
-   //If the page entry is not null (not used), calculate its address
-   //from the table_addr member and return it.
-   if( ptd != 0 ){
-      return ( (page_table_t*)(ptd->table_addr * ARCH_PAGE_SIZE) );
-   }else{
-      return 0;
-   }
-}
-
-page_desc_t *get_page_desc( uint32_t addr, page_table_t *table){   
-   return &( table->page_descriptors[ offset_in_pt( addr ) ] );
-}
-
-
-uint32_t virt_to_phys( uint32_t addr, page_directory_t *dir ){
-   //FIXME hack to get higher-half working
-   return addr - 0xC0000000;
-/*
-   //This is meant to happen if, before paging is enabled, we
-   //pass in current_directory.
-   if( dir == NULL )
-      return addr;
-
-   //Check to make sure directory exists before we dereference it
-   page_table_t *pg_table = get_page_table( addr, dir );
-   if( pg_table != 0 ){
-      //TODO temporary hack. fix later
-      return get_frame( get_page_desc( addr, pg_table ) ) | ( addr & 0xFFF );
-   }else{
-      //Page not mapped, return 0
-      return 0;
-   }*/
-}
-
-//Create a page table for the given virtual address.
-void make_page_table(uint32_t addr, page_directory_t *dir ){
-   uint32_t pd_offset = offset_in_pd( addr );
-   if( dir->pt_descriptors[pd_offset].table_addr == 0 ){
-
+   //Get the page table
+   pde_t *page_dir_entry = &page_directory->pd_entries[ PD_INDEX( vaddr ) ];
+   //Convert the page directory entry into the table it describes, creating
+   //the page table if needed.
+   if( page_dir_entry->table_addr == 0 && create_pt == 0 ){
+      //Page table does not exist and we have not been asked to make one.
+      //Return null as an error.
+      return NULL;
+   }else if( page_dir_entry->table_addr == 0 && create_pt ){
       //Create a new page table to use
-      page_table_t *new_table = k_malloc( kernel_heap, sizeof(page_table_t), ARCH_PAGE_SIZE );
+      pt_t *new_pt = k_malloc( kernel_heap, sizeof(pt_t), ARCH_PAGE_SIZE );
 
       //We need to place the physical address of the allocated block
       //of memory into the descriptor. So take the virtual address
       //along with the current directory in effect and find physical.
-      int phys = virt_to_phys( (uint32_t)new_table, current_directory );
-
-      dir->pt_descriptors[pd_offset].table_addr = phys / ARCH_FRAME_SIZE;
-      dir->pt_descriptors[pd_offset].present = 1;
-      dir->pt_descriptors[pd_offset].rw      = 1;
-      dir->pt_descriptors[pd_offset].user_access = 1;
+      uint32_t phys = (uint32_t)VIRT_TO_PHYS( (uint32_t)new_pt );
+      page_dir_entry->table_addr = phys / ARCH_PAGE_SIZE;
+      page_dir_entry->present = 1;
+      page_dir_entry->rw = 1;
+      page_dir_entry->user_access = 1; //Temporary
    }
+
+   //At this point, the page table is known to exist
+   pt_t *page_table = (pt_t*)(PHYS_TO_VIRT(page_dir_entry->table_addr * ARCH_PAGE_SIZE) );
+
+   //Get the page table entry from the page table
+   pte_t *page_table_entry = &page_table->pt_entries[ PT_INDEX( vaddr ) ];
+   return page_table_entry;
 }
 
-//Given a page, return its frame's address. This effectively turns
-//a virtual into a physical address.
-uint32_t get_frame( page_desc_t *page ){
-   return page->frame_addr * ARCH_FRAME_SIZE;
+void map_page(uint32_t vaddr, uint32_t paddr, pd_t *page_directory){
+
+   //Get the pte to map the page
+   pte_t *page = get_page( vaddr, 1, page_directory );
+
+   //Setup the actual mapping
+   page->frame_addr = paddr / ARCH_FRAME_SIZE;
+   page->present = 1;
+   page->rw = 1;
+   page->user = 1;
 }
 
+//Used for pages that frequently change (like when used by copy_to_physiscal)
+void quick_map( uint32_t vaddr, uint32_t paddr, pd_t *page_directory){
+   map_page( vaddr, paddr, page_directory );
 
-void setup_page( page_desc_t *page, uint8_t is_kernel, uint8_t is_rw, uint32_t frame_addr ){
-   //Assume frame address is properly aligned   
-   //Only allocate a frame if the page does not have one  
-   if( ! page->frame_addr ){
-      page->present = 1;
-      page->rw = is_rw;
-      page->user = is_kernel;
-      page->frame_addr = frame_addr / ARCH_FRAME_SIZE;
+   //We expect the mapping to change frequently, so this ensure that when
+   //we return, there is no cached reference to the page we mapped.
+   inval_page( vaddr );
+}
+
+//Copies len bytes of memory at the virtual address vbuf to the physical
+//address paddr.
+void copy_to_physical(char *vbuf, uint32_t paddr, uint32_t len){
+   //Since we are using a higher-half kernel, we cannot disable paging.
+   //To access the physical memory, we make a window within the current
+   //page directory (the kernel page directory) at 0x0 that maps to
+   //the desired physical address. If we need to copy more than one page,
+   //we increment the physical frame pointed to as we copy.
+   //Align page frame on 4K boundary
+   quick_map( 0x0, (paddr & ~0xFFF), kernel_page_dir );
+
+   //FIXME len is assumed to be less than the page size
+   memcpy( (char*)0x0, vbuf, len );
+}
+
+//Copies the page at one physical address to another 
+//We map the page 0x0 to pdest and 0x1000 to psrc
+static void copy_page( uint32_t pdest, uint32_t psrc ){
+   quick_map( 0x0, pdest, kernel_page_dir );
+   quick_map( 0x1000, psrc, kernel_page_dir );
+   
+   memcpy( (char*)0x0, (char*)0x1000, ARCH_PAGE_SIZE );
+
+   //No need to unmap the pages since we called using quick_map
+}
+
+static void clone_table(pde_t *dest_pde, pde_t *source_pde){
+
+   //Convert each into a pointer to the page table
+   if( source_pde->table_addr == 0 )
+      return;
+
+   pt_t *dest_pt = (pt_t*)PHYS_TO_VIRT(dest_pde->table_addr * ARCH_PAGE_SIZE);
+   pt_t *source_pt = (pt_t*)k_malloc(kernel_heap, sizeof(pt_t), ARCH_PAGE_SIZE);
+   memset(source_pt, sizeof(pt_t), 0);
+
+   //For every page descriptor in the source table, make a new page
+   //descriptor in the destination and copy the data
+   for(int i = 0; i < PTE_IN_PT; i++){
+
+      //Only create a new page in the copy if the source has one
+      if( source_pt->pt_entries[i].frame_addr != 0 ){
+         dest_pt->pt_entries[i].frame_addr = first_free_frame();
+         dest_pt->pt_entries[i].rw = source_pt->pt_entries[i].rw;
+         dest_pt->pt_entries[i].user = source_pt->pt_entries[i].user;
+         dest_pt->pt_entries[i].accessed = source_pt->pt_entries[i].accessed;
+         dest_pt->pt_entries[i].dirty = source_pt->pt_entries[i].dirty;
+
+         //Finally, copy over the data
+         copy_page( dest_pt->pt_entries[i].frame_addr * ARCH_FRAME_SIZE,
+                    source_pt->pt_entries[i].frame_addr * ARCH_FRAME_SIZE );
+      }
    }
+
+   //Now set the page table descriptor 
+   dest_pde->present = 1;
+   dest_pde->rw = 1;
+   dest_pde->user_access = 1;
+   dest_pde->table_addr = (VIRT_TO_PHYS( dest_pt ) / ARCH_PAGE_SIZE);
 }
 
-void setup_page_desc( page_desc_t *page, uint8_t is_kernel, uint8_t is_rw, uint32_t frame_addr ){
-   //Assume frame address is properly aligned   
-   //Only allocate a frame if the page does not have one  
-   if( ! page->frame_addr ){
-      page->present = 1;
-      page->rw = is_rw;
-      page->user = is_kernel;
-      page->frame_addr = frame_addr / ARCH_FRAME_SIZE;
+
+
+pd_t *clone_pd(pd_t *clone_dir){
+
+   pd_t *new_dir = k_malloc( kernel_heap, sizeof(pd_t), ARCH_PAGE_SIZE );
+   memset( new_dir, sizeof(pd_t), 0 );
+
+   for(int i = 0; i < PDE_IN_PD; i++){
+
+      //Map in the kernel virtual addresses to the cloned page directory.
+      //We unconditionally map the kernel in since, when switching tasks,
+      //the scheduler MUST be in the same memory location. Creating a task
+      //that does not have this property will cause big troubles.
+      if( kernel_page_dir->pd_entries[i].table_addr == 
+          clone_dir->pd_entries[i].table_addr ){
+         new_dir->pd_entries[i] = kernel_page_dir->pd_entries[i];
+      }else{
+         //If there is a directory in clone_dir that is not in the 
+         //kernel page directory, make a copy of it.
+         clone_table(&new_dir->pd_entries[i], &clone_dir->pd_entries[i] );
+         new_dir->pd_entries[i].present = 1;
+         new_dir->pd_entries[i].rw = 1;
+         //Temporary
+         new_dir->pd_entries[i].user_access = 1;
+      }
    }
-}
-
-
-void map_page(uint32_t vaddr, uint32_t paddr, page_directory_t *dir){
-
-   //Make sure the table exists before we reference it. If it already
-   //exists, this will do nothing.
-   make_page_table( vaddr, dir );
-
-   //Get the page table
-   page_table_t *page_table = get_page_table( vaddr, dir );
-
-   //Get the page descriptor within the page table
-   page_desc_t *page_descriptor = get_page_desc( vaddr, page_table );
-
-   //Map the virtual to physical address
-   setup_page_desc( page_descriptor, 1, 1, paddr );
+   return new_dir;
 }
  
 void init_paging(){
-   //FIXME
    //We will assume that we are loaded at 0xC0000000
    //and that we can manage 5MB of physical memory.
    unsigned int kernel_end_page = 0x500000 + 0xC0000000;
 
    //Make the page directory for the kernel
-   kernel_page_dir = (page_directory_t*)k_malloc( kernel_heap, sizeof(page_directory_t), ARCH_PAGE_SIZE );
-   memset( kernel_page_dir, sizeof(page_directory_t), 0 );
+   kernel_page_dir = (pd_t*)k_malloc( kernel_heap, sizeof(pd_t), ARCH_PAGE_SIZE );
+   memset( kernel_page_dir, sizeof(pd_t), 0 );
 
    for(int i = 0xC0000000; i < kernel_end_page; i += 0x1000 ){
       map_page( i, i - 0xC0000000, kernel_page_dir );
@@ -131,93 +166,8 @@ void init_paging(){
 
    //Let the processor know where our page table is
    //and enable paging.
-   uint32_t phys = (uint32_t)kernel_page_dir - 0xC0000000;
-   load_page_dir( phys );
+   load_pd( (void*)VIRT_TO_PHYS(kernel_page_dir));
 }
-
-//Copies the contents of one page to another. Both are physical
-//addresses.
-void copy_page( uint8_t *dest, uint8_t *src ){
-   
-   //NOTE: In the future, we may have a higher-half kernel.
-   //in that case, this would fail (eip is virtual). Instead, we
-   //could have a "window" page that we temporarily map here in the
-   //kernel page directory to copy over the page. This way, we would
-   //never have to disable paging and mess up everything.
-   arch_disable_paging();
-
-   for(int i = 0; i < ARCH_PAGE_SIZE; i++){
-      dest[i] = src[i];
-   }
-   
-   arch_enable_paging();
-}
-
-
-page_table_desc_t clone_table(page_table_desc_t source_desc){
-
-   //Convert the source page table descriptor 
-
-   page_table_t *src = (page_table_t*)(source_desc.table_addr * ARCH_PAGE_SIZE);
-
-   //Make a new page table
-   page_table_t *new_table = (page_table_t*)k_malloc( kernel_heap, sizeof(page_table_t), ARCH_PAGE_SIZE );
-   memset(new_table, sizeof(page_table_t), 0);
-
-   //For every page descriptor in the table, make a new one
-   //in the copy and copy the data over.
-   for(int i = 0; i < PDES_IN_PT; i++){
-      //Only create a new page in the copy if the source has one
-      if( src->page_descriptors[i].frame_addr ){
-         new_table->page_descriptors[i].frame_addr = first_free_frame();
-         new_table->page_descriptors[i].rw = src->page_descriptors[i].rw;
-         new_table->page_descriptors[i].user = src->page_descriptors[i].user;
-         new_table->page_descriptors[i].accessed = src->page_descriptors[i].accessed;
-         new_table->page_descriptors[i].dirty = src->page_descriptors[i].dirty;
-
-         //Finally, copy over the data
-         copy_page( (uint8_t*)(src->page_descriptors[i].frame_addr * ARCH_PAGE_SIZE),
-                    (uint8_t*)(new_table->page_descriptors[i].frame_addr * ARCH_PAGE_SIZE));
-
-      }
-   }
-
-   //Now create a page table descriptor referencing the table we made
-   page_table_desc_t descriptor;
-   descriptor.present = 1;
-   descriptor.rw = 1;
-   descriptor.user_access = 1;
-   descriptor.table_addr = virt_to_phys( (uint32_t)new_table, current_directory ) / ARCH_FRAME_SIZE;
-
-   return descriptor;
-}
-
-
-
-page_directory_t *clone_page_dir(page_directory_t *copy_from){
-
-   page_directory_t *new_dir = k_malloc( kernel_heap, sizeof(page_directory_t), ARCH_PAGE_SIZE );
-   memset( new_dir, sizeof(page_directory_t), 0 );
-
-   for(int i = 0; i < PTDES_IN_PD; i++){
-      //All page directories must ultimatelly inherit from kernel_page_dir
-      //since when we switch tasks, the scheduler code MUST be in the
-      //same place. This is why we link.      
-      if( kernel_page_dir->pt_descriptors[i].table_addr == copy_from->pt_descriptors[i].table_addr ){
-         new_dir->pt_descriptors[i] = copy_from->pt_descriptors[i];
-      }else{
-         //If there is a directory in copy_from that is not in the 
-         //kernel page directory, make a copy of it.
-         new_dir->pt_descriptors[i] = clone_table( copy_from->pt_descriptors[i] );
-         new_dir->pt_descriptors[i].present = 1;
-         new_dir->pt_descriptors[i].rw = 1;
-         //Temporary hack
-         new_dir->pt_descriptors[i].user_access = 1;
-      }
-   }
-   return new_dir;
-}
-
 
 void page_int_handler(registers_t r){
    int fault_addr;
@@ -247,24 +197,3 @@ void page_int_handler(registers_t r){
    //halt the machine
    arch_stop_cpu();
 }
-
-//Copies a buffer to a physical address in memory
-//Used when loading in userland processes
-void copy_to_physical(char *buf, int amount, uint32_t addr){
-
-   //Get the physical address of the buffer. This is needed since
-   //we deal with physical, not virtual, addresses when copying.
-   uint32_t buf_physical = virt_to_phys( (uint32_t)buf, kernel_page_dir );
-
-   //Disable paging and interrupts
-   arch_disable_ints();
-   arch_disable_paging();
-
-   //Copy over buffer
-   memcpy( (char*)addr, (char*)buf_physical, amount );
-
-   //Re-enable paging
-   arch_enable_paging();
-   //arch_enable_ints();
-}
-

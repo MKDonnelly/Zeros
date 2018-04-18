@@ -73,9 +73,7 @@ void load_tss();
 //Defined in descriptors.asm
 void load_gdt(gdt_descriptor_t*);
 
-//We will just automatically set
-//the GDT entries.
-//There is no need to pass them as args
-//since we only need a few entries.
-//We can modify this later as needed.
+//All of the GDT entries will be setup in init_gdt.
+//To simplify the process, no support is added to create
+//another gdt entry after setup.
 void init_gdt();

@@ -11,14 +11,10 @@
 
 extern void init_idt();
 
-//When calling an interrupt, 
-//the registers are pushed
-//to the stack. This is the
-//structure of those registers
-//which a c function can use.
-//Pusha pushes in the following order:
-//eax, ecx, edx, ebx, esp (original value),
-//ebp, esi, edi.
+//When calling an interrupt, the registers are pushed
+//to the stack. This is the structure of those registers
+//which a c function can use. Pusha pushes in the following order:
+//eax, ecx, edx, ebx, esp (original value), ebp, esi, edi.
 //In addition, an interrupt pushes an error code
 //and interrupt number. Read this backwards and from
 //bottom to top to see how the registers are pushed.
@@ -60,4 +56,3 @@ void arch_unregister_interrupt( uint8_t );
 //All interrupts must pass through this to
 //be routed to the correct destination.
 void main_interrupt_handler(registers_t);
-

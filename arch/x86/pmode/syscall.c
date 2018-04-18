@@ -5,15 +5,13 @@ static void syscall_handler(registers_t regs);
 static void *syscall_table[TOTAL_SYSCALLS];
 
 void init_syscalls(){
-
    arch_register_interrupt(SYSCALL_INT, syscall_handler );
 }
 
-void register_syscall( void (*syscall)(), int syscall_number ){
+void register_syscall( void *syscall_handler, int syscall_number ){
    if( syscall_number >= 0 && syscall_number < TOTAL_SYSCALLS )
-      syscall_table[syscall_number] = syscall;
+      syscall_table[syscall_number] = syscall_handler;
 }
-
 
 void syscall_handler(registers_t regs){
 
@@ -35,4 +33,3 @@ void syscall_handler(registers_t regs){
       pop %%ebx;    \
       pop %%ebx;" : "=a" (ret) : "r" (regs.edi), "r"(regs.esi), "r"(regs.edx), "r"(regs.ecx), "r"(regs.ebx), "r"(location));
 }
-

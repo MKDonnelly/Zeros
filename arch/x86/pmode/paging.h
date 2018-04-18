@@ -1,13 +1,13 @@
 #pragma once
 
-#include <arch/x86/drivers/vgacommon/vgacommon.h>
 #include <arch/x86/pmode/isr.h>
 #include <arch/x86/frame.h>
+#include <arch/x86/pmode/pagingasm.h>
+#include <arch/x86/cpu.h>
 
 #include <kernel/mm/heap.h>
 
 #include <lib/memory.h>
-#include <lib/bitwise.h>
 #include <lib/types.h>
 
 #define ARCH_PAGE_SIZE  0x1000
@@ -22,26 +22,31 @@
 #define PAGE_RES_M     0x8
 #define PAGE_ID_M      0x10
 
-//PDES = Page descriptor
-//PT = Page Table
-//PTDES = Page table descriptors
 //PD = Page directory
-#define PDES_IN_PT 1024
-#define PTDES_IN_PD 1024
+//PDE = Page directory entry
+//PT = Page Table
+//PTE = Page Table Entry
+#define PDE_IN_PD 1024
+#define PTE_IN_PT 1024
+
+#define KERNEL_VBASE 0xC0000000
 
 //The upper 10 bits of the address specifies the 
 //offset within the page directory.
-#define offset_in_pd(addr) (addr >> 22)
+#define PD_INDEX(vaddr) (vaddr >> 22)
 
 //After the first 10 bits, the next 10 bits specifies
 //the offset within the page table.
-#define offset_in_pt(addr) ((addr >> 12) & 0x3ff)
+#define PT_INDEX(vaddr) ((vaddr >> 12) & 0x3ff)
 
-//TODO Revise naming of structures to be consistent 
-//     with intel/AMD manuals
+//Used to convert Virtual <=> Physical addresses. This may
+//be insufficient later. I assume that all of these will be called
+//with kernel addresses
+#define PHYS_TO_VIRT(paddr) ( (uint32_t)paddr + KERNEL_VBASE)
+#define VIRT_TO_PHYS(vaddr) ( (uint32_t)vaddr - KERNEL_VBASE)
 
 //This represents an individual page<->frame allocation.
-struct page_descriptor{
+struct pte{
    uint8_t present          : 1; //Present in memory
    uint8_t rw               : 1; //Read-write if set
    uint8_t user             : 1; //Ring 0 if clear
@@ -57,25 +62,23 @@ struct page_descriptor{
    //matter. This is the frame address >> 12 
    uint32_t frame_addr      : 20; 
 } __attribute__((packed));
-typedef struct page_descriptor page_desc_t;
+typedef struct pte pte_t;
 
 //A page table is composed of page table entires.
 //Each of these page entries maps a virtual to physical
 //address using a page_table_entry_t.
-struct page_table{
+struct pt{
 
-   page_desc_t page_descriptors[ PDES_IN_PT ];
+   pte_t pt_entries[ PTE_IN_PT ];
 
 }__attribute__((packed));
-typedef struct page_table page_table_t;
+typedef struct pt pt_t;
 
 
-//Each of these points to a single page_table_t,
-//The address of which is in table_addr.
-struct page_table_desc{
+struct pde{
    int8_t present          : 1;
    int8_t rw               : 1;
-   int8_t user_access      : 1;
+   int8_t user_access      : 1; //1 = user access, 0 = ring0 only
    int8_t write_through    : 1;
    int8_t cache_disabled   : 1;
    int8_t accessed         : 1;
@@ -87,71 +90,52 @@ struct page_table_desc{
    int32_t table_addr      : 20;
 
 } __attribute__((packed));
-typedef struct page_table_desc page_table_desc_t;
+typedef struct pde pde_t;
 
 
 //A page directory is composed of page table descriptors.
-struct page_directory{
+struct pd{
 
-   page_table_desc_t pt_descriptors[PTDES_IN_PD];
+   pde_t pd_entries[PDE_IN_PD];
+
+   //pd_entries is used by the hardware paging translation mechanism.
+   //it can only work with physical addresses. However, we as the OS
+   //can only work with virtual addresses.
 
 }__attribute__((packed));
-typedef struct page_directory page_directory_t;
+typedef struct pd pd_t;
 
+///////////////////////////////////////////////
 
 //This points to the current page directory being used
 //for address translation. It is null if not page table
 //is in effect.
-extern page_directory_t *current_directory;
+extern pd_t *kernel_page_dir;
+extern pd_t *current_page_dir;
 
 /////////////////Get information from paging structures
+//Given a page directory and a virtual address, return the 
+//pte corresponding to it. If create_pt is set, create any
+//page tables needed. If create_pt is not set and the pt
+//is not allocated, return null
+//pte_t *get_page( uint32_t vaddr, bool create_pt, pd_t *page_directory); 
+//////////////////////////////////////////////////
 
-//Given a virtual address and page directory, get the page table that
-//the address resides in.
-page_table_t *get_page_table(uint32_t addr, page_directory_t *dir);
-
-//Given a virtual address and a page table, retrieve the page
-//descriptor that maps the virtual address to a physical address.
-page_desc_t *get_page_desc(uint32_t addr, page_table_t *table);
-
-//Given a page table descriptor, get the frame address from it.
-uint32_t get_frame(page_desc_t *page);
-//////////////////
-
+//Map a physical to virtual address in the paging structure
+void map_page(uint32_t vaddr, uint32_t paddr, pd_t *page_directory);
+void quick_map(uint32_t vaddr, uint32_t paddr, pd_t *page_directory);
+///////////////////////////////////////
 
 /////////////////Cloning page directory
-page_directory_t *clone_page_dir(page_directory_t*);
+pd_t *clone_pd(pd_t *page_directory);
 
-//extern void copy_page_physical(uint32_t,uint32_t);
-page_directory_t *clone_dir(page_directory_t*);
-/////////////////
-
-
-//Given a virtual address and a page directory, find the physical
-//address that the virtual address maps to
-uint32_t virt_to_phys(uint32_t addr, page_directory_t *dir);
-
-//Loads the given page directory into CR3 for use. 
-void load_page_dir(page_directory_t*);
 
 //Given a buffer, length, and physical address, copy the
 //buffer to the physical address.
-void copy_to_physical(char*,int,uint32_t);
-
-void map_page(uint32_t vaddr, uint32_t paddr, page_directory_t *dir);
-
-//This will be visible to the kernel for use
-//Userland processes will start with a clone of
-//this page table as well.
-extern page_directory_t *kernel_page_dir;
+void copy_to_physical(char *vbuf, uint32_t paddr, uint32_t len);
 
 //Initilized the paging structure
 void init_paging();
 
 //Handles page interrupts
 void page_int_handler(registers_t);
-
-//Defined in page.asm
-void arch_disable_paging();
-void arch_enable_paging();
-void load_page_dir(page_directory_t*);
