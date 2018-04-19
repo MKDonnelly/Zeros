@@ -9,6 +9,8 @@
 #include <lib/abstract_ll.h>
 #include <lib/elf.h>
 
+#include <drivers/ata/ata_pio.h>
+
 #include <kernel/multiboot.h>
 #include <kernel/task.h>
 
@@ -207,14 +209,33 @@ void kmain(struct multiboot_info *multiboot_info){
   arch_keyboard_init( keyboard_main_handler );
   k_clear_screen();
 
-  create_heap( &kernel_heap, 0x300000+0xC0000000, 0x200000, blocklist_malloc, blocklist_free, blocklist_init_heap );
+
+  //Disable irqs on ata
+  portb_write( ATA_PIO_CTRL_P, 0x02 );
+
+  ////////////////////
+  uint16_t *identify_data = identify_drive(0, 0);
+  uint32_t total_sectors = ( identify_data[61] << 16 ) | identify_data[60];
+  k_printf("Total sectors: %d\n", total_sectors);
+
+  //test write 
+
+  uint16_t *data = k_malloc( kernel_heap, sizeof(uint16_t)*256, 0);
+  memset( data, sizeof(uint16_t)*256, 7);
+  uint8_t sectors = 1;
+  uint32_t lba = 0;
+
+  ata_pio_write_sector( sectors, lba, data );
+
+  uint16_t *buf = ata_pio_read_sector( 1, 0 );
+  for(int i = 0; i < 10; i++)
+     k_printf("%d\n", (uint8_t)buf[i]);
+  ///////////////////
+
 
   //mouse_init();
   //register_mouse_handler( m );
   //arch_enable_ints();
-  
-  k_printf("Working");
-
   init_syscalls();
   register_syscall( k_putchar, 0 );
   
@@ -247,6 +268,13 @@ void kmain(struct multiboot_info *multiboot_info){
   //map_page( userland_stack, userland_stack, userland_dir );
   //k_add_task( k_create_userland_task( (void*)elf_hdr->e_entry, NULL, NULL, 0x1000, userland_stack, userland_dir ) );
 
+  page_directory_t *userland_dir = clone_page_dir( kernel_page_dir );
+  copy_to_physical( userland_copy, first->length, userland_prog );
+  map_page( prog_hdr->p_vaddr, userland_prog, userland_dir );
+  map_page( userland_stack, userland_stack, userland_dir );
+  k_add_task( k_create_userland_task( (void*)elf_hdr->e_entry, NULL, NULL, 0x1000, userland_stack, userland_dir ) );
+*/
+/*
   for(int i = 0; i < elf_hdr->e_phnum; i++){
     prog_hdr = (struct elf_prog_hreader*)(userland_copy + elf_hdr->e_phoff + i * elf_hdr->e_phentsize);
     copy_to_physical( userland_copy + prog_hdr->p_offset, 

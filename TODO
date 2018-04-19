@@ -72,13 +72,10 @@ documentation/testing
       use assert more in code 
    Clean up all of the circular #includes
 
- 
 misc tasks 
    use a cross compiler
    Create /dev virtual directory
    Get proper release/press code working with keyboard
-   create function to invalidate a page
-      asm volatile ("invlpg (%0)" : : "b" (page_addr) : "memory") 
    make as much as possible work through the VFS 
    port zeros to xen
    make BGA driver

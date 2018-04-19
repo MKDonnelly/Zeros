@@ -1,7 +1,6 @@
 CPROGS := $(shell find . -name '*\.c')
 COUTPUT := $(CPROGS:.c=.o)
 
-
 fs_build: $(COUTPUT) 
 
 %.o: %.c
@@ -10,4 +9,3 @@ fs_build: $(COUTPUT)
 
 clean:
 	@find . -name '*\.o' -exec rm -Rf {} \;
-

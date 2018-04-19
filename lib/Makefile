@@ -9,4 +9,3 @@ lib_build: $(COUTPUT) $(ASMOUTPUT)
 
 clean:
 	@find . -name '*\.o' -exec rm -Rf {} \;
-
