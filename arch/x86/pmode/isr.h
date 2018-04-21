@@ -23,10 +23,10 @@ extern void init_idt();
 typedef struct{
    uint32_t gs, fs, es, ds;
 
-   //TODO rename esp as useless_value_of_esp_never_use since
-   //     this is the esp value in the interrupt code. The only
-   //     good value of esp we have is esp_pushed.
-   uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax;
+   //In interrupt_common, we do a pusha. This pushes the esp
+   //value WHICH WAS USED BY THE ISR. This is not the task esp
+   //when we were interrupted; that value is in esp_pushed.
+   uint32_t edi, esi, ebp, USELESS_ESP_VALUE, ebx, edx, ecx, eax;
 
    //int_number and error are 8 bit numbers, but the
    //stack is aligned to 32 bits.

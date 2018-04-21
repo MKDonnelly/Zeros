@@ -49,7 +49,7 @@ void kmain(struct multiboot_info *multiboot_info){
   create_heap( &kernel_heap, 0x300000+0xC0000000, 0x200000, blocklist_malloc, blocklist_free, blocklist_init_heap );
 
   k_printf("Working");
-
+/*
   init_syscalls();
   register_syscall( k_putchar, 0 );
   
@@ -83,12 +83,12 @@ void kmain(struct multiboot_info *multiboot_info){
   register_syscall( current_sched_alg->exit_task, 1 );
 
   k_add_task( k_create_userland_task( (void*)0x1000, NULL, NULL, 0x1000, (uint32_t)ustack, userland_pd ));
-
+*/
 /*
   k_add_task( k_create_kernel_task( thread1, NULL, NULL, 0x1000, kernel_page_dir) );  
   k_add_task( k_create_kernel_task( thread2, NULL, NULL, 0x1000, kernel_page_dir) );  
  */
-  start_scheduler();
+  //start_scheduler();
   while(1) arch_halt_cpu();
 }
 

@@ -24,9 +24,9 @@ static pte_t *get_page( uint32_t vaddr, bool create_pt, pd_t *page_directory){
       //along with the current directory in effect and find physical.
       uint32_t phys = (uint32_t)VIRT_TO_PHYS( (uint32_t)new_pt );
       page_dir_entry->table_addr = phys / ARCH_PAGE_SIZE;
-      page_dir_entry->present = 1;
-      page_dir_entry->rw = 1;
-      page_dir_entry->user_access = 1; //Temporary
+      page_dir_entry->present = PAGE_PRESENT;
+      page_dir_entry->rw = PAGE_RW;
+      page_dir_entry->user_access = PAGE_USR_ACCESS;
    }
 
    //At this point, the page table is known to exist
@@ -44,9 +44,9 @@ void map_page(uint32_t vaddr, uint32_t paddr, pd_t *page_directory){
 
    //Setup the actual mapping
    page->frame_addr = paddr / ARCH_FRAME_SIZE;
-   page->present = 1;
-   page->rw = 1;
-   page->user = 1;
+   page->present = PAGE_PRESENT;
+   page->rw = PAGE_RW;
+   page->user = PAGE_USR_ACCESS;
 }
 
 //Used for pages that frequently change (like when used by copy_to_physiscal)
@@ -67,7 +67,7 @@ void copy_to_physical(char *vbuf, uint32_t paddr, uint32_t len){
    //the desired physical address. If we need to copy more than one page,
    //we increment the physical frame pointed to as we copy.
    //Align page frame on 4K boundary
-   quick_map( 0x0, (paddr & ~0xFFF), kernel_page_dir );
+   quick_map( 0x0, ALIGN_4K(paddr), kernel_page_dir );
 
    //FIXME len is assumed to be less than the page size
    memcpy( (char*)0x0, vbuf, len );
@@ -113,9 +113,9 @@ static void clone_table(pde_t *dest_pde, pde_t *source_pde){
    }
 
    //Now set the page table descriptor 
-   dest_pde->present = 1;
-   dest_pde->rw = 1;
-   dest_pde->user_access = 1;
+   dest_pde->present = PAGE_PRESENT;
+   dest_pde->rw = PAGE_RW;
+   dest_pde->user_access = PAGE_USR_ACCESS;
    dest_pde->table_addr = (VIRT_TO_PHYS( dest_pt ) / ARCH_PAGE_SIZE);
 }
 
@@ -139,10 +139,9 @@ pd_t *clone_pd(pd_t *clone_dir){
          //If there is a directory in clone_dir that is not in the 
          //kernel page directory, make a copy of it.
          clone_table(&new_dir->pd_entries[i], &clone_dir->pd_entries[i] );
-         new_dir->pd_entries[i].present = 1;
-         new_dir->pd_entries[i].rw = 1;
-         //Temporary
-         new_dir->pd_entries[i].user_access = 1;
+         new_dir->pd_entries[i].present = PAGE_PRESENT;
+         new_dir->pd_entries[i].rw = PAGE_RW;
+         new_dir->pd_entries[i].user_access = PAGE_USR_ACCESS; //TEMPORARY
       }
    }
    return new_dir;
@@ -157,8 +156,8 @@ void init_paging(){
    kernel_page_dir = (pd_t*)k_malloc( kernel_heap, sizeof(pd_t), ARCH_PAGE_SIZE );
    memset( kernel_page_dir, sizeof(pd_t), 0 );
 
-   for(int i = 0xC0000000; i < kernel_end_page; i += 0x1000 ){
-      map_page( i, i - 0xC0000000, kernel_page_dir );
+   for(int i = KERNEL_VBASE; i < kernel_end_page; i += 0x1000 ){
+      map_page( i, i - KERNEL_VBASE, kernel_page_dir );
    }
 
    //Setup the interrupt handler for paging BEFORE enabling paging

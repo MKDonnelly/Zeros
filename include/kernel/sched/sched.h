@@ -3,6 +3,8 @@
 //Generic properties of a scheduler. Describes the
 //basic functions a scheduler must implement.
 
+#ifdef NO
+
 #include <kernel/task.h>
 #include <lib/timing.h>
 #include <lib/abstract_ll.h>
@@ -51,3 +53,4 @@ struct sched_alg *current_sched_alg;
 //Initilize the scheduler system
 void init_scheduler();
 void start_scheduler();
+#endif

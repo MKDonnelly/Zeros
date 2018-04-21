@@ -6,11 +6,11 @@
 //The initial EFlags value when starting a thread
 #define INITIAL_EFLAGS 0x0202
 
-//A thread context is identical to the register
-//list pushed when an interrupt is triggered 
-typedef registers_t thread_context_t;
+//A context is the registers pushed when interrupted 
+typedef registers_t context_t;
 
-//Create the initial state of the thread
-void arch_create_kernel_context(thread_context_t**,void(func)(void *),void*, void (*thread_exit)(), void*,uint32_t);
-void arch_create_userland_context(thread_context_t**,void(func)(void *),void*, void (*thread_exit)(), void*,uint32_t);
-
+//Create an intial context for a new kernel task
+context_t *arch_create_kcontext( void (*start)(void*), void *param,
+                                 void (*exit)(), uint32_t *stack_addr );
+context_t *arch_create_ucontext( void (*start)(void*), void *param,
+                                 void (*exit)(), uint32_t *stack_addr );

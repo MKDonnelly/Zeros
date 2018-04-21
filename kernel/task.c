@@ -1,5 +1,5 @@
 #include <kernel/task.h>
-
+#ifdef NO
 //Internally used by k_create_task to assign
 //a unique id to every task
 int next_task_id = 0;
@@ -72,3 +72,4 @@ ktask_t *k_create_userland_task ( void *start_func, void *param, void *exit_func
 
    return new_task;
 }
+#endif

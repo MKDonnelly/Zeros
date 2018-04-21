@@ -2,7 +2,6 @@ Multitasking
    Refine task/scheduler code. Move task stuff to arch layer.
       Move scheduling struct pointers out of task and decouple
       task<->scheduler dependency
-
    Create a separate area for allocating thread stack
       space. Place a guard page at the end of each so that
       a page fault ocurrs if one exceeds its stack size

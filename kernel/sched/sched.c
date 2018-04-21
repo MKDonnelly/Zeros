@@ -1,5 +1,5 @@
 #include <kernel/sched/sched.h>
-
+/*
 //Pointer to the specific scheduler algorithm
 //being used. This provides and interface for the
 //rest of the sytem to use
@@ -36,4 +36,4 @@ void start_scheduler(){
 
    //Now actually start the scheduler
    k_start_scheduler();
-}
+}*/

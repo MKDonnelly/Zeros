@@ -12,7 +12,6 @@
 
 #define ARCH_PAGE_SIZE  0x1000
 #define TABLE_SIZE 0x1000
-
 #define PAGE_INTERRUPT 14
 
 //Masks for page error
@@ -44,6 +43,16 @@
 //with kernel addresses
 #define PHYS_TO_VIRT(paddr) ( (uint32_t)paddr + KERNEL_VBASE)
 #define VIRT_TO_PHYS(vaddr) ( (uint32_t)vaddr - KERNEL_VBASE)
+
+//Align a page on 4K boundary
+#define ALIGN_4K(address) (address & ~0xFFF)
+
+//Various constants for paging structure
+#define PAGE_PRESENT 1
+#define PAGE_RW 1
+#define PAGE_RO 0
+#define PAGE_USR_ACCESS 1
+#define PAGE_KERNEL_ACCESS 0
 
 //This represents an individual page<->frame allocation.
 struct pte{

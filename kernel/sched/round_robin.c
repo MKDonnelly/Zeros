@@ -1,5 +1,7 @@
 #include <kernel/sched/round_robin.h>
 
+#ifdef NO
+
 struct sched_alg rr_alg = (struct sched_alg){
    .add_task        =   rr_add_task,
    .rm_task         =   rr_rm_task,
@@ -122,3 +124,4 @@ thread_context_t *rr_schedule(thread_context_t *interrupted_task){
 
    return current_task->context;
 }
+#endif

@@ -1,65 +1,73 @@
 #include <arch/x86/pmode/context.h>
 
-//A thread context is identical to the interrupt stack layout
-void arch_create_kernel_context (thread_context_t **context, 
-   void (*func)(void *), void *param, void (*thread_exit)(), void *stack, uint32_t stack_size ){
+context_t *cur_context = NULL;
 
-        //Pointer to the head of the thread's stack
-        uint32_t *thread_stack = stack + stack_size;
+//Sets up a context for a kernel-level task and returns a pointer
+//to the head of the stack (a context_t* type)
+context_t *arch_create_kcontext( void (*start)(void *), void *param, 
+                                 void (*exit)(), uint32_t *stack_addr ){
 
-        // Give the first parameter to the thread by placing
-        // it at the head of the thread stack
-        thread_stack--;
-        *thread_stack = (uint32_t)param;
+   /*    Kernel context layout 
+      stack_addr+0x0: 1st parameter
+      stack_addr+0x4: exit function
+      stack_addr+   : context_t struct
+   */
 
-        //This is called when the function returns
-        thread_stack--;
-        *thread_stack = (uint32_t)thread_exit;
+   //The first item on the stack is the first parameter
+   stack_addr--;
+   *stack_addr = (uint32_t)param;
+  
+   //The next item is the address of the function to call
+   //upon return. 
+   stack_addr--;
+   *stack_addr = (uint32_t)exit;
 
-        // Add the thread context to the thread stack 
-        // This really just allocates space for the registers;
-        // the actual values are placed when we do a thread switch
-        *context = (void *)thread_stack - sizeof(thread_context_t);
+   //The next is the set of registers that will be popped when
+   //this task begins. This is of type context_t
+   context_t *context = (context_t*)((uint8_t*)stack_addr - sizeof(context_t));
+   context->eip = (uint32_t)start;
+   context->eflags = INITIAL_EFLAGS;
 
-        // Initilize the thread context by setting the function
-        // to call and the initial eflags value
-        (*context)->eip = (uint32_t)func;
-        (*context)->eflags = INITIAL_EFLAGS;
-        (*context)->cs = gdt_kernel_code;
-        (*context)->ebp = (*context)->esp = 
-           (*context)->esp_pushed = (uint32_t)(*context);
-        (*context)->ss = (*context)->gs = (*context)->fs = (*context)->es = (*context)->ds = gdt_kernel_data;
+   //This is a kernel task, so we use the kernel code segment for cs
+   context->cs = gdt_kernel_code;
+   context->esp_pushed = context->ebp = (uint32_t)context;
+
+   //Kernel level tasks used the kernel data gdt descriptor
+   context->ss = context->gs = context->fs =
+      context->es = context->ds = gdt_kernel_data;
+
+   //Return the head of the stack, which will point to a context_t
+   return context;
 }
 
 
-void arch_create_userland_context(thread_context_t **context, 
-   void (*func)(void *), void *param, void (*thread_exit)(), void *stack, uint32_t stack_size ){
+context_t *arch_create_ucontext( void (*start)(void*), void *param, 
+                                void (*exit)(), uint32_t *stack_addr ){
 
-        //Pointer to the head of the thread's stack
-        uint32_t *thread_stack = stack + stack_size;
+   /*    User context layout 
+      stack_addr+0x0: 1st parameter
+      stack_addr+0x4: exit function
+      stack_addr+   : context_t struct
+   */
 
-        // Give the first parameter to the thread by placing
-        // it at the head of the thread stack
-        thread_stack--;
-        *thread_stack = (uint32_t)param;
+   //Put the first parameter on the stack
+   stack_addr--;
+   *stack_addr = (uint32_t)param;
+   
+   //Put the exit function on the stack
+   stack_addr--;
+   *stack_addr = (uint32_t)exit;
 
-        //This is called when the function returns
-        thread_stack--;
-        *thread_stack = (uint32_t)thread_exit;
+   //Put the context_t on the stack
+   context_t *context = (context_t*)((uint8_t*)stack_addr - sizeof(context_t));
 
-        // Add the thread context to the thread stack 
-        // This really just allocates space for the registers;
-        // the actual values are placed when we do a thread switch
-        *context = (void *)thread_stack - sizeof(thread_context_t);
+   context->eip = (uint32_t)start;
+   context->cs = 0x1B;
+   context->ss = 0x23;
+   context->eflags = INITIAL_EFLAGS;
+   context->ebp = context->esp_pushed = (uint32_t)context;
 
-        // Initilize the thread context by setting the function
-        // to call and the initial eflags value
-        (*context)->eip = (uint32_t)func;
-        //See gdt.c/h for what this value is for
-        (*context)->cs = 0x1B;
-        (*context)->ss  = 0x23;
-        (*context)->eflags = INITIAL_EFLAGS;
-        (*context)->ebp = (*context)->esp =
-        (*context)->esp_pushed = (uint32_t)(*context);
+   //Return a pointer to the head of the stack of type context_t
+   return context;
 }
 
