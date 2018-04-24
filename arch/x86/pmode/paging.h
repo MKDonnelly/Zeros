@@ -1,5 +1,7 @@
 #pragma once
 
+//TODO Create map_kernel(...pd_t*) and map_user(...pd_t*)
+
 #include <arch/x86/pmode/isr.h>
 #include <arch/x86/frame.h>
 #include <arch/x86/pmode/pagingasm.h>
@@ -119,6 +121,7 @@ typedef struct pd pd_t;
 //This points to the current page directory being used
 //for address translation. It is null if not page table
 //is in effect.
+//TODO try to remove
 extern pd_t *kernel_page_dir;
 extern pd_t *current_page_dir;
 

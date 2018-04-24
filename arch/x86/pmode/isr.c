@@ -1,6 +1,13 @@
 #include <arch/x86/pmode/isr.h>
 #include <arch/x86/cpu.h>
 
+//Bitfield of which interrupts are currently
+//registered.
+static uint8_t int_present[ TOTAL_INTERRUPTS / 8 ];
+
+//This holds an array of handlers for the interrupts
+static void (*int_handlers[TOTAL_INTERRUPTS])(registers_t);
+
 //This function initilizes the
 //whole interrupt system. It creates
 //and populates interrupt service 
@@ -10,9 +17,7 @@ void init_interrupts(){
    //Zero out every interrupt in the
    //interrupt enabled array, just to
    //be safe
-   for(int i = 0; i < TOTAL_INTERRUPTS; i++){
-      bit_clear( &int_present, i);
-   }
+   memset( int_present, TOTAL_INTERRUPTS / 8, 0 );
 
    //This does x = 0..255
    //add_idt_entry(x, (u32)isrx);

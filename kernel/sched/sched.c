@@ -1,16 +1,12 @@
-#include <kernel/sched/sched.h>
-/*
+/*#include <kernel/sched/sched.h>
+
 //Pointer to the specific scheduler algorithm
 //being used. This provides and interface for the
 //rest of the sytem to use
 struct sched_alg *current_sched_alg;
 
-//Used by low-level interrupt code to pass the
-//current context to this level.
-thread_context_t *cur_context = NULL;
-
 void scheduler_handler(){
-   cur_context = current_sched_alg->schedule( cur_context );   
+   current_sched_alg->schedule();   
 }
 
 //Used to setup the scheduling system without actually starting

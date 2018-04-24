@@ -1,7 +1,6 @@
 #include "syscall.h"
 
 static void syscall_handler(registers_t regs);
-
 static void *syscall_table[TOTAL_SYSCALLS];
 
 void init_syscalls(){

@@ -17,7 +17,3 @@ struct tss{
    uint16_t iomap_base;
 }__attribute__((packed));
 typedef struct tss tss_t;
-
-//TSS used for system
-tss_t tss_entry;
-

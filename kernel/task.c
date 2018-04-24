@@ -1,75 +1,47 @@
 #include <kernel/task.h>
-#ifdef NO
+
 //Internally used by k_create_task to assign
 //a unique id to every task
 int next_task_id = 0;
 
-ktask_t *k_create_kernel_task ( void *start_func, void *param, void *exit_func, uint32_t stack_size, pd_t *task_page_dir){
+ktask_t *k_create_ktask( void (*start)(), void *param, 
+                         void (*exit)(), uint32_t *stack){
 
-   //Create a thread descriptor
+   //Create a task descriptor
    ktask_t *new_task = k_malloc( kernel_heap, sizeof(ktask_t), 0 );
 
-   //Allocate stack space for the thread
    //WE MUST ALIGN THE THREAD STACK TO PAGE_SIZE OR ELSE THE
    //THREADS WILL GET ASYMETRIC PROCESSING TIME DUE TO ALIGNMENT!
-   void *stack = k_malloc( kernel_heap, stack_size, ARCH_PAGE_SIZE );
+   new_task->task_stack = stack;
 
-   new_task->stack_ptr = stack;
+   //Intilize the arch-specific member task_info 
+   new_task->task_info = arch_create_ktask(start, param, exit, stack);
 
-   //Create a context for the task
-   if( exit_func == NULL )
-      exit_func = current_sched_alg->exit_task;
-
-   arch_create_kernel_context( &(new_task->context), start_func, param,
-                                exit_func, stack, stack_size );
-
-   //Add in page directory 
-   new_task->task_page_directory = task_page_dir;
-
-   // Null the exit status
-   new_task->return_value = 0;
+   // Setup generic task info
    new_task->state = TASK_READY;
-
-   //Add a unique task id
+   new_task->ret_val = NULL;
    new_task->task_id = next_task_id++;
    new_task->is_kernel_task = 1;
 
    return new_task;
 }
 
-ktask_t *k_create_userland_task ( void *start_func, void *param, void *exit_func, uint32_t stack_size, uint32_t stack_addr, pd_t *task_page_dir){
+ktask_t *k_create_utask( void (*start)(), void *param, 
+                         void (*exit)(), uint32_t *stack){
 
-   //Create a thread descriptor
+   //Create a task descriptor
    ktask_t *new_task = k_malloc( kernel_heap, sizeof(ktask_t), 0 );
 
-   //Allocate stack space for the thread
-   void *stack = (void*)stack_addr;
+   new_task->task_stack = stack;
 
-   //Allocate stack space for the interrupt stack
-   void *interrupt_stack = k_malloc( kernel_heap, 0x1000, 0 );
-   new_task->interrupt_stack = interrupt_stack;
+   //Create bare arch-specific task info
+   new_task->task_info = arch_create_utask(start, param, exit, stack);
 
-   //Used to free the memory allocated 
-   new_task->stack_ptr = (void*)stack_addr;
-
-   //Create a context for the task
-   if( exit_func == NULL )
-      exit_func = current_sched_alg->exit_task;
-
-   arch_create_userland_context( &(new_task->context), start_func, param,
-                                exit_func, stack, stack_size );
-
-   //Add in page structure
-   new_task->task_page_directory = task_page_dir;
-
-   // Null the exit status
-   new_task->return_value = 0;
+   //Initilize generic task info
    new_task->state = TASK_READY;
-
-   //Add a unique task id
+   new_task->ret_val = NULL;
    new_task->task_id = next_task_id++;
    new_task->is_kernel_task = 0;
 
    return new_task;
 }
-#endif

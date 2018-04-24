@@ -1,7 +1,5 @@
 #include <kernel/sched/round_robin.h>
-
-#ifdef NO
-
+/*
 struct sched_alg rr_alg = (struct sched_alg){
    .add_task        =   rr_add_task,
    .rm_task         =   rr_rm_task,
@@ -11,14 +9,12 @@ struct sched_alg rr_alg = (struct sched_alg){
    .schedule        =   rr_schedule,
    .init_scheduler  =   rr_init_scheduler,
    .start_scheduler =   rr_start_scheduler,
-};
+};*/
 
 ktask_t *task_list = NULL;
 
 ktask_t *current_task = NULL;
-pd_t *current_pdir = NULL;
 int current_task_index = 0;
-
 int task_count = 0;
 
 
@@ -37,29 +33,30 @@ void rr_rm_task(ktask_t *descriptor){
 
 //We presume the current task calls yield
 void rr_yield_task(){
-   arch_trigger_interrupt( SCHEDULER_INTERRUPT );
+//   arch_trigger_interrupt( SCHEDULER_INTERRUPT );
 }
 
 //We presume that the current task is calling this if run
-void rr_exit_task(void *return_value){
+void rr_exit_task(void *return_value){/*
    current_task->state = TASK_EXIT;
    current_task->return_value = return_value;
-   rr_yield_task();
+   rr_yield_task();*/
 }
-
+/*
 static int jt_helper(void *node, void *ref){
    if( ((ktask_t*)node)->state == TASK_EXIT && (ktask_t*)node == (ktask_t*)ref )
       return 1;
    return 0;
-}
+}*/
 
 void *rr_join_task(ktask_t *descriptor){
-
+/*
    ktask_t *task_to_join = NULL;
    while( task_to_join == NULL ){
       task_to_join = (ktask_t*)find_node_ll( (void**)&task_list, descriptor, jt_helper);
    }
-   return task_to_join->return_value;
+   return task_to_join->return_value;*/
+   return NULL;
 }
 
 //Fork the calling task
@@ -84,11 +81,12 @@ void idle_task(){
 //so that kmain may add tasks to it. The actual
 //scheduling is not done until rr_start_scheduler
 //is called.
-void rr_init_scheduler(){
+void rr_setup_scheduler(){
    //Add idle task
-   ktask_t *idle = k_create_kernel_task(idle_task, NULL, NULL, 1024, kernel_page_dir);
+   char *idle_stack = k_malloc(kernel_heap, 2000, 0x1000);
+   ktask_t *idle = k_create_ktask(idle_task, NULL, NULL, (uint32_t*)((uint8_t*)idle_stack + 2000));
    add_node_ll( (void**)&task_list, idle, 0 );
-   task_count++;   
+   task_count++;
 }   
 
 //Start the scheduler by jumping to the first task (idle)
@@ -99,29 +97,17 @@ void rr_init_scheduler(){
 void rr_start_scheduler(){
    //Index 0 is for the idle thread
    current_task = get_node_ll( (void**)&task_list, 0 );
-   load_pd( (uint32_t*)VIRT_TO_PHYS(current_task->task_page_directory) );
+   arch_run_next( &current_task->task_info );
    idle_task();
 }
 
 //The main scheduler. Routinely called to manage tasks
-thread_context_t *rr_schedule(thread_context_t *interrupted_task){
-   current_task->context = interrupted_task;
+void rr_schedule(){
 
    do{
       current_task_index = (current_task_index + 1) % task_count;
       current_task = get_node_ll( (void**)&task_list, current_task_index);
    }while( current_task->state != TASK_READY );
 
-   //Switch page dir if needed
-   if( current_task->task_page_directory != current_pdir ){
-      current_pdir = current_task->task_page_directory;
-      load_pd( (uint32_t*)VIRT_TO_PHYS(current_pdir) );
-   }
-
-   //Switch interrupt stack if needed
-   if( ! current_task->is_kernel_task )
-      set_kernel_stack( (uint32_t)current_task->interrupt_stack + 0x1000 );
-
-   return current_task->context;
+   arch_run_next( &(current_task->task_info) );
 }
-#endif

@@ -67,12 +67,6 @@ extern const int16_t gdt_userland_data;
 extern const int16_t gdt_userland_code_rpl;
 extern const int16_t gdt_userland_data_rpl;
 
-//Defined in descriptors.asm
-void load_tss();
-
-//Defined in descriptors.asm
-void load_gdt(gdt_descriptor_t*);
-
 //All of the GDT entries will be setup in init_gdt.
 //To simplify the process, no support is added to create
 //another gdt entry after setup.

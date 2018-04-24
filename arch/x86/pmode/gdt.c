@@ -1,10 +1,13 @@
 #include <arch/x86/pmode/gdt.h>
 
 //Our global descriptor table
-gdt_entry_t gdt_table[GDT_ENTRIES];
+static gdt_entry_t gdt_table[GDT_ENTRIES];
 
 //The GDT descriptor
-gdt_descriptor_t gdt_descriptor;
+static gdt_descriptor_t gdt_descriptor;
+
+//The TSS used by the system
+static tss_t tss_entry;
 
 const int16_t gdt_kernel_code = 0x8;
 const int16_t gdt_kernel_data = 0x10;

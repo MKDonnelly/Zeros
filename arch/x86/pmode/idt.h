@@ -3,6 +3,7 @@
 #include <lib/types.h>
 #include <arch/x86/pmode/gdt.h>
 #include <arch/x86/cpu.h>
+#include <arch/x86/pmode/descriptors.h>
 
 #define TOTAL_INTERRUPTS 256
 
@@ -29,14 +30,6 @@ typedef struct{
    uint16_t length;
    uint32_t base_addr;
 }__attribute__((packed)) idt_descriptor_t;
-
-//The Interrupt descriptor table and 
-//interrupt descriptor
-idt_entry_t idt_table[ TOTAL_INTERRUPTS ];
-idt_descriptor_t idt_descriptor;
-
-//Defined in descriptors.asm
-void arch_load_idt(idt_descriptor_t*);
 
 //Given an interrupt number and a 
 //function handler, place it into
