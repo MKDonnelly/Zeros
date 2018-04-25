@@ -6,7 +6,7 @@
 static uint8_t int_present[ TOTAL_INTERRUPTS / 8 ];
 
 //This holds an array of handlers for the interrupts
-static void (*int_handlers[TOTAL_INTERRUPTS])(registers_t);
+static void (*int_handlers[TOTAL_INTERRUPTS])(context_t);
 
 //This function initilizes the
 //whole interrupt system. It creates
@@ -29,7 +29,7 @@ void init_interrupts(){
 
 //Places the handler function into the interrupt handler array 
 //This is exported to general kernel code.
-void arch_register_interrupt( uint8_t int_number, void (*handler)(registers_t)){
+void arch_register_interrupt( uint8_t int_number, void (*handler)(context_t)){
   //Mark the interrupt as present
   bit_set( &int_present, int_number );
   int_handlers[int_number] = handler;
@@ -44,7 +44,9 @@ void arch_unregister_interrupt( uint8_t int_number ){
    int_handlers[int_number] = 0;
 }
 
-void main_interrupt_handler(registers_t r){
+//Every interrupt is directed towards this function and is 
+//then routed to the correct handler.
+void main_interrupt_handler(context_t r){
 
    //Check to see if this interrupt came from a PIC.
    //If it did, send the appropriate EOI

@@ -12,6 +12,26 @@
 extern gdt_kernel_data
 extern gdt_kernel_code
 
+;Stores the current context during an interrupt.
+;The scheduler may request this using get_current_context
+;and set this using set_current_context. This is the basic
+;method for task switching.
+current_context dq 0
+
+global get_current_context
+get_current_context:
+   mov eax, [current_context]
+   ret
+
+global set_current_context
+set_current_context:
+   push eax
+   mov eax, [esp+0x8]
+   mov [current_context], eax
+   pop eax
+   ret
+
+
 ; This is common to all interrupts.
 ; The only thing that differs is 
 ; the error code and interrupt
@@ -30,10 +50,7 @@ extern gdt_kernel_code
 ;     <pushad stuff>
 ;        32 bits e[a,c,d,b]x, edi, esi, esp, ebp
 
-extern cur_context
 interrupt_common:
-   ;cli   ;We cannot be interrupt during an interrupt
-
    pushad
 
    ;Save segment registers for userland interrupt
@@ -49,15 +66,14 @@ interrupt_common:
    mov fs, ax
    mov gs, ax
 
-   ;Save the current context
-   ;TODO maybe pass this as an argument 
-   ;instead of having this magic variable
-   mov [cur_context], esp
+   ;Store the current context into "current_context"
+   ;for use by the scheduler.
+   mov [current_context], esp
 
    call main_interrupt_handler 
 
    ;Restore context after scheduler call
-   mov esp, [cur_context]
+   mov esp, [current_context]
 
    ;Restore userland segment registers
    pop gs
@@ -73,9 +89,7 @@ interrupt_common:
    ;While we only push two bytes worth of
    ;data, the stack is automatically aligned
    ;to 4-byte boundaries. As a result, we need
-   ;to jump back 8 bytes. We could also do 
-   ;   pop eax
-   ;   pop eax
+   ;to jump back 8 bytes. 
    add esp, 8
    iretd
 

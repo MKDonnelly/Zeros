@@ -1,7 +1,5 @@
 #include <arch/x86/pmode/context.h>
 
-context_t *cur_context = NULL;
-
 //Sets up a context for a kernel-level task and returns a pointer
 //to the head of the stack (a context_t* type)
 context_t *arch_create_kcontext( void (*start)(void *), void *param, 

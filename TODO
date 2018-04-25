@@ -1,33 +1,16 @@
 Multitasking
-   Refine task/scheduler code. Move task stuff to arch layer.
-      Move scheduling struct pointers out of task and decouple
-      task<->scheduler dependency
-   Create a separate area for allocating thread stack
-      space. Place a guard page at the end of each so that
-      a page fault ocurrs if one exceeds its stack size
-   SMP
-   Work on threading code
-      improve scheduler (queues, priority, different algs)
-      create thread synchronization constructs, messages
-         use xchg to implement mutexes
-      make sure core functions (kmalloc, scheduling) cannot
-         be interrupted and corrupted using either cli/sti or locks
-      get a task exit without an explicit call to exit_task to work
+   Create guard page for ktask stacks
+   Symmetric Multi Processing (SMP)
+   Work on scheduler
+   Create thread synchronization primitives
+   Create message passing interface and shared memory for IPC
+   Use locking and sti/cli to prevent race conditions
+   Allow tasks to implicitly exit on return using exit_task
+   Utilize page faults better (kill task that makes a page fault,etc)
    program execution
       create symbol table for dynamic linker
       elf file parser
-
-paging
-   layout memory better
-   use page faults better (i.e. map in page if a stack overflows,
-      kill processes that make illegal memory access, etc)
-   make routine for mapping areas of memory, creating
-      userland page directory
-   create mmap syscall
-
-userland
-   create system call interface
-   move some drivers to userland
+   create systemcall interface
    use syscall/sysret instead of interrupt
 
 drivers
@@ -36,10 +19,7 @@ drivers
 
 dynamic memory
    Stress-test kmalloc
-   kzmalloc
-   Implement memory allocation algorithms
-      Buddy allocator
-      Create a slab allocator (have fixed size block ready)
+   kzmalloc, buddy allocator, slab allocator
  
 initrd
    Add in cpio or tar support
@@ -56,20 +36,12 @@ printing/screen manipulation:
   use hwinfo --framebuffer to see and program video modes
     also use grub gfx directive to boot into a higher video mode
   make routines for 1024x768 graphics mode (set by multiboot header)
+  make BGA driver
 
 documentation/testing
-   Unit tests for various subsystems
    Add a how-to to explain how each subsystem works
       Add examples for each subsystem for reference
       and list the dependencies
-   Set variables to trace dependency problems in kernel
-      (i.e. make sure if the heap is not setup, we do not
-      try to use it and throw an error)
-   Make all code conform to coding style in README
-   Create better print output (BUG,LOG,ASSERT,etc)
-      and catch errors by using __FILE__ and __LINE__
-      use assert more in code 
-   Clean up all of the circular #includes
 
 misc tasks 
    use a cross compiler
@@ -77,7 +49,6 @@ misc tasks
    Get proper release/press code working with keyboard
    make as much as possible work through the VFS 
    port zeros to xen
-   make BGA driver
    add in arch-specific bitwise operators, optimizations (AVX, SIMD, etc)
    port over a c library (newlib, uClib, musl)
 
@@ -85,7 +56,6 @@ advanced os examples:
    dragonfly bsd, minix, plan9, genode, haiku, helenos, redox
 
 low-priority
-   write oneshot for timer callback code
    add random number generator, md5 sum function
    try to boot UEFI with grub-efi
    add cpuid functions

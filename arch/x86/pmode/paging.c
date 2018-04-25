@@ -5,6 +5,10 @@
 pd_t *current_page_dir = NULL;
 pd_t *kernel_page_dir;
 
+//Given a page directory and a virtual address, return the 
+//pte corresponding to it. If create_pt is set, create any
+//page tables needed. If create_pt is not set and the pt
+//is not allocated, return null
 static pte_t *get_page( uint32_t vaddr, bool create_pt, pd_t *page_directory){
 
    //Get the page table
@@ -37,7 +41,7 @@ static pte_t *get_page( uint32_t vaddr, bool create_pt, pd_t *page_directory){
    return page_table_entry;
 }
 
-void map_page(uint32_t vaddr, uint32_t paddr, pd_t *page_directory){
+void map_page(uint32_t vaddr, uint32_t paddr, pd_t *page_directory, uint8_t rw, uint8_t user_access){
 
    //Get the pte to map the page
    pte_t *page = get_page( vaddr, 1, page_directory );
@@ -45,13 +49,23 @@ void map_page(uint32_t vaddr, uint32_t paddr, pd_t *page_directory){
    //Setup the actual mapping
    page->frame_addr = paddr / ARCH_FRAME_SIZE;
    page->present = PAGE_PRESENT;
-   page->rw = PAGE_RW;
-   page->user = PAGE_USR_ACCESS;
+   page->rw = rw;
+   page->user = user_access;
+}
+
+void map_page_range( uint32_t vaddr, uint32_t paddr, pd_t *page_directory, 
+                     uint8_t rw, uint8_t user_access, uint32_t length ){
+   while( length > 0 ){
+      map_page( vaddr, paddr, page_directory, rw, user_access );
+      vaddr += ARCH_PAGE_SIZE;
+      paddr += ARCH_PAGE_SIZE;
+      length -= ARCH_PAGE_SIZE;
+   }
 }
 
 //Used for pages that frequently change (like when used by copy_to_physiscal)
 void quick_map( uint32_t vaddr, uint32_t paddr, pd_t *page_directory){
-   map_page( vaddr, paddr, page_directory );
+   map_page( vaddr, paddr, page_directory, PAGE_RW, PAGE_KERNEL_ACCESS );
 
    //We expect the mapping to change frequently, so this ensure that when
    //we return, there is no cached reference to the page we mapped.
@@ -148,17 +162,13 @@ pd_t *clone_pd(pd_t *clone_dir){
 }
  
 void init_paging(){
-   //We will assume that we are loaded at 0xC0000000
-   //and that we can manage 5MB of physical memory.
-   unsigned int kernel_end_page = 0x500000 + 0xC0000000;
-
    //Make the page directory for the kernel
    kernel_page_dir = (pd_t*)k_malloc( kernel_heap, sizeof(pd_t), ARCH_PAGE_SIZE );
    memset( kernel_page_dir, sizeof(pd_t), 0 );
 
-   for(int i = KERNEL_VBASE; i < kernel_end_page; i += 0x1000 ){
-      map_page( i, i - KERNEL_VBASE, kernel_page_dir );
-   }
+   //Create the kernel page table mapping. Map 5M of the kernel starting
+   //at KERNEL_VADDR to the first 5M of physical memory
+   map_page_range( KERNEL_VADDR, 0, kernel_page_dir, PAGE_RW, PAGE_USR_ACCESS, 0x500000 );
 
    //Setup the interrupt handler for paging BEFORE enabling paging
    arch_register_interrupt( PAGE_INTERRUPT, page_int_handler);
@@ -168,7 +178,7 @@ void init_paging(){
    load_pd( (void*)VIRT_TO_PHYS(kernel_page_dir));
 }
 
-void page_int_handler(registers_t r){
+void page_int_handler(context_t r){
    int fault_addr;
    //TODO convert to assembly
    asm volatile("mov %%cr2, %0" : "=r" (fault_addr));

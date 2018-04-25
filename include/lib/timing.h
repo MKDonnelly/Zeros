@@ -36,6 +36,3 @@ void timing_set_alarm( void (*alarm_function)(), int ms_period);
 
 //Handles periodic interrupts from arch code
 void timing_main_handler();
-
-//Return current system time
-//system_time_t timing_get_time();

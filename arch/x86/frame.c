@@ -2,79 +2,79 @@
 
 //Bitfield for allocated frames (1 for allocated
 //0 for free)
-int8_t *frames;
+static int8_t *framepool_alloc;
 
 //Total number of frames being managed
-uint32_t total_frames;
+static uint32_t framepool_length;
 
 //The start address of the first frame
 //This is used as a reference when returning 
 //frame addresses
-uint32_t first_frame_addr;
+static uint32_t framepool_start;
 
-
-//Given a frame address, deallocate it in the frames bitfield 
+//Given a frame address, deallocate it in the framepool_alloc bitfield 
 void free_frame(uint32_t addr){
-    uint32_t index = (addr - first_frame_addr) / ARCH_FRAME_SIZE;
+    uint32_t index = (addr - framepool_start) / ARCH_FRAME_SIZE;
 
     //Free the frame for use by clearing
-    //its allocated bit in *frames.
-    bit_clear( frames, index );
+    //its allocated bit in framepool_alloc.
+    bit_clear( framepool_alloc, index );
 }
 
 //Specifically allocate a frame. Return -1 if
 //the frame is already allocated
 int8_t allocate_frame( uint32_t frame_addr ){
-   uint32_t index = (frame_addr - first_frame_addr) / ARCH_FRAME_SIZE;
-   if( bit_get( frames, index ) == 0 ){
-      bit_set( frames, index );
+   uint32_t index = (frame_addr - framepool_start) / ARCH_FRAME_SIZE;
+
+   if( bit_get( framepool_alloc, index ) == 0 ){
+      bit_set( framepool_alloc, index );
       return 0;
-   }else{
-      return -1;
    }
+
+   //Frame was already allocated
+   return -1;
 }
 
-int get_frame_stat( uint32_t frame_addr ){
-   uint32_t index = (frame_addr - first_frame_addr) / ARCH_FRAME_SIZE;
-   return bit_get( frames, index );
+//Get the allocation status of a frame. 1 = allocated, 0 = free
+uint8_t get_frame_stat( uint32_t frame_addr ){
+   uint32_t index = (frame_addr - framepool_start) / ARCH_FRAME_SIZE;
+   return bit_get( framepool_alloc, index );
 }
 
 
-//Loop over *frames to find the first unset bit,
+//Loop over *framepool_alloc to find the first unset bit,
 //which will indicate a free frame. Returns 0
-//if no frames are present. This returns the address
+//if no frames are present. This returns the physical address
 //of the frame if successful.
 uint32_t first_free_frame(){
 
-   //Loop over each bit in frames
-   for(int offset = 0; offset < total_frames; offset++){
-      if( bit_get( frames, offset ) == 0 ){
-         //Found a free frame! Return it and set it as allocated
-         bit_set( frames, offset );
-         return (offset * ARCH_FRAME_SIZE) + first_frame_addr;
+   //Loop over each bit in framepool_alloc
+   for(int offset = 0; offset < framepool_length; offset++){
+      if( bit_get( framepool_alloc, offset ) == 0 ){
+         //Found a free frame. Return it and set it as allocated
+         bit_set( framepool_alloc, offset );
+         return (offset * ARCH_FRAME_SIZE) + framepool_start;
       }
    }
-   //No free frames!
+   //No free frames
    return 0;
 }
 
 //Caller specifies the starting address and length
 //in frames to manager
-void init_frames(uint32_t start_addr, uint32_t frames_len){
+void make_frame_pool(uint32_t paddr_start, uint32_t length){
 
    //Set the number of frames and starting address
-   total_frames = frames_len;
-   first_frame_addr = start_addr;
+   framepool_start = paddr_start;
+   //The length will be the number of bits requied. We over-estimate
+   //to be safe.
+   framepool_length = (length / 8)  + 1;
 
    //Calculate how many bytes need to be allocated
-   //for the frames bitfield. We over-estimate how
-   //many bytes are needed (i.e. if we need 17 pages,
-   //we allocate 3 bytes)
-   int frames_length = (total_frames / 8) + 1;
-
-   //Allocate memory for the bitfield
-   frames = k_malloc(kernel_heap, frames_length, 0);
-
+   //for the framepool_alloc bitfield. We over-estimate how
+   //many bits we need to be save. At most, we will wast 7 bits.
+   framepool_alloc = k_malloc(kernel_heap, framepool_length, 0);
+   
    //Zero out the frames bitfield
-   memset( frames, frames_length, 0 );
+   memset( framepool_alloc, framepool_length, 0 );
 }

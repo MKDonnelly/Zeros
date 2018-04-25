@@ -1,22 +1,9 @@
 #include <kernel/sched/round_robin.h>
-/*
-struct sched_alg rr_alg = (struct sched_alg){
-   .add_task        =   rr_add_task,
-   .rm_task         =   rr_rm_task,
-   .exit_task       =   rr_exit_task,
-   .yield_task      =   rr_yield_task,
-   .join_task       =   rr_join_task,
-   .schedule        =   rr_schedule,
-   .init_scheduler  =   rr_init_scheduler,
-   .start_scheduler =   rr_start_scheduler,
-};*/
 
-ktask_t *task_list = NULL;
-
-ktask_t *current_task = NULL;
-int current_task_index = 0;
-int task_count = 0;
-
+static ktask_t *task_list = NULL;
+static ktask_t *current_task = NULL;
+static int current_task_index = 0;
+static int task_count = 0;
 
 void rr_add_task( ktask_t *new_task){
    add_node_ll( (void**)&task_list, new_task, task_count++);
@@ -84,7 +71,7 @@ void idle_task(){
 void rr_setup_scheduler(){
    //Add idle task
    char *idle_stack = k_malloc(kernel_heap, 2000, 0x1000);
-   ktask_t *idle = k_create_ktask(idle_task, NULL, NULL, (uint32_t*)((uint8_t*)idle_stack + 2000));
+   ktask_t *idle = k_create_ktask(idle_task, NULL, NULL, STACK_HEAD(idle_stack, 2000 ));
    add_node_ll( (void**)&task_list, idle, 0 );
    task_count++;
 }   

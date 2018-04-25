@@ -1,7 +1,6 @@
 #include <arch/x86/drivers/timer.h>
 
-
-void arch_timer_init( void (*timer_callback)(registers_t) ){
+void arch_timer_init( void (*timer_callback)(context_t) ){
 
    //Set the timer to operate at 100HZ
    set_timer_count( I8253_10MS_COUNTER );
@@ -11,7 +10,6 @@ void arch_timer_init( void (*timer_callback)(registers_t) ){
    enable_irq( TIMER_IRQ );
    arch_register_interrupt( TIMER_INTERRUPT, timer_callback );
 }
-
 
 void set_timer_count(uint16_t count){
 
@@ -30,16 +28,3 @@ void set_timer_count(uint16_t count){
    portb_write( I8253_CH0_P, higherByte );
 }
 
-/*
-static uint16_t get_timer_count(){
-   portb_write( I8253_CTRL_P, 0 );
-   
-   uint16_t result;
-   uint8_t tmp;
-   tmp = portb_read( 0x40 );
-   result = tmp;
-   tmp = portb_read( 0x40 );
-   result |= (tmp << 8 );
-
-   return result;
-}*/

@@ -1,6 +1,6 @@
 #include "syscall.h"
 
-static void syscall_handler(registers_t regs);
+static void syscall_handler(context_t regs);
 static void *syscall_table[TOTAL_SYSCALLS];
 
 void init_syscalls(){
@@ -12,7 +12,7 @@ void register_syscall( void *syscall_handler, int syscall_number ){
       syscall_table[syscall_number] = syscall_handler;
 }
 
-void syscall_handler(registers_t regs){
+void syscall_handler(context_t regs){
 
    if( regs.eax < 0 || regs.eax > TOTAL_SYSCALLS )
       return;

@@ -9,4 +9,3 @@
 void bit_set(void*,int);
 void bit_clear(void*,int);
 uint8_t bit_get(void*,int);
-

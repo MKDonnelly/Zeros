@@ -1,7 +1,5 @@
 #pragma once
 
-//TODO Create map_kernel(...pd_t*) and map_user(...pd_t*)
-
 #include <arch/x86/pmode/isr.h>
 #include <arch/x86/frame.h>
 #include <arch/x86/pmode/pagingasm.h>
@@ -11,6 +9,8 @@
 
 #include <lib/memory.h>
 #include <lib/types.h>
+
+#define KERNEL_VADDR 0xC0000000
 
 #define ARCH_PAGE_SIZE  0x1000
 #define TABLE_SIZE 0x1000
@@ -30,8 +30,6 @@
 #define PDE_IN_PD 1024
 #define PTE_IN_PT 1024
 
-#define KERNEL_VBASE 0xC0000000
-
 //The upper 10 bits of the address specifies the 
 //offset within the page directory.
 #define PD_INDEX(vaddr) (vaddr >> 22)
@@ -43,8 +41,8 @@
 //Used to convert Virtual <=> Physical addresses. This may
 //be insufficient later. I assume that all of these will be called
 //with kernel addresses
-#define PHYS_TO_VIRT(paddr) ( (uint32_t)paddr + KERNEL_VBASE)
-#define VIRT_TO_PHYS(vaddr) ( (uint32_t)vaddr - KERNEL_VBASE)
+#define PHYS_TO_VIRT(paddr) ( (uint32_t)paddr + KERNEL_VADDR)
+#define VIRT_TO_PHYS(vaddr) ( (uint32_t)vaddr - KERNEL_VADDR)
 
 //Align a page on 4K boundary
 #define ALIGN_4K(address) (address & ~0xFFF)
@@ -121,20 +119,17 @@ typedef struct pd pd_t;
 //This points to the current page directory being used
 //for address translation. It is null if not page table
 //is in effect.
-//TODO try to remove
+//TODO make {get,set}_{kernel,current}_page_dir
 extern pd_t *kernel_page_dir;
 extern pd_t *current_page_dir;
 
-/////////////////Get information from paging structures
-//Given a page directory and a virtual address, return the 
-//pte corresponding to it. If create_pt is set, create any
-//page tables needed. If create_pt is not set and the pt
-//is not allocated, return null
-//pte_t *get_page( uint32_t vaddr, bool create_pt, pd_t *page_directory); 
-//////////////////////////////////////////////////
-
 //Map a physical to virtual address in the paging structure
-void map_page(uint32_t vaddr, uint32_t paddr, pd_t *page_directory);
+void map_page(uint32_t vaddr, uint32_t paddr, pd_t *page_directory, 
+              uint8_t rw, uint8_t user_access);
+//Map a sequential range of pages so we do not have to repeatedly call
+//map_page
+void map_page_range( uint32_t vaddr, uint32_t paddr, pd_t *page_directory,
+                     uint8_t rw, uint8_t user_access, uint32_t length);
 void quick_map(uint32_t vaddr, uint32_t paddr, pd_t *page_directory);
 ///////////////////////////////////////
 
@@ -150,4 +145,4 @@ void copy_to_physical(char *vbuf, uint32_t paddr, uint32_t len);
 void init_paging();
 
 //Handles page interrupts
-void page_int_handler(registers_t);
+void page_int_handler(context_t);
