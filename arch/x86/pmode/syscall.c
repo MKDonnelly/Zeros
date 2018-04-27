@@ -1,7 +1,7 @@
 #include "syscall.h"
 
 static void syscall_handler(context_t regs);
-static void *syscall_table[TOTAL_SYSCALLS];
+static uint32_t (*syscall_table[TOTAL_SYSCALLS])();
 
 void init_syscalls(){
    arch_register_interrupt(SYSCALL_INT, syscall_handler );
@@ -17,18 +17,6 @@ void syscall_handler(context_t regs){
    if( regs.eax < 0 || regs.eax > TOTAL_SYSCALLS )
       return;
 
-   void *location = syscall_table[regs.eax];
-   int ret;
-   asm volatile("   \
-      push %1;      \
-      push %2;      \
-      push %3;      \
-      push %4;      \
-      push %5;      \
-      call *%6;     \
-      pop %%ebx;    \
-      pop %%ebx;    \
-      pop %%ebx;    \
-      pop %%ebx;    \
-      pop %%ebx;" : "=a" (ret) : "r" (regs.edi), "r"(regs.esi), "r"(regs.edx), "r"(regs.ecx), "r"(regs.ebx), "r"(location));
+   uint32_t (*syscall)() = syscall_table[regs.eax];
+   regs.eax = syscall(regs.ebx, regs.ecx, regs.edx, regs.esi, regs.edi);
 }

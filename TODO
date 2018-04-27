@@ -1,36 +1,51 @@
 Multitasking
+   program execution
+      work on elf linking and loading
+      READ MAN ELF!
+      For some reason, the program header offset is 0
+         when doing a default link with no linker script
+         Links to the same address w/ the default address
+         do as well, but other address work fine.
+   create systemcall interface 
    Create guard page for ktask stacks
    Symmetric Multi Processing (SMP)
    Work on scheduler
-   Create thread synchronization primitives
    Create message passing interface and shared memory for IPC
    Use locking and sti/cli to prevent race conditions
    Allow tasks to implicitly exit on return using exit_task
    Utilize page faults better (kill task that makes a page fault,etc)
-   program execution
-      create symbol table for dynamic linker
-      elf file parser
-   create systemcall interface
    use syscall/sysret instead of interrupt
 
 drivers
    APIC, HPET, ATA PIO mode, PCI, network card
    basic ext2 filesystem, CMOS
 
-dynamic memory
-   Stress-test kmalloc
-   kzmalloc, buddy allocator, slab allocator
- 
-initrd
-   Add in cpio or tar support
-   Add directory support to initrd and improve code
+make a modular kernel
+
+misc tasks 
+   use a cross compiler
+   Create /dev virtual directory
+   make as much as possible work through the VFS 
+   port zeros to xen
+   port over a c library (newlib, uClib, musl)
+
+advanced os examples:
+   dragonfly bsd, minix, plan9, genode, haiku, helenos, redox
+
+low-priority
+
+   add random number generator, md5 sum function
+   add in arch-specific bitwise operators, optimizations (AVX, SIMD, etc)
+   Get proper release/press code working with keyboard
+   try to boot UEFI with grub-efi
+   add cpuid functions
+   use timer channel 2 to play sound on pc speaker
+   work on arm arch code with qemu-arm
 
 printing/screen manipulation:
-  Double buffering
+  Double buffering, frame buffer
   Add escape sequences for vga colors in 3h mode
-  Work on VGA 13h mode driver
-     Implement basic shape drawing
-     Later on, implement a frame buffer
+  VGA 13h mode driver (shapes, graphics)
   Get a dump of the vga font and create custom font 
   Add more vga register modes (get higher res dumps using qemu)
   use hwinfo --framebuffer to see and program video modes
@@ -38,26 +53,11 @@ printing/screen manipulation:
   make routines for 1024x768 graphics mode (set by multiboot header)
   make BGA driver
 
+initrd
+   Add in cpio or tar support
+   Add directory support to initrd
+
 documentation/testing
    Add a how-to to explain how each subsystem works
       Add examples for each subsystem for reference
       and list the dependencies
-
-misc tasks 
-   use a cross compiler
-   Create /dev virtual directory
-   Get proper release/press code working with keyboard
-   make as much as possible work through the VFS 
-   port zeros to xen
-   add in arch-specific bitwise operators, optimizations (AVX, SIMD, etc)
-   port over a c library (newlib, uClib, musl)
-
-advanced os examples:
-   dragonfly bsd, minix, plan9, genode, haiku, helenos, redox
-
-low-priority
-   add random number generator, md5 sum function
-   try to boot UEFI with grub-efi
-   add cpuid functions
-   use timer channel 2 to play sound on pc speaker
-   work on arm arch code with qemu-arm

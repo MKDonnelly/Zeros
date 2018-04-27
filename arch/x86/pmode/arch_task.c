@@ -1,10 +1,10 @@
 #include <arch/x86/pmode/arch_task.h>
 
 
-arch_task_info_t arch_create_ktask(void (*start)(), void *param,
+arch_task_t arch_create_ktask(void (*start)(), void *param,
                                    void (*exit)(), uint32_t *stack){
 
-   arch_task_info_t kernel_task;
+   arch_task_t kernel_task;
 
    //Create the context
    kernel_task.task_context = arch_create_kcontext( start, param, exit, stack);
@@ -19,10 +19,12 @@ arch_task_info_t arch_create_ktask(void (*start)(), void *param,
    return kernel_task;
 }
 
-arch_task_info_t arch_create_utask(void (*start)(), void *param,
+//NOTE: This is used to create a userland task from a function in
+//the kernel code. This is for testing only, since all userland
+//programs will be loaded from and ELF file.
+arch_task_t arch_create_utask(void (*start)(), void *param,
                                    void (*exit)(), uint32_t *stack){
-   
-   arch_task_info_t user_task;
+   arch_task_t user_task;
 
    //Create context
    user_task.task_context = arch_create_ucontext(start, param, exit, stack);
@@ -32,6 +34,34 @@ arch_task_info_t arch_create_utask(void (*start)(), void *param,
 
    //Setup a system call stack of 1KB. Align on page boundary
    user_task.interrupt_stack = k_malloc( kernel_heap, 1024, 0x1000);
+
+   return user_task;
+}
+
+#define USERLAND_STACK 0xB0000000
+
+arch_task_t arch_load_utask_elf( char *elf_file_buffer ){
+   arch_task_t user_task;
+
+   //Userland task will inherit the pd from kernel_page_dir
+   user_task.task_pd = clone_pd( kernel_page_dir );
+
+   uint32_t start_addr = arch_create_from_elf( (Elf32_Ehdr*)elf_file_buffer, user_task.task_pd);
+
+   //Map in a stack for the task
+   uint32_t ustack = first_free_frame();
+   //Subtract the size of the page, since the stack head will be AT
+   //USERLAND_STACK.
+   map_page( USERLAND_STACK - ARCH_PAGE_SIZE, ustack, user_task.task_pd, 1, 1 );
+   quick_map( USERLAND_STACK - ARCH_PAGE_SIZE, ustack, kernel_page_dir );
+
+   //Create context. In this case, we do not need to subtract 
+   //ARCH_PAGE_SIZE since arch_create_ucontext assumes that is is
+   //passed the head of the stack.
+   user_task.task_context = arch_create_ucontext((void*)start_addr, NULL, NULL, (uint32_t*)USERLAND_STACK );
+
+   //Setup a syscall stack of 1K aligned on page boundary
+   user_task.interrupt_stack = k_malloc(kernel_heap, 1024, 0x1000 );
 
    return user_task;
 }

@@ -22,6 +22,8 @@ ktask_t *k_create_ktask( void (*start)(), void *param,
    new_task->ret_val = NULL;
    new_task->task_id = next_task_id++;
    new_task->is_kernel_task = 1;
+   new_task->task_brk_len = 0;
+   new_task->task_brk = NULL;
 
    return new_task;
 }
@@ -42,7 +44,27 @@ ktask_t *k_create_utask( void (*start)(), void *param,
    new_task->ret_val = NULL;
    new_task->task_id = next_task_id++;
    new_task->is_kernel_task = 0;
+   new_task->task_brk_len = 0;
+   new_task->task_brk = NULL;
 
    return new_task;
 }
 
+ktask_t *k_create_utask_elf( char *elf_data ){ 
+
+   //Create a task descriptor
+   ktask_t *new_task = k_malloc( kernel_heap, sizeof(ktask_t), 0 );
+
+   //Create bare arch-specific task info
+   new_task->task_info = arch_load_utask_elf(elf_data);
+
+   //Initilize generic task info
+   new_task->state = TASK_READY;
+   new_task->ret_val = NULL;
+   new_task->task_id = next_task_id++;
+   new_task->is_kernel_task = 0;
+   new_task->task_brk_len = 0;
+   new_task->task_brk = NULL;
+
+   return new_task;
+}

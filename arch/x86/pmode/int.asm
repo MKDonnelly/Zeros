@@ -26,8 +26,10 @@ get_current_context:
 global set_current_context
 set_current_context:
    push eax
-   mov eax, [esp+0x8]
+
+   mov eax, [esp+8]
    mov [current_context], eax
+
    pop eax
    ret
 

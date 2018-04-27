@@ -9,7 +9,7 @@ pd_t *kernel_page_dir;
 //pte corresponding to it. If create_pt is set, create any
 //page tables needed. If create_pt is not set and the pt
 //is not allocated, return null
-static pte_t *get_page( uint32_t vaddr, bool create_pt, pd_t *page_directory){
+pte_t *get_page( uint32_t vaddr, bool create_pt, pd_t *page_directory){
 
    //Get the page table
    pde_t *page_dir_entry = &page_directory->pd_entries[ PD_INDEX( vaddr ) ];
@@ -53,6 +53,8 @@ void map_page(uint32_t vaddr, uint32_t paddr, pd_t *page_directory, uint8_t rw, 
    page->user = user_access;
 }
 
+//TODO create map_page_range that does not care about physical memory
+//location and just uses the frame allocation system.
 void map_page_range( uint32_t vaddr, uint32_t paddr, pd_t *page_directory, 
                      uint8_t rw, uint8_t user_access, uint32_t length ){
    while( length > 0 ){
@@ -153,9 +155,11 @@ pd_t *clone_pd(pd_t *clone_dir){
          //If there is a directory in clone_dir that is not in the 
          //kernel page directory, make a copy of it.
          clone_table(&new_dir->pd_entries[i], &clone_dir->pd_entries[i] );
-         new_dir->pd_entries[i].present = PAGE_PRESENT;
-         new_dir->pd_entries[i].rw = PAGE_RW;
-         new_dir->pd_entries[i].user_access = PAGE_USR_ACCESS; //TEMPORARY
+         new_dir->pd_entries[i].present = 
+                  clone_dir->pd_entries[i].present;
+         new_dir->pd_entries[i].rw = clone_dir->pd_entries[i].rw;
+         new_dir->pd_entries[i].user_access = 
+                  clone_dir->pd_entries[i].user_access;
       }
    }
    return new_dir;
@@ -168,7 +172,10 @@ void init_paging(){
 
    //Create the kernel page table mapping. Map 5M of the kernel starting
    //at KERNEL_VADDR to the first 5M of physical memory
-   map_page_range( KERNEL_VADDR, 0, kernel_page_dir, PAGE_RW, PAGE_USR_ACCESS, 0x500000 );
+   map_page_range( KERNEL_VADDR, 0, kernel_page_dir, PAGE_RW, PAGE_KERNEL_ACCESS, 0x500000 );
+
+   //Setup a frame pool
+   make_frame_pool( 0x600000, 100 );
 
    //Setup the interrupt handler for paging BEFORE enabling paging
    arch_register_interrupt( PAGE_INTERRUPT, page_int_handler);

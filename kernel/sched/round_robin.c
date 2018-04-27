@@ -20,14 +20,14 @@ void rr_rm_task(ktask_t *descriptor){
 
 //We presume the current task calls yield
 void rr_yield_task(){
-//   arch_trigger_interrupt( SCHEDULER_INTERRUPT );
+   arch_trigger_scheduler();
 }
 
 //We presume that the current task is calling this if run
-void rr_exit_task(void *return_value){/*
+void rr_exit_task(void *return_value){
    current_task->state = TASK_EXIT;
-   current_task->return_value = return_value;
-   rr_yield_task();*/
+   current_task->ret_val = return_value;
+   rr_yield_task();
 }
 /*
 static int jt_helper(void *node, void *ref){

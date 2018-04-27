@@ -7,7 +7,6 @@
 #include <lib/debug.h>
 #include <lib/timing.h>
 #include <lib/abstract_ll.h>
-#include <lib/elf.h>
 
 #include <drivers/ata/ata_pio.h>
 
@@ -22,9 +21,11 @@
 #include <fs/fs.h>
 #include <fs/initrd/initrd.h>
 
+#include <lib/elf32.h>
+
 void thread1(){
    int t1count = 0;
-   while(1){
+   while(t1count < 5){
       k_printf_at("1", t1count++, 0);
       for(int i = 0; i < 50000000; i++);
    }
@@ -32,7 +33,7 @@ void thread1(){
 
 void thread2(){
    int t2count = 0;
-   while(1){
+   while(t2count < 51){
       k_printf_at("2", t2count++, 1);
       for(int i = 0; i < 50000000; i++);
    }
@@ -49,14 +50,31 @@ void kmain(struct multiboot_info *multiboot_info){
                 blocklist_malloc, blocklist_free, blocklist_init_heap );
 
    init_paging();
+   init_syscalls();
+   register_syscall( k_putchar, 0 );
+   register_syscall( rr_exit_task, 1);
+
 
    setup_sched(rr_schedule, 100);
    rr_setup_scheduler();
+/*
+   char *s1 = k_malloc(kernel_heap, 1024, 0);
+   char *s2 = k_malloc(kernel_heap, 1024, 0);
+   rr_add_task( k_create_ktask( thread1, NULL, rr_exit_task, STACK_HEAD(s1, 1024)));
+   rr_add_task( k_create_ktask( thread2, NULL, rr_exit_task, STACK_HEAD(s2, 1024)));
+*/
 
-   char *s1 = k_malloc(kernel_heap, 1024, 0x1000);
-   rr_add_task( k_create_ktask( thread1, NULL, NULL, STACK_HEAD(s1, 1024)));
-   char *s2 = k_malloc(kernel_heap, 1024, 0x1000);
-   rr_add_task( k_create_ktask( thread2, NULL, NULL, STACK_HEAD(s2, 1024)));
+//Read in first file from initrd (it will contain a test binary)
+   char *program_buf = k_malloc(kernel_heap, 5000, 0);
+   //identity map the lower part to make it easier to grab the initrd.
+   map_page_range( 0x0, 0x0, kernel_page_dir, PAGE_RW, PAGE_USR_ACCESS, 0x500000);
+   fs_root = init_initrd( ((struct module*)multiboot_info->mods)->start );
+   fs_node_t *first = fs_root->readdir( fs_root, 0 );
+   first->read( first, 0, first->length, program_buf);
+
+   ktask_t *new_task = k_create_utask_elf(program_buf);
+   
+   rr_add_task(new_task);
 
    rr_start_scheduler();
 

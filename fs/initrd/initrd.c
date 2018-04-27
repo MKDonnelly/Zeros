@@ -34,15 +34,12 @@ static uint32_t initrd_readfile(fs_node_t *node, uint32_t offset, uint32_t size,
    //be reading 1 byte values
    int8_t *ptr = (int8_t*)fileLocation;
 
-   //Now we can start reading!
+   //Now we can start reading
    int i;
    for(i = 0; i < size && i < node->length; i++){
       buffer[i] = ptr[i];
    }
 
-   //Make sure the string read is terminated by a null
-   //TODO change this as we will not always be reading strings
-   buffer[i] = 0; 
    return 0;
 }
 

@@ -25,6 +25,9 @@ void k_newline(){
    kernel_vga_screen.k_newline();
 }
 
+//TODO Fails when we print two chars in a row
+//     i.e. k_printf("%c %c", 'Z', 'Z');
+//     Only the first char is printed
 void k_printf(char *str, ...){
 
    va_arg args = va_start( str );

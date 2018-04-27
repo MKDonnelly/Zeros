@@ -14,10 +14,12 @@ typedef struct ktask{
 
    //Generic, arch-abstracted structure describing
    //the task's state.
-   arch_task_info_t task_info;
+   arch_task_t task_info;
 
    //Generic information related to every task
-   void *task_stack;
+   void *task_stack; //Pointer to top of stack
+   void *task_brk;   //Pointer to end of heap
+   uint32_t task_brk_len; //Length of task heap, in bytes
    enum TASK_STATE state;
    void *ret_val;
    uint32_t task_id;
@@ -37,3 +39,5 @@ ktask_t *k_create_ktask(void (*start)(), void *param,
 
 ktask_t *k_create_utask(void (*start)(), void *param,
                         void (*exit)(), uint32_t *stack);
+
+ktask_t *k_create_utask_elf(char *elf_data);

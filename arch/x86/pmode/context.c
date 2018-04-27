@@ -68,4 +68,3 @@ context_t *arch_create_ucontext( void (*start)(void*), void *param,
    //Return a pointer to the head of the stack of type context_t
    return context;
 }
-

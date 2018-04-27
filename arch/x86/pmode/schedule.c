@@ -2,9 +2,9 @@
 
 //High-level kernel scheduling function
 static void (*sched_callback)() = NULL;
-static arch_task_info_t *current_task = NULL;
+static arch_task_t *current_task = NULL;
 
-void arch_run_next(arch_task_info_t *next_task){
+void arch_run_next(arch_task_t *next_task){
    current_task = next_task;
 
    load_pd( (void*)VIRT_TO_PHYS(next_task->task_pd) );
@@ -13,6 +13,10 @@ void arch_run_next(arch_task_info_t *next_task){
    //Make sure we do not load that.
    if( next_task->interrupt_stack != NULL )
       set_kernel_stack( (uint32_t)next_task->interrupt_stack );
+}
+
+void arch_trigger_scheduler(){
+   arch_trigger_interrupt( ARCH_SCHED_INT );
 }
 
 void setup_sched(void (*sched_call_back)(), uint32_t ms_period){
