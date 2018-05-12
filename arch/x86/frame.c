@@ -73,7 +73,7 @@ void init_frames(uint32_t start_addr, uint32_t frames_len){
    int frames_length = (total_frames / 8) + 1;
 
    //Allocate memory for the bitfield
-   frames = k_malloc(kernel_heap, frames_length, 0);
+   frames = k_malloc(frames_length, 0);
 
    //Zero out the frames bitfield
    memset( frames, frames_length, 0 );

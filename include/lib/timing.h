@@ -1,7 +1,7 @@
 #pragma once
 
 #include <kernel/mm/heap.h>
-#include <lib/abstract_ll.h>
+#include <lib/generic_ll.h>
 #include <arch/x86/archx86.h>
 
 typedef struct{

@@ -7,12 +7,12 @@ int next_task_id = 0;
 ktask_t *k_create_kernel_task ( void *start_func, void *param, void *exit_func, uint32_t stack_size, pd_t *task_page_dir){
 
    //Create a thread descriptor
-   ktask_t *new_task = k_malloc( kernel_heap, sizeof(ktask_t), 0 );
+   ktask_t *new_task = k_malloc( sizeof(ktask_t), 0 );
 
    //Allocate stack space for the thread
    //WE MUST ALIGN THE THREAD STACK TO PAGE_SIZE OR ELSE THE
    //THREADS WILL GET ASYMETRIC PROCESSING TIME DUE TO ALIGNMENT!
-   void *stack = k_malloc( kernel_heap, stack_size, ARCH_PAGE_SIZE );
+   void *stack = k_malloc( stack_size, ARCH_PAGE_SIZE );
 
    new_task->stack_ptr = stack;
 
@@ -40,13 +40,13 @@ ktask_t *k_create_kernel_task ( void *start_func, void *param, void *exit_func, 
 ktask_t *k_create_userland_task ( void *start_func, void *param, void *exit_func, uint32_t stack_size, uint32_t stack_addr, pd_t *task_page_dir){
 
    //Create a thread descriptor
-   ktask_t *new_task = k_malloc( kernel_heap, sizeof(ktask_t), 0 );
+   ktask_t *new_task = k_malloc( sizeof(ktask_t), 0 );
 
    //Allocate stack space for the thread
    void *stack = (void*)stack_addr;
 
    //Allocate stack space for the interrupt stack
-   void *interrupt_stack = k_malloc( kernel_heap, 0x1000, 0 );
+   void *interrupt_stack = k_malloc( 0x1000, 0 );
    new_task->interrupt_stack = interrupt_stack;
 
    //Used to free the memory allocated 

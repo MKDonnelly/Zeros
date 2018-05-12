@@ -21,7 +21,7 @@ int task_count = 0;
 
 
 void rr_add_task( ktask_t *new_task){
-   add_node_ll( (void**)&task_list, new_task, task_count++);
+   add_node_ll( task_list, new_task, task_count++);
 }
 
 int rm_task_helper(void *node, void *ref){
@@ -45,17 +45,14 @@ void rr_exit_task(void *return_value){
    rr_yield_task();
 }
 
-static int jt_helper(void *node, void *ref){
-   if( ((ktask_t*)node)->state == TASK_EXIT && (ktask_t*)node == (ktask_t*)ref )
-      return 1;
-   return 0;
-}
-
 void *rr_join_task(ktask_t *descriptor){
 
    ktask_t *task_to_join = NULL;
    while( task_to_join == NULL ){
-      task_to_join = (ktask_t*)find_node_ll( (void**)&task_list, descriptor, jt_helper);
+      foreach_in_gll( task_list, task_iter ){
+         if( task_iter == descriptor && task_iter->state == TASK_EXIT )
+            task_to_join = task_iter;
+      }
    }
    return task_to_join->return_value;
 }
@@ -85,7 +82,7 @@ void idle_task(){
 void rr_init_scheduler(){
    //Add idle task
    ktask_t *idle = k_create_kernel_task(idle_task, NULL, NULL, 1024, kernel_page_dir);
-   add_node_ll( (void**)&task_list, idle, 0 );
+   add_node_ll( task_list, idle, 0 );
    task_count++;   
 }   
 
@@ -96,7 +93,7 @@ void rr_init_scheduler(){
 //task going.
 void rr_start_scheduler(){
    //Index 0 is for the idle thread
-   current_task = get_node_ll( (void**)&task_list, 0 );
+   current_task = get_node_ll( task_list, 0 );
    load_pd( (uint32_t*)VIRT_TO_PHYS(current_task->task_page_directory) );
    idle_task();
 }
@@ -107,7 +104,7 @@ thread_context_t *rr_schedule(thread_context_t *interrupted_task){
 
    do{
       current_task_index = (current_task_index + 1) % task_count;
-      current_task = get_node_ll( (void**)&task_list, current_task_index);
+      current_task = get_node_ll( task_list, current_task_index);
    }while( current_task->state != TASK_READY );
 
    //Switch page dir if needed

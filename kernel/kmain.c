@@ -6,7 +6,7 @@
 #include <lib/bitwise.h>
 #include <lib/debug.h>
 #include <lib/timing.h>
-#include <lib/abstract_ll.h>
+#include <lib/generic_ll.h>
 #include <lib/elf.h>
 
 #include <drivers/ata/ata_pio.h>
@@ -46,7 +46,8 @@ void kmain(struct multiboot_info *multiboot_info){
   arch_keyboard_init( keyboard_main_handler );
   k_clear_screen();
 
-  create_heap( &kernel_heap, 0x300000+0xC0000000, 0x200000, blocklist_malloc, blocklist_free, blocklist_init_heap );
+   create_heap( &global_kernel_heap, 0x300000+0xC0000000, 0x200000, 
+                &blocklist_heap );
 
   mutex_t lock;
   init_spinlock(&lock);
@@ -59,7 +60,7 @@ void kmain(struct multiboot_info *multiboot_info){
   init_syscalls();
   register_syscall( k_putchar, 0 );
   
-  char *userland_copy = (char*)k_malloc( kernel_heap, 5000, 0 );
+  char *userland_copy = (char*)k_malloc( 5000, 0 );
 
   //Read program from initrd
   fs_root = init_initrd( ((struct module*)multiboot_info->mods)->start );
@@ -81,7 +82,7 @@ void kmain(struct multiboot_info *multiboot_info){
     k_printf("%x %x %d\n", prog_hdr->p_vaddr, userland_copy + prog_hdr->p_offset, prog_hdr->p_filesize);
   }
 
-  char *ustack = k_malloc(kernel_heap, 0x1000, 0);
+  char *ustack = k_malloc( 0x1000, 0);
   pd_t *userland_pd = clone_pd( kernel_page_dir );
   map_page( 0x1000, 0x600000, userland_pd );
 

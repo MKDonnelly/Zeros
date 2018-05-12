@@ -1,5 +1,12 @@
 #include <kernel/mm/heap_blocklist.h>
 
+heap_algs_t blocklist_heap = {
+   .malloc = blocklist_malloc,
+   .free   = blocklist_free,
+   .init_heap = blocklist_init_heap
+};
+
+
 void blocklist_init_heap(heap_t *heap_descriptor){
 
     heap_block_t* head = (heap_block_t*)heap_descriptor->start;

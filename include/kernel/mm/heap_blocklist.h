@@ -10,7 +10,6 @@
 //and kmalloc will just merge it into the called memory.
 #define MIN_SPLIT 20
 
-
 typedef struct heap_block{
    //Pointer to the next heapNode
    //in the heap 
@@ -32,11 +31,13 @@ typedef struct heap_block{
    int8_t not_used : 7; //For future information
 } heap_block_t;
 
-//Initilize the kernel heap
-void blocklist_init_heap(heap_t*);
+extern heap_algs_t blocklist_heap;
+
+//Initilize the heap
+void blocklist_init_heap(heap_t *heap);
 
 //Dynamically allocate memory
-void *blocklist_malloc(heap_t*,uint32_t size, uint32_t align);
+void *blocklist_malloc(heap_t *heap, uint32_t size, uint32_t align);
 
 //Free dynamic memory
-void blocklist_free(heap_t*,void*);
+void blocklist_free(heap_t *heap, void *memblock);

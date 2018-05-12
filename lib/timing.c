@@ -8,36 +8,14 @@ int total_alarms = 0;
 
 void timing_set_alarm(void (*alarm_function)(), int ms_period){
 
-   alarm_t *new_alarm = (alarm_t*)k_malloc( kernel_heap, sizeof(alarm_t), 0);
+   alarm_t *new_alarm = (alarm_t*)k_malloc( sizeof(alarm_t), 0);
    new_alarm->callback = alarm_function;
    new_alarm->callback_period = new_alarm->time_left = ms_period;
 
-   add_node_ll( allist(alarm_list), new_alarm, 0);
+   add_node_ll( alarm_list, new_alarm, 0);
    total_alarms++;
 }
 
-//used with find_node_ll to run down
-//the abstract linked list of alarms.
-//decrements the time remaining and handles
-//any alarms that go off
-int handle_alarms(void *alarm1, void *alarm2){
-
-   //alarm1 will take on each item in the alarm list
-   alarm_t *current_alarm = (alarm_t*)alarm1;
-
-   //Subtract off 10ms. We assume that is the
-   //delay between successive timer interrupts.
-   current_alarm->time_left -= ARCH_TIMER_MS_PERIOD;
-
-   //Handle alarms that go off
-   if( current_alarm->time_left <= 0 ){
-      current_alarm->time_left = current_alarm->callback_period;
-      current_alarm->callback();
-   }
-
-   //Always return 0 so that we run down the linked list
-   return 0;
-}
 
 //Increment the global time and call any
 //alarms.
@@ -46,6 +24,14 @@ void timing_main_handler(){
 
    if( total_alarms ){
       //This runs down the list of alarms and handles each
-      find_node_ll( (void**)&alarm_list, NULL, handle_alarms );
+      foreach_in_gll( alarm_list, alarm_iter ){
+         alarm_iter->time_left -= ARCH_TIMER_MS_PERIOD;
+         
+         //Handle any alarms that go off
+         if( alarm_iter->time_left <= 0 ){
+            alarm_iter->time_left = alarm_iter->callback_period;
+            alarm_iter->callback();
+         }
+      }      
    }
 }

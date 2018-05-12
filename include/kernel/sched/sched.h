@@ -5,7 +5,7 @@
 
 #include <kernel/task.h>
 #include <lib/timing.h>
-#include <lib/abstract_ll.h>
+#include <lib/generic_ll.h>
 
 #define SCHEDULER_INTERRUPT 50
 

@@ -2,7 +2,7 @@
 
 #include <kernel/sched/sched.h>
 #include <kernel/task.h>
-#include <lib/abstract_ll.h>
+#include <lib/generic_ll.h>
 
 extern struct sched_alg rr_alg;
 
