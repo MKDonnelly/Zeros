@@ -2,15 +2,13 @@ Multitasking
    Refine task/scheduler code. Move task stuff to arch layer.
       Move scheduling struct pointers out of task and decouple
       task<->scheduler dependency
-
    Create a separate area for allocating thread stack
       space. Place a guard page at the end of each so that
       a page fault ocurrs if one exceeds its stack size
    SMP
    Work on threading code
       improve scheduler (queues, priority, different algs)
-      create thread synchronization constructs, messages
-         use xchg to implement mutexes
+      implement IPC
       make sure core functions (kmalloc, scheduling) cannot
          be interrupted and corrupted using either cli/sti or locks
       get a task exit without an explicit call to exit_task to work
@@ -81,6 +79,7 @@ misc tasks
    make BGA driver
    add in arch-specific bitwise operators, optimizations (AVX, SIMD, etc)
    port over a c library (newlib, uClib, musl)
+   look into the timestamp counter 
 
 advanced os examples:
    dragonfly bsd, minix, plan9, genode, haiku, helenos, redox

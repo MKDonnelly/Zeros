@@ -48,6 +48,12 @@ void kmain(struct multiboot_info *multiboot_info){
 
   create_heap( &kernel_heap, 0x300000+0xC0000000, 0x200000, blocklist_malloc, blocklist_free, blocklist_init_heap );
 
+  mutex_t lock;
+  init_spinlock(&lock);
+
+  for(int i = 0; i < 10; i++)
+     k_printf("%d\n", random());
+
   k_printf("Working");
 
   init_syscalls();

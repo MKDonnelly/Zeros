@@ -1,6 +1,7 @@
 #pragma once
 
 #include <lib/types.h>
+#include <arch/x86/pmode/spinlock.h>
 
 typedef struct heap{
    uint32_t start;
@@ -15,12 +16,16 @@ typedef struct heap{
    void *(*malloc)();
    void (*free)();
    void (*init_heap)();
-   
+
+   //This is to prevent the heap from being corrupted when
+   //being modified.
+   mutex_t heap_lock;
 }heap_t;
 
 //Used by kernel and initilized in kmain
 heap_t kernel_heap;
 
+//TODO clean these up
 #define k_malloc(heap_descriptor, size, alignment) heap_descriptor.malloc( &heap_descriptor, size, alignment )
 
 #define k_free(heap_descriptor, memblock) heap_descriptor.free( &heap_descriptor, memblock)

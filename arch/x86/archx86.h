@@ -9,6 +9,7 @@
 #include <arch/x86/pmode/isr.h>
 #include <arch/x86/pmode/context.h>
 #include <arch/x86/pmode/syscall.h>
+#include <arch/x86/pmode/spinlock.h>
 #include <arch/x86/cpu.h>
 
 #include <arch/x86/drivers/keyboard.h>
