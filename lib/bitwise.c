@@ -20,7 +20,6 @@ void bit_set( void *mem, int bitNum ){
    //We then access that char* as an array
    //and set the specified bit.
    ( (char*)mem )[index] |= (0x1 << offset);
-
 }
 
 void bit_clear( void *mem, int bitNum ){

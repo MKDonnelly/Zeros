@@ -39,21 +39,18 @@ void thread2(){
    }
 }
 
+#include <kernel/mm/heap_bitmap.h>
+
 void kmain(struct multiboot_info *multiboot_info){
 
-  arch_init_system();
-  arch_timer_init( timing_main_handler );
-  arch_keyboard_init( keyboard_main_handler );
-  k_clear_screen();
+   arch_init_system();
+   arch_timer_init( timing_main_handler );
+   arch_keyboard_init( keyboard_main_handler );
+   k_clear_screen();
+
 
    create_heap( &global_kernel_heap, 0x300000+0xC0000000, 0x200000, 
-                &blocklist_heap );
-
-  mutex_t lock;
-  init_spinlock(&lock);
-
-  for(int i = 0; i < 10; i++)
-     k_printf("%d\n", random());
+                &bitmap_heap );
 
   k_printf("Working");
 

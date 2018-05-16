@@ -1,7 +1,6 @@
 #pragma once
 
 #include <lib/types.h>
-#include <arch/x86/archx86.h>
 #include <kernel/mm/heap.h>
 
 //When splitting a piece of free memory in the

@@ -20,7 +20,7 @@ void blocklist_init_heap(heap_t *heap_descriptor){
     head->free_mem = ( (uint8_t*)head + sizeof(heap_block_t) );
     head->allocated = 0;
 
-    init_spinlock(&(heap_descriptor->heap_lock));
+    init_spinlock(&heap_descriptor->heap_lock);
 }
 
 
@@ -30,7 +30,7 @@ void blocklist_init_heap(heap_t *heap_descriptor){
 void *blocklist_malloc(heap_t *heap_descriptor, uint32_t size, uint32_t align){
 
    //Lock the heap to prevent corruption
-   acquire_spinlock( &(heap_descriptor->heap_lock) );
+   acquire_spinlock( &heap_descriptor->heap_lock );
 
    heap_block_t* head = (heap_block_t*)heap_descriptor->start;
 
@@ -81,7 +81,7 @@ void *blocklist_malloc(heap_t *heap_descriptor, uint32_t size, uint32_t align){
          current_node->allocated = 1;
 
          //Unlock the heap
-         free_spinlock( &(heap_descriptor->heap_lock) );
+         free_spinlock( &heap_descriptor->heap_lock );
          return current_node->free_mem;
 
      }else{
@@ -102,13 +102,13 @@ void *blocklist_malloc(heap_t *heap_descriptor, uint32_t size, uint32_t align){
          head->allocated = 1;
 
          //Unlock the heap
-         free_spinlock( &(heap_descriptor->heap_lock) );
+         free_spinlock( &heap_descriptor->heap_lock );
          return head->free_mem;
       }
    }
   
    //If we get here, we must have run out of memory.
-   free_spinlock( &(heap_descriptor->heap_lock) );
+   free_spinlock( &heap_descriptor->heap_lock );
    return NULL;
 }
 
@@ -147,7 +147,7 @@ static void blocklist_unify_heap(heap_t *heap_descriptor){
 void blocklist_free(heap_t *heap_descriptor, void *memChunk){
 
    //Lock the heap to prevent corruption
-   acquire_spinlock( &(heap_descriptor->heap_lock) );
+   acquire_spinlock( &heap_descriptor->heap_lock );
 
    heap_block_t *head = (heap_block_t*)heap_descriptor->start;
    char found_mem = 0;
@@ -174,5 +174,5 @@ void blocklist_free(heap_t *heap_descriptor, void *memChunk){
    //but it is simple. We already called lock,
    //so this function will NOT lock the heap again.
    blocklist_unify_heap(heap_descriptor);
-   free_spinlock( &(heap_descriptor->heap_lock) );
+   free_spinlock( &heap_descriptor->heap_lock );
 }

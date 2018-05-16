@@ -1,7 +1,4 @@
 Multitasking
-   Refine task/scheduler code. Move task stuff to arch layer.
-      Move scheduling struct pointers out of task and decouple
-      task<->scheduler dependency
    Create a separate area for allocating thread stack
       space. Place a guard page at the end of each so that
       a page fault ocurrs if one exceeds its stack size
@@ -9,9 +6,6 @@ Multitasking
    Work on threading code
       improve scheduler (queues, priority, different algs)
       implement IPC
-      make sure core functions (kmalloc, scheduling) cannot
-         be interrupted and corrupted using either cli/sti or locks
-      get a task exit without an explicit call to exit_task to work
    program execution
       create symbol table for dynamic linker
       elf file parser
@@ -20,8 +14,6 @@ paging
    layout memory better
    use page faults better (i.e. map in page if a stack overflows,
       kill processes that make illegal memory access, etc)
-   make routine for mapping areas of memory, creating
-      userland page directory
    create mmap syscall
 
 userland
