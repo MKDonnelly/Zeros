@@ -33,7 +33,7 @@ void thread1(){
 
 void thread2(){
    int t2count = 0;
-   while(t2count < 51){
+   while(t2count < 5){
       k_printf_at("2", t2count++, 1);
       for(int i = 0; i < 50000000; i++);
    }
@@ -57,13 +57,13 @@ void kmain(struct multiboot_info *multiboot_info){
 
    setup_sched(rr_schedule, 100);
    rr_setup_scheduler();
-/*
-   char *s1 = k_malloc(kernel_heap, 1024, 0);
-   char *s2 = k_malloc(kernel_heap, 1024, 0);
+
+   char *s1 = k_malloc(kernel_heap, 1024, 0x1000);
+   char *s2 = k_malloc(kernel_heap, 1024, 0x1000);
    rr_add_task( k_create_ktask( thread1, NULL, rr_exit_task, STACK_HEAD(s1, 1024)));
    rr_add_task( k_create_ktask( thread2, NULL, rr_exit_task, STACK_HEAD(s2, 1024)));
-*/
 
+/*
 //Read in first file from initrd (it will contain a test binary)
    char *program_buf = k_malloc(kernel_heap, 5000, 0);
    //identity map the lower part to make it easier to grab the initrd.
@@ -75,7 +75,7 @@ void kmain(struct multiboot_info *multiboot_info){
    ktask_t *new_task = k_create_utask_elf(program_buf);
    
    rr_add_task(new_task);
-
+*/
    rr_start_scheduler();
 
 /*
