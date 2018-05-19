@@ -4,15 +4,18 @@
 //a unique id to every task
 int next_task_id = 0;
 
-ktask_t *k_create_ktask( void (*start)(), void *param, 
-                         void (*exit)(), uint32_t *stack){
+#define STACK_SIZE 0x1000
+
+ktask_t *k_create_ktask( void (*start)(), void *param, void (*exit)()){
 
    //Create a thread descriptor
    ktask_t *new_task = k_malloc( sizeof(ktask_t), 0 );
 
    //WE MUST ALIGN THE THREAD STACK TO PAGE_SIZE OR ELSE THE
    //THREADS WILL GET ASYMETRIC PROCESSING TIME DUE TO ALIGNMENT!
-   new_task->task_stack = stack;
+   //new_task->task_stack = stack;
+   char *stack = k_malloc( STACK_SIZE, ARCH_PAGE_SIZE );
+   new_task->task_stack = STACK_HEAD( stack, ARCH_PAGE_SIZE );
 
    //Intilize the arch-specific member task_info 
    new_task->task_info = arch_create_ktask(start, param, exit, stack);

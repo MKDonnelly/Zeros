@@ -29,8 +29,9 @@ static void idle_task(){
 
 void rr_setup(){
    //Add idle task
-   char *idle_stack = k_malloc( 2000, 0x1000);
-   ktask_t *idle = k_create_ktask(idle_task, NULL, NULL, STACK_HEAD(idle_stack, 2000 ));
+//   char *idle_stack = k_malloc( 2000, 0x1000);
+//   ktask_t *idle = k_create_ktask(idle_task, NULL, NULL, STACK_HEAD(idle_stack, 2000 ));
+   ktask_t *dle = k_create_ktask(idle_task, NULL, NULL);
    add_node_ll( task_list, idle, 0 );
    task_count++;
 }   
