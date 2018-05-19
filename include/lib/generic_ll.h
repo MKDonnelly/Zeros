@@ -2,6 +2,7 @@
 
 #include <lib/types.h>
 #include <kernel/mm/heap.h>
+
 /*			Generic Linked List
    These functions comprise a data structure that is a greatly
    generalized linked list. An Generic Linked List (hereby abbreviated
@@ -25,9 +26,7 @@
              element = element->next )
 
 
-//Create a lambda function. This is a very useful construct when
-//used with apply_op_ll since we can create small functions to
-//pass to it.
+//Create a lambda function.
 #define LAMBDA( rettype, params, func )  \
         ({                               \
            rettype __lambda__ params {   \
@@ -42,7 +41,7 @@
 //arguments are passed, return -1
 #define create_ll( list, num_elements, element_size ) \
 	__create_ll( (void**)&list, num_elements, element_size )
-int __create_ll( void **list, int count, int element_size);
+void __create_ll( void **list, int count, int element_size);
 
 
 //Runs down a linked list and frees each node.
@@ -52,29 +51,39 @@ void __dealloc_ll(void **list);
 
 
 //Adds an element to the list at the given index
-//Returns -1 on error
 #define add_node_ll( list, element, index ) \
 	__add_node_ll( (void**)&list, element, index )
-int __add_node_ll( void **list, void *element, int index);
+void __add_node_ll( void **list, void *element, int index);
 
 
 //Removes the given element from the list and returns it.
 //Returns NULL on error
-#define rm_node_ll( list, index )\
-	__rm_node_ll( (void**)&list, index )
-void *__rm_node_ll( void **list, int index );
+#define rmi_node_ll( list, index )\
+	__rmi_node_ll((void**)&list, index)
+void *__rmi_node_ll( void **list, int index );
+
+//Removes the node given a pointer to it
+#define rmp_node_ll( list, ptr )\
+	__rmp_node_ll((void**)&list, ptr)
+void __rmp_node_ll( void **list, void *ptr );
 
 
 //Returns the given node at index. Returns NULL on error
+//This macro simplifies the syntax by automatically casting
+//the return pointer and transforming list into (void**)&list
 #define get_node_ll( list, index ) \
-	__get_node_ll( (void**)&list, index )
+	((typeof(list))__get_node_ll( (void**)&list, index ))
 void *__get_node_ll( void **list, int index );
 
 //Replaces the node at the given index with the new node.
 //Returns the old node.
-#define set_node_ll( list, new_node, index ) \
-	__set_node_ll( (void**)&list, new_node, index )
-void *__set_node_ll( void **list, void *new_node, int index );
+#define replacei_node_ll( list, new_node, index ) \
+	__replacei_node_ll( (void**)&list, new_node, index )
+void *__replacei_node_ll( void **list, void *new_node, int index );
+
+#define replacep_node_ll( list, new_node, old ) \
+	__replacep_node_ll( (void**)&list, new_node, old )
+void *__replacep_node_ll( void **list, void *new_node, void *old );
 
 //Returns the size of the generic linked list
 #define get_size_ll( list )\

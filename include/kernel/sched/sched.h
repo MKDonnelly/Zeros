@@ -26,7 +26,7 @@ typedef struct{
    void (*scheduler_exit_task)();
 
    //Used to join with a given task
-   void (*scheduler_join_task)();
+   void *(*scheduler_join_task)();
 
    //This does the actual task switching and is
    //routinely called.
