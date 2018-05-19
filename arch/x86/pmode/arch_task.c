@@ -33,7 +33,7 @@ arch_task_t arch_create_utask(void (*start)(), void *param,
    user_task.task_pd = clone_pd( kernel_page_dir );
 
    //Setup a system call stack of 1KB. Align on page boundary
-   user_task.interrupt_stack = k_malloc( kernel_heap, 1024, 0x1000);
+   user_task.interrupt_stack = k_malloc( 1024, 0x1000);
 
    return user_task;
 }
@@ -61,7 +61,7 @@ arch_task_t arch_load_utask_elf( char *elf_file_buffer ){
    user_task.task_context = arch_create_ucontext((void*)start_addr, NULL, NULL, (uint32_t*)USERLAND_STACK );
 
    //Setup a syscall stack of 1K aligned on page boundary
-   user_task.interrupt_stack = k_malloc(kernel_heap, 1024, 0x1000 );
+   user_task.interrupt_stack = k_malloc( 1024, 0x1000 );
 
    return user_task;
 }

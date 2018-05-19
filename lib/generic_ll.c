@@ -1,33 +1,44 @@
-#include <lib/abstract_ll.h>
+#include <lib/generic_ll.h>
 
-//Internally used by create_ll
-//NEVER used by outside code.
+//Internally used and NEVER used by outside code.
+//This is meant to cast an unknown list element into
+//something that we can work with. 
 typedef struct mem{
    struct mem *next;
 }mem_t;
 
-//Creates a linked list. Callers will need to pass in
-//create_ll( (void**)&my_list, ...)
-void create_ll( void **list, int count, int element_size){
 
-   //Validate arguments. If any are invalid, return. 
-   if( list == 0 || count < 0 || element_size <= 0 ){
-      return;
+//Given a pointer to an element of the type we are using,
+// create a linked list with 'count' items, each of size
+// 'element_size'. Passing 0 for size nulls the list.
+//ex.
+//   my_crazy_structure *my_structure;
+//   create_ll( my_structure, 20, sizeof(my_crazy_structure));
+//              ^^^^^^^^^^^^ Valid because of macro in header
+int __create_ll( void **list, int count, int element_size){
+
+   //Validate arguments. If any are invalid, return null
+   if( list == 0 || count < 0 || element_size < 0 ){
+      return -1;
    }
 
-   if( count == 0 ){
+   //A ALL of size zero is a null list
+   if( count == 0 || element_size == 0 ){
       *((mem_t**)list) = NULL;
-      return;
+      return 0;
    }
 
+   //Initilize the first element.
    mem_t **head = (mem_t**)list;
-   (*head) = (mem_t*)k_malloc(kernel_heap, element_size, 0);
+   (*head) = (mem_t*)k_malloc(element_size, 0);
 
    mem_t *next_node = (*head);
 
+   //While there are still more elements to create
    while( --count > 0 ){
-      //Allocate the *next pointer and jump through it.
-      next_node->next = (mem_t*)k_malloc(kernel_heap, element_size, 0 );
+
+      //Allocate the *next item in the list and jump through it.
+      next_node->next = (mem_t*)k_malloc( element_size, 0 );
       next_node = next_node->next;
    }
 
@@ -36,22 +47,34 @@ void create_ll( void **list, int count, int element_size){
 }
 
 
-void dealloc_ll(void **list){
+//Deallocates each item in the linked list.
+//ex.
+//   my_crazy_structure *list;
+//   ...
+//   dealloc_ll( list );
+void __dealloc_ll(void **list){
 
-   mem_t **h = (mem_t**)list;
-
-   mem_t *head = (mem_t*)(*h);
-   mem_t *next = (mem_t*)(*h);
    
+   mem_t **list_addr = (mem_t**)list;
+
+   mem_t *head = (mem_t*)(*list_addr);
+   mem_t *next = (mem_t*)(*list_addr);
+  
+   //Run down the linked list by freeing the head node
+   //and then stepping to next. 
    while( head != NULL ){
       next = head->next;
-      k_free(kernel_heap, head );
+      k_free( head );
       head = next;
    }
 }
 
+
 //Adds element at index in list. Returns -1 on error
-int add_node_ll( void **list, void *element, int index){
+//ex.
+//    my_crazy_structure *list;
+//    add_node_ll( list, new_element, 0 );
+int __add_node_ll( void **list, void *element, int index){
 
    //Return if the element is null or the index is bad
    //Also return if we are asked to place an element
@@ -63,7 +86,8 @@ int add_node_ll( void **list, void *element, int index){
    mem_t **head = (mem_t**)list;
 
    //Adding an element to the head is a special case
-   if( index == 0 ){      
+   //We need to modify the actual pointer to the list passed in.
+   if( index == 0 ){
       mem_t *tmp = *head;
       (*head) = element;
       
@@ -101,10 +125,10 @@ int add_node_ll( void **list, void *element, int index){
 
 //Returns the node given at index and removes
 //it from the list. Returns null on error.
-void *rm_node_ll(void **list, int index){
+void *__rm_node_ll(void **list, int index){
 
    if( *((mem_t**)list) == NULL || index < 0 )
-      return 0;
+      return NULL;
 
    mem_t **head = (mem_t**)list;
    mem_t *stepper = (*head);
@@ -142,10 +166,10 @@ void *rm_node_ll(void **list, int index){
 
 //Returns the node given at index but does
 //not remove the node. Returns null on error
-void *get_node_ll(void **list, int index){
+void *__get_node_ll(void **list, int index){
 
    if( *((mem_t**)list) == NULL || index < 0 )
-      return 0;
+      return NULL;
 
    mem_t **head = (mem_t**)list;
    mem_t *stepper = (*head);
@@ -174,10 +198,10 @@ void *get_node_ll(void **list, int index){
 
 //Replaces the node at index with new_node and
 //returns the old node at that index. Returns null on error.
-void *set_node_ll(void **list, void *new_node, int index){
+void *__set_node_ll(void **list, void *new_node, int index){
 
    if( *((mem_t**)list) == NULL || new_node == NULL || index < 0 )
-      return 0;
+      return NULL;
 
    mem_t **head = (mem_t**)list;
    mem_t *stepper = (*head);
@@ -211,29 +235,14 @@ void *set_node_ll(void **list, void *new_node, int index){
    return ret_node;
 }
 
-//Find the given element in the list, using a compare function
-//passed in.  Return null if it is not found.
-void *find_node_ll( void **list, void *element, int (*compare_function)(void *each_in_list, void *reference_node) ){
-
-    mem_t **head = (mem_t**)list;
-    mem_t *stepper = *head;
-
-    while( stepper != NULL ){
-       if( compare_function( stepper, element ) == 1 )
-          return stepper;
-       stepper = stepper->next;
-    }
-    return 0;
-}
-
-void apply_op_ll( void **list, void (*operator_function)(void*)){
-
+int __get_size_ll( void **list ){
    mem_t **head = (mem_t**)list;
-   mem_t *next = *head;
+   mem_t *element = *head;
+   int total = 0;
 
-   while( next != NULL ){
-      operator_function( (void*)next );
-      next = next->next;
+   while( element != NULL ){
+      element = element->next;
+      total++;
    }
+   return total;
 }
-

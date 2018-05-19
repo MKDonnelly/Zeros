@@ -55,7 +55,7 @@ uint16_t *identify_drive( uint8_t bus, uint8_t drive ){
   //now wait until the DRQ bit (bit 3) is set
   while( ! (portb_read( ATA_PIO_CMD_P ) & 0x8 ) );
 
-  uint16_t *identify_data = k_malloc( kernel_heap, sizeof(uint16_t) * SECTOR_SIZE, 0);
+  uint16_t *identify_data = k_malloc( sizeof(uint16_t) * SECTOR_SIZE, 0);
 
   //if err is not set, read in the data
   if( ! (portb_read( ATA_PIO_CMD_P ) & 0x1 ) ){
@@ -89,7 +89,7 @@ uint16_t *ata_pio_read_sector( uint8_t total_sectors, uint32_t lba ){
   while( ! (portb_read( ATA_PIO_CMD_P ) & 0x8 ) );
 
   //we can now read in a sector
-  uint16_t *buffer = k_malloc( kernel_heap, sizeof(uint16_t) * SECTOR_SIZE, 0);
+  uint16_t *buffer = k_malloc( sizeof(uint16_t) * SECTOR_SIZE, 0);
   for(int i = 0; i < SECTOR_SIZE; i++){
      buffer[i] = portw_read( ATA_PIO_DATA_P );
   }

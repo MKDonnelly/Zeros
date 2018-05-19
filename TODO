@@ -29,6 +29,7 @@ misc tasks
    make as much as possible work through the VFS 
    port zeros to xen
    port over a c library (newlib, uClib, musl)
+   look into the timestamp counter 
 
 advanced os examples:
    dragonfly bsd, minix, plan9, genode, haiku, helenos, redox

@@ -7,8 +7,8 @@ int next_task_id = 0;
 ktask_t *k_create_ktask( void (*start)(), void *param, 
                          void (*exit)(), uint32_t *stack){
 
-   //Create a task descriptor
-   ktask_t *new_task = k_malloc( kernel_heap, sizeof(ktask_t), 0 );
+   //Create a thread descriptor
+   ktask_t *new_task = k_malloc( sizeof(ktask_t), 0 );
 
    //WE MUST ALIGN THE THREAD STACK TO PAGE_SIZE OR ELSE THE
    //THREADS WILL GET ASYMETRIC PROCESSING TIME DUE TO ALIGNMENT!
@@ -31,8 +31,8 @@ ktask_t *k_create_ktask( void (*start)(), void *param,
 ktask_t *k_create_utask( void (*start)(), void *param, 
                          void (*exit)(), uint32_t *stack){
 
-   //Create a task descriptor
-   ktask_t *new_task = k_malloc( kernel_heap, sizeof(ktask_t), 0 );
+   //Create a thread descriptor
+   ktask_t *new_task = k_malloc( sizeof(ktask_t), 0 );
 
    new_task->task_stack = stack;
 
@@ -53,7 +53,7 @@ ktask_t *k_create_utask( void (*start)(), void *param,
 ktask_t *k_create_utask_elf( char *elf_data ){ 
 
    //Create a task descriptor
-   ktask_t *new_task = k_malloc( kernel_heap, sizeof(ktask_t), 0 );
+   ktask_t *new_task = k_malloc( sizeof(ktask_t), 0 );
 
    //Create bare arch-specific task info
    new_task->task_info = arch_load_utask_elf(elf_data);

@@ -73,7 +73,7 @@ void make_frame_pool(uint32_t paddr_start, uint32_t length){
    //Calculate how many bytes need to be allocated
    //for the framepool_alloc bitfield. We over-estimate how
    //many bits we need to be save. At most, we will wast 7 bits.
-   framepool_alloc = k_malloc(kernel_heap, framepool_length, 0);
+   framepool_alloc = k_malloc( framepool_length, 0);
    
    //Zero out the frames bitfield
    memset( framepool_alloc, framepool_length, 0 );

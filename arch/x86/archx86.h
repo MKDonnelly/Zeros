@@ -11,6 +11,8 @@
 #include <arch/x86/pmode/syscall.h>
 #include <arch/x86/pmode/arch_task.h>
 #include <arch/x86/pmode/schedule.h>
+#include <arch/x86/pmode/spinlock.h>
+#include <arch/x86/cpu.h>
 
 #include <arch/x86/drivers/keyboard.h>
 #include <arch/x86/drivers/mouse.h>

@@ -1,5 +1,12 @@
 #include <kernel/mm/heap_blocklist.h>
 
+heap_algs_t blocklist_heap = {
+   .malloc = blocklist_malloc,
+   .free   = blocklist_free,
+   .init_heap = blocklist_init_heap
+};
+
+
 void blocklist_init_heap(heap_t *heap_descriptor){
 
     heap_block_t* head = (heap_block_t*)heap_descriptor->start;
@@ -12,6 +19,8 @@ void blocklist_init_heap(heap_t *heap_descriptor){
     heap_descriptor->size_left -= sizeof(heap_block_t);
     head->free_mem = ( (uint8_t*)head + sizeof(heap_block_t) );
     head->allocated = 0;
+
+    init_spinlock(&heap_descriptor->heap_lock);
 }
 
 
@@ -19,6 +28,9 @@ void blocklist_init_heap(heap_t *heap_descriptor){
 //align the memory to it's size. If phys is non-null, return the physical
 //address of the allocate memory (different when using paging)
 void *blocklist_malloc(heap_t *heap_descriptor, uint32_t size, uint32_t align){
+
+   //Lock the heap to prevent corruption
+   acquire_spinlock( &heap_descriptor->heap_lock );
 
    heap_block_t* head = (heap_block_t*)heap_descriptor->start;
 
@@ -68,6 +80,8 @@ void *blocklist_malloc(heap_t *heap_descriptor, uint32_t size, uint32_t align){
 
          current_node->allocated = 1;
 
+         //Unlock the heap
+         free_spinlock( &heap_descriptor->heap_lock );
          return current_node->free_mem;
 
      }else{
@@ -87,18 +101,23 @@ void *blocklist_malloc(heap_t *heap_descriptor, uint32_t size, uint32_t align){
 
          head->allocated = 1;
 
+         //Unlock the heap
+         free_spinlock( &heap_descriptor->heap_lock );
          return head->free_mem;
       }
    }
   
    //If we get here, we must have run out of memory.
+   free_spinlock( &heap_descriptor->heap_lock );
    return NULL;
 }
 
 
 //Run through the heap and merge as much
-//free memory as possible. 
+//free memory as possible. THIS SHOULD ONLY BE CALLED
+//BY FREE, SO NO LOCK IS NEEDED!
 static void blocklist_unify_heap(heap_t *heap_descriptor){
+
    heap_block_t *head = (heap_block_t*)heap_descriptor->start;
 
    while( head != NULL ){
@@ -127,6 +146,9 @@ static void blocklist_unify_heap(heap_t *heap_descriptor){
 //not be the first free memory location
 void blocklist_free(heap_t *heap_descriptor, void *memChunk){
 
+   //Lock the heap to prevent corruption
+   acquire_spinlock( &heap_descriptor->heap_lock );
+
    heap_block_t *head = (heap_block_t*)heap_descriptor->start;
    char found_mem = 0;
 
@@ -149,6 +171,8 @@ void blocklist_free(heap_t *heap_descriptor, void *memChunk){
    }
 
    //Yes, this is very inefficient, 
-   //but it is simple.
+   //but it is simple. We already called lock,
+   //so this function will NOT lock the heap again.
    blocklist_unify_heap(heap_descriptor);
+   free_spinlock( &heap_descriptor->heap_lock );
 }

@@ -21,7 +21,7 @@ pte_t *get_page( uint32_t vaddr, bool create_pt, pd_t *page_directory){
       return NULL;
    }else if( page_dir_entry->table_addr == 0 && create_pt ){
       //Create a new page table to use
-      pt_t *new_pt = k_malloc( kernel_heap, sizeof(pt_t), ARCH_PAGE_SIZE );
+      pt_t *new_pt = k_malloc( sizeof(pt_t), ARCH_PAGE_SIZE );
 
       //We need to place the physical address of the allocated block
       //of memory into the descriptor. So take the virtual address
@@ -107,7 +107,7 @@ static void clone_table(pde_t *dest_pde, pde_t *source_pde){
       return;
 
    pt_t *dest_pt = (pt_t*)PHYS_TO_VIRT(dest_pde->table_addr * ARCH_PAGE_SIZE);
-   pt_t *source_pt = (pt_t*)k_malloc(kernel_heap, sizeof(pt_t), ARCH_PAGE_SIZE);
+   pt_t *source_pt = (pt_t*)k_malloc( sizeof(pt_t), ARCH_PAGE_SIZE);
    memset(source_pt, sizeof(pt_t), 0);
 
    //For every page descriptor in the source table, make a new page
@@ -139,7 +139,7 @@ static void clone_table(pde_t *dest_pde, pde_t *source_pde){
 
 pd_t *clone_pd(pd_t *clone_dir){
 
-   pd_t *new_dir = k_malloc( kernel_heap, sizeof(pd_t), ARCH_PAGE_SIZE );
+   pd_t *new_dir = k_malloc( sizeof(pd_t), ARCH_PAGE_SIZE );
    memset( new_dir, sizeof(pd_t), 0 );
 
    for(int i = 0; i < PDE_IN_PD; i++){
@@ -167,7 +167,7 @@ pd_t *clone_pd(pd_t *clone_dir){
  
 void init_paging(){
    //Make the page directory for the kernel
-   kernel_page_dir = (pd_t*)k_malloc( kernel_heap, sizeof(pd_t), ARCH_PAGE_SIZE );
+   kernel_page_dir = (pd_t*)k_malloc( sizeof(pd_t), ARCH_PAGE_SIZE );
    memset( kernel_page_dir, sizeof(pd_t), 0 );
 
    //Create the kernel page table mapping. Map 5M of the kernel starting
