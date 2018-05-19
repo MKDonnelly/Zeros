@@ -8,6 +8,8 @@ global _start
 _start:
    mov ecx, str
    call write_str
+
+.end:
    mov eax, 1
    int 0x31
 

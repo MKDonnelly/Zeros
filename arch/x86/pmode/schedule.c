@@ -19,10 +19,14 @@ void arch_trigger_scheduler(){
    arch_trigger_interrupt( ARCH_SCHED_INT );
 }
 
-void setup_sched(void (*sched_call_back)(), uint32_t ms_period){
+void arch_setup_sched(void (*sched_call_back)(), uint32_t ms_period){
    //Explicit interrupt to the scheduler
    arch_register_interrupt( ARCH_SCHED_INT, handle_sched_int );
    sched_callback = sched_call_back;
+   //NOTE: handle_sched_int must be a wrapper around the high-level
+   //      scheduler call. It ensures that current_task is valid
+   //      when the high-level scheduler is called and that it
+   //      is set to run next when the high-level scheduler exits.
    timing_set_alarm( handle_sched_int, ms_period );
 }
 

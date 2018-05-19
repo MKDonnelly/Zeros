@@ -1,19 +1,52 @@
 #include <kernel/sched/round_robin.h>
 
+//Linked list of tasks to run
 static ktask_t *task_list = NULL;
+
+//Pointer to current task
 static ktask_t *current_task = NULL;
-static int current_task_index = 0;
+
+//Number of tasks in the task list
 static int task_count = 0;
+int current_task_index = 0;
+
+
+//The main scheduler. Routinely called to manage tasks
+void rr_schedule(){
+   do{
+      current_task_index = (current_task_index + 1) % task_count;
+      current_task = get_node_ll( (void**)&task_list, current_task_index);
+   }while( current_task->state != TASK_READY );
+
+   arch_run_next( &(current_task->task_info) );
+}
+
+
+static void idle_task(){
+   arch_enable_ints();
+   while(1) arch_halt_cpu();
+}
+
+void rr_setup(){
+   //Add idle task
+   char *idle_stack = k_malloc(kernel_heap, 2000, 0x1000);
+   ktask_t *idle = k_create_ktask(idle_task, NULL, NULL, STACK_HEAD(idle_stack, 2000 ));
+   add_node_ll( (void**)&task_list, idle, 0 );
+   task_count++;
+}   
+
+void rr_start(){
+   //Index 0 is for the idle thread
+   current_task = get_node_ll( (void**)&task_list, 0 );
+   arch_run_next( &current_task->task_info );
+   idle_task();
+}
+
 
 void rr_add_task( ktask_t *new_task){
    add_node_ll( (void**)&task_list, new_task, task_count++);
 }
 
-int rm_task_helper(void *node, void *ref){
-   if( (ktask_t*)node == (ktask_t*)ref )
-      return 1;
-   return 0;
-}
 
 void rr_rm_task(ktask_t *descriptor){
 }
@@ -59,42 +92,17 @@ void scheduler_fork(){
    rr_add_task( forked_task );   
 }*/
 
-void idle_task(){
-   arch_enable_ints();
-   while(1) arch_halt_cpu();
-}
 
-//Init scheduler just sets up the scheduler
-//so that kmain may add tasks to it. The actual
-//scheduling is not done until rr_start_scheduler
-//is called.
-void rr_setup_scheduler(){
-   //Add idle task
-   char *idle_stack = k_malloc(kernel_heap, 2000, 0x1000);
-   ktask_t *idle = k_create_ktask(idle_task, NULL, NULL, STACK_HEAD(idle_stack, 2000 ));
-   add_node_ll( (void**)&task_list, idle, 0 );
-   task_count++;
-}   
 
-//Start the scheduler by jumping to the first task (idle)
-//We take the approach that after jumping into idle, the timer
-//interrupt will be called and the context will be saved. This
-//simplifies a more complicated init system for getting the first
-//task going.
-void rr_start_scheduler(){
-   //Index 0 is for the idle thread
-   current_task = get_node_ll( (void**)&task_list, 0 );
-   arch_run_next( &current_task->task_info );
-   idle_task();
-}
 
-//The main scheduler. Routinely called to manage tasks
-void rr_schedule(){
+schedalg_t rr_scheduler = {
+   .scheduler_setup      = rr_setup,
+   .scheduler_start      = rr_start,
+   .scheduler_add_task   = rr_add_task,
+   .scheduler_rm_task    = rr_rm_task,
+   .scheduler_yield_task = rr_yield_task,
+   .scheduler_exit_task  = rr_exit_task,
+   .scheduler_join_task  = rr_join_task,
+   .scheduler_schedule   = rr_schedule
+};
 
-   do{
-      current_task_index = (current_task_index + 1) % task_count;
-      current_task = get_node_ll( (void**)&task_list, current_task_index);
-   }while( current_task->state != TASK_READY );
-
-   arch_run_next( &(current_task->task_info) );
-}

@@ -19,6 +19,9 @@ drivers
    basic ext2 filesystem, CMOS
 
 make a modular kernel
+Go through and design a nice API
+   i.e. all functions are formatted like
+        <subsystem>_<action>_<object>
 
 misc tasks 
    use a cross compiler

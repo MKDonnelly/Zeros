@@ -16,6 +16,7 @@
 #include <kernel/mm/heap_blocklist.h>
 #include <kernel/mm/heap.h>
 
+#include <kernel/sched/sched.h>
 #include <kernel/sched/round_robin.h>
 
 #include <fs/fs.h>
@@ -50,20 +51,19 @@ void kmain(struct multiboot_info *multiboot_info){
                 blocklist_malloc, blocklist_free, blocklist_init_heap );
 
    init_paging();
+   
+   current_scheduler = &rr_scheduler;
+   arch_setup_sched( current_scheduler->scheduler_schedule, 100);
+   current_scheduler->scheduler_setup();
    init_syscalls();
-   register_syscall( k_putchar, 0 );
-   register_syscall( rr_exit_task, 1);
-
-
-   setup_sched(rr_schedule, 100);
-   rr_setup_scheduler();
-
+   
+/*
    char *s1 = k_malloc(kernel_heap, 1024, 0x1000);
    char *s2 = k_malloc(kernel_heap, 1024, 0x1000);
    rr_add_task( k_create_ktask( thread1, NULL, rr_exit_task, STACK_HEAD(s1, 1024)));
    rr_add_task( k_create_ktask( thread2, NULL, rr_exit_task, STACK_HEAD(s2, 1024)));
+*/
 
-/*
 //Read in first file from initrd (it will contain a test binary)
    char *program_buf = k_malloc(kernel_heap, 5000, 0);
    //identity map the lower part to make it easier to grab the initrd.
@@ -74,9 +74,9 @@ void kmain(struct multiboot_info *multiboot_info){
 
    ktask_t *new_task = k_create_utask_elf(program_buf);
    
-   rr_add_task(new_task);
-*/
-   rr_start_scheduler();
+   current_scheduler->scheduler_add_task(new_task);
+
+   current_scheduler->scheduler_start();
 
 /*
    char *userland_copy = (char*)k_malloc( kernel_heap, 5000, 0 );
