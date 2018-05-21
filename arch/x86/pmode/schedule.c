@@ -1,9 +1,27 @@
 #include <arch/x86/pmode/schedule.h>
 
 //High-level kernel scheduling function
-static void (*sched_callback)() = NULL;
 static arch_task_t *current_task = NULL;
 
+//In int.asm. Used to set and get current context
+extern context_t *get_current_context();
+extern void set_current_context(context_t*);
+
+//Called during isr to save current context into the
+//given arch_task_t
+void arch_save_context(){
+   if( current_task != NULL ){
+      current_task->task_context = get_current_context();
+   }
+}
+
+//Called when an interrupt is returning to load the 
+//next task to run
+void arch_set_context(){
+   set_current_context(current_task->task_context);
+}
+
+//Higher level code calls this to set the next task to run
 void arch_run_next(arch_task_t *next_task){
    current_task = next_task;
 
@@ -15,43 +33,11 @@ void arch_run_next(arch_task_t *next_task){
       set_kernel_stack( (uint32_t)next_task->interrupt_stack );
 }
 
+//Explicitly calls scheduler (like with yield)
 void arch_trigger_scheduler(){
    arch_trigger_interrupt( ARCH_SCHED_INT );
 }
 
-void arch_setup_sched(void (*sched_call_back)(), uint32_t ms_period){
-   //Explicit interrupt to the scheduler
-   arch_register_interrupt( ARCH_SCHED_INT, handle_sched_int );
-   sched_callback = sched_call_back;
-   //NOTE: handle_sched_int must be a wrapper around the high-level
-   //      scheduler call. It ensures that current_task is valid
-   //      when the high-level scheduler is called and that it
-   //      is set to run next when the high-level scheduler exits.
-   timing_set_alarm( handle_sched_int, ms_period );
-}
-
-extern context_t *get_current_context();
-extern void set_current_context(context_t*);
-
-void handle_sched_int(){
-
-   //This is one of the first pieces of code to run in
-   //a scheduler interrupt. Our first job is to save the
-   //state of the interrupted task
-   if( current_task != NULL ){
-      current_task->task_context = get_current_context();
-   }
-
-   //Call high-level scheduler function to decide which
-   //task to run next (set by arch_run_next). Note that by
-   //having a callback to the higher-level scheduler here,
-   //we prevent a race condition with saving the current task
-   //context (above) and setting the new context (below)
-   sched_callback();
-
-   //We cannot load cur_context in arch_run_next since arch_run_next
-   //may be called right in the middle of scheduler code, which would
-   //mess everything up. We must call it just as we are leaving the
-   //scheduler interrupt (i.e. here)
-   set_current_context(current_task->task_context);
+void arch_register_scheduler(void (*sched_handler)()){
+   arch_register_interrupt( ARCH_SCHED_INT, sched_handler );
 }

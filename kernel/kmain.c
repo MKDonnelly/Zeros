@@ -61,7 +61,7 @@ void kmain(struct multiboot_info *multiboot_info){
    init_paging();
    
    current_scheduler = &rr_scheduler;
-   arch_setup_sched( current_scheduler->scheduler_schedule, 100);
+   //arch_setup_sched( current_scheduler->scheduler_schedule, 100);
    current_scheduler->scheduler_setup();
    init_syscalls();
 

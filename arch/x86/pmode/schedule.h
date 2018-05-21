@@ -5,11 +5,12 @@
 
 #define ARCH_SCHED_INT 50
 
-//Handles arch-level tasks for scheduling.
-//This includes mapping the interrupt. In addition,
-//higher-level kernel code will pass in arch_task_info_t*,
-//which will be used by this to run the task.
-void arch_setup_sched(void (*sched_callback)(), uint32_t ms_period);
-void handle_sched_int();
+//Kernel-level code passes in the arch_task_t part of a ktask_t
+//to instruct the arch layer to run that task next.
 void arch_run_next(arch_task_t *next_task);
+
+//Used to explicitly call the scheduler (like with yield)
 void arch_trigger_scheduler();
+
+//This sets up the function to call when arch_trigger_scheduler is called
+void arch_register_scheduler( void (*sched_handler)());

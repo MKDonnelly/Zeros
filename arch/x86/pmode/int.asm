@@ -52,6 +52,8 @@ set_current_context:
 ;     <pushad stuff>
 ;        32 bits e[a,c,d,b]x, edi, esi, esp, ebp
 
+[extern arch_save_context]
+[extern arch_set_context]
 interrupt_common:
    pushad
 
@@ -72,7 +74,14 @@ interrupt_common:
    ;for use by the scheduler.
    mov [current_context], esp
 
+   ;TODO make a call here to save the current context
+   ;     into the arch_task_t structure (int arch_task.c)
+   ;     then decouple the timer all in arch_task.c
+   call arch_save_context
+
    call main_interrupt_handler 
+
+   call arch_set_context
 
    ;Restore context after scheduler call
    mov esp, [current_context]
