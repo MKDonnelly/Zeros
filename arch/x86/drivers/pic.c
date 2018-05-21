@@ -53,6 +53,7 @@ void enable_irq(uint8_t num){
 
 //Disable an irq by setting the pic bit to 1
 void disable_irq(uint8_t num){
+
    int8_t curPICMask = portb_read( MASTER_PIC_DATA_P );
    int8_t mask = 0x1 << num;
    portb_write( MASTER_PIC_DATA_P, curPICMask | mask);

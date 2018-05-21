@@ -54,13 +54,13 @@ void bitmap_init_heap(heap_t *heap){
    head->free_space = (char*)ALIGN_ON((uint32_t)(head->dibitmap + 
                       head->dibitmap_len), head->blocksize);
 
-   init_spinlock(&heap->heap_lock);
+   spinlock_init(&heap->heap_lock);
 }
 
 void bitmap_free(heap_t *heap, void *memblock){
    bitmap_heap_t *head = (bitmap_heap_t*)heap->start;
 
-   acquire_spinlock(&heap->heap_lock);
+   spinlock_acquire(&heap->heap_lock);
 
    uint32_t offset = (uint32_t)memblock - (uint32_t)head->free_space;
    uint32_t index = offset / head->blocksize;
@@ -81,7 +81,7 @@ void bitmap_free(heap_t *heap, void *memblock){
       i++;
    }
 
-   free_spinlock(&heap->heap_lock);
+   spinlock_release(&heap->heap_lock);
 }
 
 
@@ -93,7 +93,7 @@ void bitmap_free(heap_t *heap, void *memblock){
 
 void *bitmap_malloc(heap_t *heap, uint32_t size, uint32_t align){
    bitmap_heap_t *head = (bitmap_heap_t*)heap->start;
-   acquire_spinlock( &heap->heap_lock );
+   spinlock_acquire( &heap->heap_lock );
 
    //Add 1 to catch any fractional part of a block required
    int blocks_needed = (size / head->blocksize) + 1;
@@ -134,7 +134,7 @@ void *bitmap_malloc(heap_t *heap, uint32_t size, uint32_t align){
             dibit_set( head->dibitmap, i + j, color );
          }
 
-         free_spinlock(&heap->heap_lock);
+         spinlock_acquire(&heap->heap_lock);
          return (void*)ALIGN_ON( (uint32_t)(head->free_space + 
                           i * head->blocksize), head->blocksize);
       }

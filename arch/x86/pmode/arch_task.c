@@ -4,6 +4,9 @@
 arch_task_t arch_create_ktask(void (*start)(), void *param,
                                    void (*exit)(), uint32_t *stack){
 
+   KASSERT( start != NULL );
+   KASSERT( stack != NULL );
+
    arch_task_t kernel_task;
 
    //Create the context
@@ -24,6 +27,9 @@ arch_task_t arch_create_ktask(void (*start)(), void *param,
 //programs will be loaded from and ELF file.
 arch_task_t arch_create_utask(void (*start)(), void *param,
                                    void (*exit)(), uint32_t *stack){
+   KASSERT( start != NULL );
+   KASSERT( stack != NULL );
+
    arch_task_t user_task;
 
    //Create context
@@ -41,6 +47,8 @@ arch_task_t arch_create_utask(void (*start)(), void *param,
 #define USERLAND_STACK 0xB0000000
 
 arch_task_t arch_load_utask_elf( char *elf_file_buffer ){
+   KASSERT(elf_file_buffer != NULL);
+
    arch_task_t user_task;
 
    //Userland task will inherit the pd from kernel_page_dir
@@ -62,6 +70,7 @@ arch_task_t arch_load_utask_elf( char *elf_file_buffer ){
 
    //Setup a syscall stack of 1K aligned on page boundary
    user_task.interrupt_stack = k_malloc( 1024, 0x1000 );
+   KASSERT( user_task.interrupt_stack != NULL );
 
    return user_task;
 }

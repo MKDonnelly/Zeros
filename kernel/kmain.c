@@ -20,11 +20,11 @@
 #include <kernel/sched/sched.h>
 #include <kernel/sched/round_robin.h>
 #include <kernel/syscall.h>
+#include <kernel/sched/workqueue.h>
 
 #include <fs/fs.h>
 #include <fs/initrd/initrd.h>
-
-#include <lib/elf32.h>
+#include <lib/assert.h>
 
 void thread1(){
    int t1count = 0;
@@ -40,6 +40,10 @@ void thread2(){
       k_printf_at("2", t2count++, 1);
       for(int i = 0; i < 50000000; i++);
    }
+}
+
+void myf(void *string){
+   k_printf("myf called with \"%s\"\n", (char*)string);
 }
 
 #include <kernel/mm/heap_bitmap.h>
@@ -60,7 +64,19 @@ void kmain(struct multiboot_info *multiboot_info){
    arch_setup_sched( current_scheduler->scheduler_schedule, 100);
    current_scheduler->scheduler_setup();
    init_syscalls();
-   
+
+
+   workqueue_t *kwq = workqueue_create();
+   tasklet_t *first = tasklet_create( thread1, NULL );
+   tasklet_t *second = tasklet_create( thread2, NULL );
+
+   workqueue_add(kwq, first);
+   workqueue_add(kwq, second);
+ 
+   workqueue_worker_spawn( kwq );
+
+   current_scheduler->scheduler_start();
+
 /*
    char *s1 = k_malloc(kernel_heap, 1024, 0x1000);
    char *s2 = k_malloc(kernel_heap, 1024, 0x1000);
@@ -68,6 +84,7 @@ void kmain(struct multiboot_info *multiboot_info){
    rr_add_task( k_create_ktask( thread2, NULL, rr_exit_task, STACK_HEAD(s2, 1024)));
 */
 
+/*
 //Read in first file from initrd (it will contain a test binary)
    char *program_buf = k_malloc( 5000, 0);
    //identity map the lower part to make it easier to grab the initrd.
@@ -81,64 +98,8 @@ void kmain(struct multiboot_info *multiboot_info){
    current_scheduler->scheduler_add_task(new_task);
 
    current_scheduler->scheduler_start();
-
-/*
-   char *userland_copy = (char*)k_malloc( kernel_heap, 5000, 0 );
-   //Read program from initrd
-   fs_root = init_initrd( ((struct module*)multiboot_info->mods)->start );
-   fs_node_t *first = fs_root->readdir( fs_root, 0 );
-   first->read( first, 0, first->length, userland_copy );
-
-   struct elf_header *elf_hdr = (struct elf_header*)userland_copy;
-   struct elf_prog_header *prog_hdr = (struct elf_prog_header*)(userland_copy + elf_hdr->e_phoff );
-   for(int i = 0; i < elf_hdr->e_phnum; i++){
-     prog_hdr = (struct elf_prog_header*)(userland_copy + elf_hdr->e_phoff + i * elf_hdr->e_phentsize);
-     copy_to_physical( userland_copy + prog_hdr->p_offset, 
-                       0x600000,
-                       prog_hdr->p_filesize);
-     k_printf("%x %x %d\n", prog_hdr->p_vaddr, userland_copy + prog_hdr->p_offset, prog_hdr->p_filesize);
-   }
-   char *ustack = k_malloc(kernel_heap, 0x1000, 0);
-   pd_t *userland_pd = clone_pd( kernel_page_dir );
-   map_page( 0x1000, 0x600000, userland_pd );
 */
-
-/*
-  init_syscalls();
-  register_syscall( k_putchar, 0 );
-  
-  char *userland_copy = (char*)k_malloc( 5000, 0 );
-
-  //Read program from initrd
-  fs_root = init_initrd( ((struct module*)multiboot_info->mods)->start );
-  k_printf("Initrd at %x\n", ((struct module*)multiboot_info->mods)->start);
-  fs_node_t *first = fs_root->readdir( fs_root, 0 );
-  first->read( first, 0, first->length, userland_copy );
-
-  //elf file now in userland_copy
-  struct elf_header *elf_hdr = (struct elf_header*)userland_copy;
-  struct elf_prog_header *prog_hdr = (struct elf_prog_header*)(userland_copy + elf_hdr->e_phoff );
- 
-  init_paging();  
-
-  for(int i = 0; i < elf_hdr->e_phnum; i++){
-    prog_hdr = (struct elf_prog_header*)(userland_copy + elf_hdr->e_phoff + i * elf_hdr->e_phentsize);
-    copy_to_physical( userland_copy + prog_hdr->p_offset, 
-                      0x600000,
-                      prog_hdr->p_filesize);
-    k_printf("%x %x %d\n", prog_hdr->p_vaddr, userland_copy + prog_hdr->p_offset, prog_hdr->p_filesize);
-  }
-
-  char *ustack = k_malloc( 0x1000, 0);
-  pd_t *userland_pd = clone_pd( kernel_page_dir );
-  map_page( 0x1000, 0x600000, userland_pd );
-
-  init_scheduler( &rr_alg );
-  register_syscall( current_sched_alg->exit_task, 1 );
-
-  k_add_task( k_create_userland_task( (void*)0x1000, NULL, NULL, 0x1000, (uint32_t)ustack, userland_pd ));
-*/
-  while(1) arch_halt_cpu();
+   while(1) arch_halt_cpu();
 }
 
 /*

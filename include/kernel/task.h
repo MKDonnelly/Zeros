@@ -3,6 +3,7 @@
 #include <lib/types.h>
 #include <kernel/mm/heap.h>
 #include <arch/x86/archx86.h>
+#include <lib/assert.h>
 
 enum TASK_STATE { TASK_RUNNING, TASK_READY, TASK_EXIT, TASK_BLOCKED };
 

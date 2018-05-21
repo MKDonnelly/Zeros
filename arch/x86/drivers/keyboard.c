@@ -33,6 +33,9 @@ static void keyboard_handler(){
 //whenever a key is pressed. The argument is
 //the key character entered.
 void arch_keyboard_init( void (*keypress_callback)(char) ){
+
+   KASSERT( keypress_callback != NULL );
+
    //Enable the keyboard irq
    enable_irq( KEYBOARD_IRQ );
 
@@ -44,6 +47,7 @@ void arch_keyboard_init( void (*keypress_callback)(char) ){
 
 //Register a different callback if needed
 void arch_keyboard_register_callback( void (*keypress_callback)(char) ){
+   KASSERT( keypress_callback != NULL );
    keyboard_callback = keypress_callback;
 }
 

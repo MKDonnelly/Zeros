@@ -3,6 +3,7 @@
 #include <arch/x86/pmode/context.h>
 #include <arch/x86/pmode/paging.h>
 #include <arch/x86/pmode/loader.h>
+#include <lib/assert.h>
 
 //Arch-specific structure describing task
 //state. This is meant to be part of a larger
