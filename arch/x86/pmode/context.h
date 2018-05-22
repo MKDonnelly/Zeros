@@ -26,7 +26,7 @@ typedef struct{
 #define INITIAL_EFLAGS 0x0202
 
 //Create an intial context for a new kernel task
-context_t *arch_create_kcontext( void (*start)(void*), void *param,
+context_t *arch_kcontext_create( void (*start)(void*), void *param,
                                  void (*exit)(), uint32_t *stack_addr );
-context_t *arch_create_ucontext( void (*start)(void*), void *param,
+context_t *arch_ucontext_create( void (*start)(void*), void *param,
                                  void (*exit)(), uint32_t *stack_addr );

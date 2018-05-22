@@ -8,7 +8,7 @@
 static idt_entry_t idt_table[ TOTAL_INTERRUPTS ];
 static idt_descriptor_t idt_descriptor;
 
-void add_idt_entry( uint8_t intNumber, uint32_t handlerFunction) {
+void idt_add_entry( uint8_t intNumber, uint32_t handlerFunction) {
 
    //IDT_TABLE is the interrupt descriptor table
    idt_table[intNumber].lower_offset = handlerFunction & 0xFFFF;
@@ -23,12 +23,18 @@ void add_idt_entry( uint8_t intNumber, uint32_t handlerFunction) {
    idt_table[intNumber].higher_offset = (handlerFunction >> 16) & 0xFFFF;
 }
 
-void load_idt(){
+//In int.asm
+extern void idt_setup_isrs();
+void idt_init(){
+   //Setup each entry in the idt. This is an assembly routine
+   //in int.asm
+   idt_setup_isrs();
+
    //Load the base and length of the idt into the idt descriptor
    idt_descriptor.base_addr = (uint32_t) &idt_table;
    //the actual size is len - 1
    idt_descriptor.length = TOTAL_INTERRUPTS * sizeof(idt_entry_t) - 1;
 
    arch_disable_ints();
-   arch_load_idt( &idt_descriptor );
+   idt_load( &idt_descriptor );
 }

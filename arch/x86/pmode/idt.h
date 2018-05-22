@@ -31,8 +31,8 @@ typedef struct{
 //Given an interrupt number and a 
 //function handler, place it into
 //the IDT.
-void add_idt_entry(uint8_t, uint32_t);
+void idt_add_entry(uint8_t, uint32_t);
 
 //This does the job of actually
 //loading the IDT to the system.
-void load_idt();
+void idt_init();

@@ -4,7 +4,7 @@
 
 //Sets up a context for a kernel-level task and returns a pointer
 //to the head of the stack (a context_t* type)
-context_t *arch_create_kcontext( void (*start)(void *), void *param, 
+context_t *arch_kcontext_create( void (*start)(void *), void *param, 
                                  void (*exit)(), uint32_t *stack_addr ){
 
    /*    Kernel context layout 
@@ -45,7 +45,7 @@ context_t *arch_create_kcontext( void (*start)(void *), void *param,
 }
 
 
-context_t *arch_create_ucontext( void (*start)(void*), void *param, 
+context_t *arch_ucontext_create( void (*start)(void*), void *param, 
                                 void (*exit)(), uint32_t *stack_addr ){
 
    /*    User context layout 

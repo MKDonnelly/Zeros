@@ -16,7 +16,7 @@ static void syscall_handler(context_t regs){
 }
 
 //Initilizes the system call interrupt
-void arch_init_syscalls(){
+void arch_syscalls_init(){
    arch_register_interrupt(SYSCALL_INT, syscall_handler );
 }
 

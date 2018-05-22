@@ -133,7 +133,7 @@ int k_get_fg_color(){
    return kernel_vga_screen.k_get_fg_color();
 }
 
-void init_vga(uint8_t mode){
+void vga_init(uint8_t mode){
 
    if( mode == 0 ){
 

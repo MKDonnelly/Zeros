@@ -11,7 +11,7 @@ void arch_timer_init( void (*timer_callback)(context_t) ){
 
    //Enable the timer interrupt and 
    //set the interrupt handler
-   enable_irq( TIMER_IRQ );
+   irq_enable( TIMER_IRQ );
    arch_register_interrupt( TIMER_INTERRUPT, timer_callback );
 }
 

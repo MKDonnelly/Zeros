@@ -26,4 +26,4 @@
 
 #include <arch/x86/cpu.h>
 
-void arch_init_system();
+void arch_system_init();

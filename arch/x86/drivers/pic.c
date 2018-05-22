@@ -3,7 +3,7 @@
 #include <arch/x86/portio.h>
 
 //Initilize the PIC
-void remap_pic(){
+void pic_init(){
 
   //Restart each PIC for configuration
   //Configure each pic to use ICW4
@@ -33,7 +33,7 @@ void remap_pic(){
 //keep in mind that we have two pics cascaded. Both are set 
 //by sending a byte to each port.
 //We have IRQ's 0-7 on master, 8-13 on slave
-void enable_irq(uint8_t num){
+void irq_enable(uint8_t num){
 
    if( num <= PIC_INTERRUPT_LINES ){
 
@@ -54,7 +54,7 @@ void enable_irq(uint8_t num){
 }
 
 //Disable an irq by setting the pic bit to 1
-void disable_irq(uint8_t num){
+void irq_disable(uint8_t num){
 
    int8_t curPICMask = portb_read( MASTER_PIC_DATA_P );
    int8_t mask = 0x1 << num;

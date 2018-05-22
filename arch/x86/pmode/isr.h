@@ -6,11 +6,11 @@
 #define ARCH_MAX_INTERRUPTS 256
 
 //In int.asm
-extern void init_idt();
+extern void idt_init();
 
 //This function handles the installation
 //of each interrupt handler
-void init_interrupts();
+void interrupts_init();
 
 //This function registers the interrupt so that
 //main_interrupt_handler may use it

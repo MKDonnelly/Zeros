@@ -111,32 +111,29 @@ typedef struct pd pd_t;
 //This points to the current page directory being used
 //for address translation. It is null if not page table
 //is in effect.
-//TODO make {get,set}_{kernel,current}_page_dir
+//TODO make {get,set}_kernel_page_dir
 extern pd_t *kernel_page_dir;
-extern pd_t *current_page_dir;
 
 //Map a physical to virtual address in the paging structure
-void map_page(uint32_t vaddr, uint32_t paddr, pd_t *page_directory, 
+void vm_pmap(uint32_t vaddr, uint32_t paddr, pd_t *page_directory, 
               uint8_t rw, uint8_t user_access);
 
 //Map a sequential range of pages so we do not have to repeatedly call
 //map_page. length is in bytes.
-void map_page_range( uint32_t vaddr, uint32_t paddr, pd_t *page_directory,
+void vm_pmap_range( uint32_t vaddr, uint32_t paddr, pd_t *page_directory,
                      uint8_t rw, uint8_t user_access, uint32_t length);
 
-void quick_map(uint32_t vaddr, uint32_t paddr, pd_t *page_directory);
+//Used to temporarily setup a page mapping
+void vm_pmap_temp(uint32_t vaddr, uint32_t paddr, pd_t *page_directory);
 ///////////////////////////////////////
 
 /////////////////Cloning page directory
-pd_t *clone_pd(pd_t *page_directory);
+pd_t *vm_pdir_clone(pd_t *page_directory);
 
 
 //Given a buffer, length, and physical address, copy the
 //buffer to the physical address.
-void copy_to_physical(char *vbuf, uint32_t paddr, uint32_t len);
+void vm_copy_to_physical(char *vbuf, uint32_t paddr, uint32_t len);
 
 //Initilized the paging structure
-void init_paging();
-
-//Handles page interrupts
-//void page_int_handler(context_t);
+void vm_init();

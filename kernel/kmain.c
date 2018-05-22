@@ -49,20 +49,19 @@ void myf(void *string){
 
 void kmain(struct multiboot_info *multiboot_info){
 
-   arch_init_system();
+   arch_system_init();
    arch_timer_init( timing_main_handler );
    arch_keyboard_init( keyboard_main_handler );
    k_clear_screen();
 
-   create_heap( &global_kernel_heap, KERNEL_VADDR+0x300000, 0x200000, 
+   heap_create( &global_kernel_heap, KERNEL_VADDR+0x300000, 0x200000, 
                 &blocklist_heap);
 
-   init_paging();
+   vm_init();
    
    current_scheduler = &rr_scheduler;
-   //arch_setup_sched( current_scheduler->scheduler_schedule, 100);
    current_scheduler->scheduler_setup();
-   init_syscalls();
+   syscalls_init();
 
 
    workqueue_t *kwq = workqueue_create();
@@ -72,6 +71,7 @@ void kmain(struct multiboot_info *multiboot_info){
    workqueue_add(kwq, first);
    workqueue_add(kwq, second);
  
+   workqueue_worker_spawn( kwq );
    workqueue_worker_spawn( kwq );
 
    current_scheduler->scheduler_start();

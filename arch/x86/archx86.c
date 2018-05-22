@@ -3,18 +3,18 @@
 #include <arch/x86/pmode/gdt.h>
 #include <arch/x86/drivers/pic.h>
 
-void arch_init_system(int video_mode){
+void arch_system_init(int video_mode){
 
    //Initilize descriptors
-   init_gdt();
-   init_interrupts();
+   gdt_init();
+   interrupts_init();
 
    //Re-map the pic
-   remap_pic();
+   pic_init();
 
    //Setup the function points to use
    //the screen
-   init_vga(0);
+   vga_init(0);
 
    arch_disable_ints();
 }

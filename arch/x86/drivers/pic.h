@@ -33,8 +33,8 @@
 
 //Remap the PIC to non-handware
 //interrupt numbers
-void remap_pic();
+void pic_init();
 
-//Enable/disable an IRQ by number
-void enable_irq(uint8_t);
-void disable_irq(uint8_t);
+//Enable/disable an IRQ on the PIC by number
+void irq_enable(uint8_t);
+void irq_disable(uint8_t);

@@ -7,7 +7,7 @@
 ; This will be used to map interrupt
 ; numbers to interrupt handler when
 ; they are defined
-[extern add_idt_entry]
+[extern idt_add_entry]
 
 extern gdt_kernel_data
 extern gdt_kernel_code
@@ -136,10 +136,10 @@ isr%1:
 ; interrupt #x to point to 
 ; isr#x. Without this, we would
 ; have to go
-;    add_idt_entry(#x, (u32)isr#x)
+;    add_idt_entry(#x, isr#x)
 ; 256 times in c!
-global init_idt
-init_idt:
+global idt_setup_isrs
+idt_setup_isrs:
    push ebp
    mov ebp, esp
    sub esp, 0x8
@@ -150,7 +150,7 @@ init_idt:
    sub esp, 0x8
    push eax
    push byte j
-   call add_idt_entry
+   call idt_add_entry
    add esp, 0x10
    %assign j j+1
 %endrep

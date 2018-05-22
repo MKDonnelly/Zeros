@@ -1,12 +1,12 @@
 #include <kernel/syscall.h>
 
 #include <arch/current_arch>
-#include <kernel/sched/round_robin.h>
+#include <kernel/sched/sched.h>
 
 //Maps all system calls to their respective
 //handlers
-void init_syscalls(){
-   arch_init_syscalls();
+void syscalls_init(){
+   arch_syscalls_init();
 
    arch_register_syscall( k_putchar, 0 );
    arch_register_syscall( current_scheduler->scheduler_exit_task, 1 );

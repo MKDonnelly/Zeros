@@ -2,6 +2,6 @@
 
 //C functions headers for assembly routines in
 //descriptors.asm
-void load_tss();
-void arch_load_idt(void*);
-void load_gdt(void*);
+void tss_load();
+void idt_load(void*);
+void gdt_load(void*);

@@ -3,8 +3,8 @@
 
 ; Used to load a TSS into the TR register
 ; TSS must be in GDT before using
-global load_tss
-load_tss:
+global tss_load
+tss_load:
    ; See gdt.h for what 0x2B is for
    mov ax, 0x2B
    ltr ax
@@ -13,8 +13,8 @@ load_tss:
 ; Used to load the IDT
 ; Takes a single pointer to the
 ; IDT as an argument. 
-global arch_load_idt
-arch_load_idt:
+global idt_load
+idt_load:
    push eax
 
    mov eax, [esp+8]
@@ -28,8 +28,8 @@ arch_load_idt:
 [extern gdt_kernel_data]
 [extern gdt_kernel_code]
 
-global load_gdt
-load_gdt:
+global gdt_load
+gdt_load:
    mov eax, [esp+4]
    lgdt [eax]
 

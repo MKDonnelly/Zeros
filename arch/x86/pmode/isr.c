@@ -6,6 +6,7 @@
 #include <arch/x86/drivers/pic.h>
 #include <arch/x86/pmode/context.h>
 #include <arch/x86/portio.h>
+#include <arch/x86/pmode/descriptors.h>
 #include <lib/bitwise.h>
 #include <lib/memory.h>
 
@@ -20,7 +21,7 @@ static void (*int_handlers[TOTAL_INTERRUPTS])(context_t);
 //whole interrupt system. It creates
 //and populates interrupt service 
 //routines in the IDT and loads the IDT.
-void init_interrupts(){
+void interrupts_init(){
 
    //Zero out every interrupt in the
    //interrupt enabled array, just to
@@ -29,10 +30,7 @@ void init_interrupts(){
 
    //This does x = 0..255
    //add_idt_entry(x, (u32)isrx);
-   init_idt();
-   
-   //Load the idt
-   load_idt();
+   idt_init();
 }
 
 //Places the handler function into the interrupt handler array 

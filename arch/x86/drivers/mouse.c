@@ -123,7 +123,7 @@ void mouse_init(){
    (void)portb_read(MOUSE_DATA_P);
 
    //Enable interrupt and setup handler
-   enable_irq( MOUSE_ISR );
+   irq_enable( MOUSE_ISR );
    arch_register_interrupt( MOUSE_INTERRUPT, mouse_interrupt_handler );
 }
 

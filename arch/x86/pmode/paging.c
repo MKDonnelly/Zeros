@@ -13,14 +13,13 @@
 
 //Points to current page directory in use as well
 //as the page directory used by the kernel.
-pd_t *current_page_dir = NULL;
 pd_t *kernel_page_dir;
 
 //Given a page directory and a virtual address, return the 
 //pte corresponding to it. If create_pt is set, create any
 //page tables needed. If create_pt is not set and the pt
 //is not allocated, return null
-pte_t *get_page( uint32_t vaddr, bool create_pt, pd_t *page_directory){
+static pte_t *get_page( uint32_t vaddr, bool create_pt, pd_t *page_directory){
 
    //Get the page table
    pde_t *page_dir_entry = &page_directory->pd_entries[ PD_INDEX( vaddr ) ];
@@ -52,7 +51,8 @@ pte_t *get_page( uint32_t vaddr, bool create_pt, pd_t *page_directory){
    return page_table_entry;
 }
 
-void map_page(uint32_t vaddr, uint32_t paddr, pd_t *page_directory, uint8_t rw, uint8_t user_access){
+void vm_pmap(uint32_t vaddr, uint32_t paddr, pd_t *page_directory, 
+             uint8_t rw, uint8_t user_access){
 
    //Get the pte to map the page
    pte_t *page = get_page( vaddr, 1, page_directory );
@@ -66,10 +66,10 @@ void map_page(uint32_t vaddr, uint32_t paddr, pd_t *page_directory, uint8_t rw, 
 
 //TODO create map_page_range that does not care about physical memory
 //location and just uses the frame allocation system.
-void map_page_range( uint32_t vaddr, uint32_t paddr, pd_t *page_directory, 
+void vm_pmap_range( uint32_t vaddr, uint32_t paddr, pd_t *page_directory, 
                      uint8_t rw, uint8_t user_access, uint32_t length ){
    while( length > 0 ){
-      map_page( vaddr, paddr, page_directory, rw, user_access );
+      vm_pmap( vaddr, paddr, page_directory, rw, user_access );
       vaddr += ARCH_PAGE_SIZE;
       paddr += ARCH_PAGE_SIZE;
       length -= ARCH_PAGE_SIZE;
@@ -77,8 +77,8 @@ void map_page_range( uint32_t vaddr, uint32_t paddr, pd_t *page_directory,
 }
 
 //Used for pages that frequently change (like when used by copy_to_physiscal)
-void quick_map( uint32_t vaddr, uint32_t paddr, pd_t *page_directory){
-   map_page( vaddr, paddr, page_directory, PAGE_RW, PAGE_KERNEL_ACCESS );
+void vm_pmap_temp( uint32_t vaddr, uint32_t paddr, pd_t *page_directory){
+   vm_pmap( vaddr, paddr, page_directory, PAGE_RW, PAGE_KERNEL_ACCESS );
 
    //We expect the mapping to change frequently, so this ensure that when
    //we return, there is no cached reference to the page we mapped.
@@ -87,14 +87,14 @@ void quick_map( uint32_t vaddr, uint32_t paddr, pd_t *page_directory){
 
 //Copies len bytes of memory at the virtual address vbuf to the physical
 //address paddr.
-void copy_to_physical(char *vbuf, uint32_t paddr, uint32_t len){
+void vm_copy_to_physical(char *vbuf, uint32_t paddr, uint32_t len){
    //Since we are using a higher-half kernel, we cannot disable paging.
    //To access the physical memory, we make a window within the current
    //page directory (the kernel page directory) at 0x0 that maps to
    //the desired physical address. If we need to copy more than one page,
    //we increment the physical frame pointed to as we copy.
    //Align page frame on 4K boundary
-   quick_map( 0x0, ALIGN_4K(paddr), kernel_page_dir );
+   vm_pmap_temp( 0x0, ALIGN_4K(paddr), kernel_page_dir );
 
    //FIXME len is assumed to be less than the page size
    memcpy( (char*)0x0, vbuf, len );
@@ -103,8 +103,8 @@ void copy_to_physical(char *vbuf, uint32_t paddr, uint32_t len){
 //Copies the page at one physical address to another 
 //We map the page 0x0 to pdest and 0x1000 to psrc
 static void copy_page( uint32_t pdest, uint32_t psrc ){
-   quick_map( 0x0, pdest, kernel_page_dir );
-   quick_map( 0x1000, psrc, kernel_page_dir );
+   vm_pmap_temp( 0x0, pdest, kernel_page_dir );
+   vm_pmap_temp( 0x1000, psrc, kernel_page_dir );
    
    memcpy( (char*)0x0, (char*)0x1000, ARCH_PAGE_SIZE );
 
@@ -146,9 +146,7 @@ static void clone_table(pde_t *dest_pde, pde_t *source_pde){
    dest_pde->table_addr = (VIRT_TO_PHYS( dest_pt ) / ARCH_PAGE_SIZE);
 }
 
-
-
-pd_t *clone_pd(pd_t *clone_dir){
+pd_t *vm_pdir_clone(pd_t *clone_dir){
 
    pd_t *new_dir = k_malloc( sizeof(pd_t), ARCH_PAGE_SIZE );
    memset( new_dir, sizeof(pd_t), 0 );
@@ -177,14 +175,15 @@ pd_t *clone_pd(pd_t *clone_dir){
 }
  
 void page_int_handler(context_t r);
-void init_paging(){
+void vm_init(){
    //Make the page directory for the kernel
    kernel_page_dir = (pd_t*)k_malloc( sizeof(pd_t), ARCH_PAGE_SIZE );
    memset( kernel_page_dir, sizeof(pd_t), 0 );
 
    //Create the kernel page table mapping. Map 5M of the kernel starting
    //at KERNEL_VADDR to the first 5M of physical memory
-   map_page_range( KERNEL_VADDR, 0, kernel_page_dir, PAGE_RW, PAGE_KERNEL_ACCESS, 0x500000 );
+   vm_pmap_range( KERNEL_VADDR, 0, kernel_page_dir, PAGE_RW, 
+                 PAGE_KERNEL_ACCESS, 0x500000 );
 
    //Setup a frame pool
    make_frame_pool( 0x600000, 100 );

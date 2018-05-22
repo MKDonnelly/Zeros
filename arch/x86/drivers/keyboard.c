@@ -39,7 +39,7 @@ static void keyboard_handler(){
 void arch_keyboard_init( void (*keypress_callback)(char) ){
 
    //Enable the keyboard irq
-   enable_irq( KEYBOARD_IRQ );
+   irq_enable( KEYBOARD_IRQ );
 
    //And set the interrupt handler
    arch_register_interrupt( KEYBOARD_INTERRUPT, keyboard_handler );

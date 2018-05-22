@@ -40,7 +40,7 @@ void set_gdt( gdt_entry_t *entry, uint32_t limit, uint32_t base ){
 }
 
 
-void make_tss(int32_t num, uint16_t stack_gdt_segment){
+void tss_create(int32_t num, uint16_t stack_gdt_segment){
 
    //compute base and limit of entry
    uint32_t base = (uint32_t)&tss_entry;
@@ -81,9 +81,10 @@ void set_kernel_stack(uint32_t stack){
 }
 
 
-void init_gdt(){
+void gdt_init(){
 
    //Initilize the null descriptor
+   //TODO just pass in gdt_table
    memset( (void*)&gdt_table[0], sizeof(gdt_entry_t), 0 );
 
    //Initilize the kernel code segment
@@ -133,7 +134,7 @@ void init_gdt(){
 
 
    //Let kmain set the kernel stack
-   make_tss( 5, gdt_kernel_data );
+   tss_create( 5, gdt_kernel_data );
 
    //Initilize the GDT descriptor
    //Always subtract one for length
@@ -141,8 +142,8 @@ void init_gdt(){
    gdt_descriptor.address = (uint32_t*)gdt_table;
 
    //Load the GDT
-   load_gdt(&gdt_descriptor);
+   gdt_load(&gdt_descriptor);
 
    //Load the TSS now that the GDT is in place
-   load_tss();
+   tss_load();
 }

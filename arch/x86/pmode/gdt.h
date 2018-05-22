@@ -65,7 +65,7 @@ extern const int16_t gdt_userland_data;
 extern const int16_t gdt_userland_code_rpl;
 extern const int16_t gdt_userland_data_rpl;
 
-//All of the GDT entries will be setup in init_gdt.
+//All of the GDT entries will be setup in gdt_init.
 //To simplify the process, no support is added to create
 //another gdt entry after setup.
-void init_gdt();
+void gdt_init();

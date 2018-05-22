@@ -49,7 +49,6 @@ global loader
 loader equ (arch_start - KERNEL_VIRT_ADDR )
 
 [extern kmain]
-[extern current_page_dir]
 
 arch_start:
 
@@ -77,11 +76,6 @@ arch_start:
     mov eax, cr0
     or eax, 0x80000000
     mov cr0, eax
-
-    ;The paging code used current_directory.
-    ;We need to set that here
-    mov eax, page_directory_table
-    mov [current_page_dir], eax
 
     ;Set the kernel stack
     mov ebp, KERNEL_STACK_START

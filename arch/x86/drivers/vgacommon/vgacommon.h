@@ -1,5 +1,66 @@
 #pragma once
 
+
+/*      Set of escape sequences that each mode must understand
+    \c = Clear screen
+    \<number>,<number> move cursor to (<number>, <number>)
+    \s = Scroll down one line
+    \b<color> = Set background to <color> (see defined constants)
+    \f<color> = Set foreground to <color> (see defined constants)
+*/
+
+/*
+typedef struct vmode{
+
+//         Cursor Manipulation
+
+   //Return the current cursor position
+   int (*vmode_get_cursor)();  
+
+   //Move the cursor to the location (x,y)                          
+   void (*vmode_move_cursor)(int x, int y);
+
+///////////////////////////////////////////
+
+//         Printing 
+   //Put a character onto the screen
+   void (*vmode_putchar)(char);
+
+   //Put a character on the screen at
+   //the specified x, y
+   void (*vmode_putchar_at)(char,int,int);
+
+   //Clear the screen
+   void (*vmode_cls)();
+
+////////////////////////////////////////
+
+//         Screen capture
+ 
+   //Capture the screen to the given
+   //array. Make sure the array is
+   //large enough
+   void (*k_screen_cap)(char*);
+
+   //Restore the screenshot 
+   void (*k_screen_res)(char*);
+
+///////////////////////////////////////
+
+   //Scroll the screen
+   void (*k_scroll)();
+
+//////////////////////////////////////
+   //Text foreground/background color
+   void (*k_set_fg_color)(int);
+   void (*k_set_bg_color)(int);
+   int (*k_get_fg_color)();
+   int (*k_get_bg_color)();
+
+   char *vga_colors;
+}vmode_t;*/
+
+
 #include <lib/types.h>
 
 #define VGA3H_MODE 0
@@ -117,5 +178,5 @@ int  k_get_fg_color();
 //above will work.
 // 0 = VGA 3h mode
 // 1 = VGA 13h mode
-void init_vga(uint8_t);
+void vga_init(uint8_t);
 

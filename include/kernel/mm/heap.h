@@ -39,6 +39,6 @@ heap_t global_kernel_heap;
 #define k_free( memblock ) \
     global_kernel_heap.actions.free(&global_kernel_heap, memblock)
 
-void create_heap(heap_t *heap, uint32_t start_addr, uint32_t len,
+void heap_create(heap_t *heap, uint32_t start_addr, uint32_t len,
                  heap_algs_t *algs );
 
