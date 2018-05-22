@@ -11,6 +11,7 @@ Multitasking
    Symmetric Multi Processing (SMP)
    Work on scheduler
    Create message passing interface and shared memory for IPC
+   Add name to task_t
    Utilize page faults better (kill task that makes a page fault,etc)
    use syscall/sysret instead of interrupt
 

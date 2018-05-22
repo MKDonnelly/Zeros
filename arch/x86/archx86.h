@@ -23,6 +23,7 @@
 #include <arch/x86/drivers/vgacommon/modeset.h>
 #include <arch/x86/drivers/vgacommon/vgacommon.h>
 #include <arch/x86/drivers/vgacommon/vgafont.h>
+#include <arch/x86/drivers/vga3h/vga3h.h>
 
 #include <arch/x86/cpu.h>
 

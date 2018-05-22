@@ -207,7 +207,7 @@ void page_int_handler(context_t r){
    uint8_t reserved = r.error & PAGE_RES_M;
    uint8_t id = r.error & PAGE_ID_M;
 
-   k_printf("Page Fault: ");
+/*   k_printf("Page Fault: ");
    if( present )
       k_printf("page not present at ");
    else if(rw)
@@ -218,7 +218,7 @@ void page_int_handler(context_t r){
       k_printf("reserved bits overwritten at ");
    else if( id )
       k_printf("instruction fetch at ");
-   k_printf("0x%x\n", fault_addr);
+   k_printf("0x%x\n", fault_addr);*/
 
    //We currently cannot handle a fault, so
    //halt the machine
