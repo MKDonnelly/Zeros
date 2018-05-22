@@ -1,5 +1,8 @@
 #include <kernel/mm/heap_bitmap.h>
 
+#include <lib/memory.h>
+#include <lib/bitwise.h>
+
 //Operators for a dibit set. A dibit set is a bitfield comprised
 //of two-bit values. Think of it as an array of two-bit types. This
 //is useful for the bitmap heap since we can "color" each alloction

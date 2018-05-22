@@ -5,9 +5,6 @@
 //just accounting for frames), so this is no problem.
 
 #include <lib/types.h>
-#include <lib/bitwise.h>
-#include <lib/memory.h>
-#include <kernel/mm/heap.h>
 
 #define ARCH_FRAME_SIZE 0x1000
 

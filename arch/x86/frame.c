@@ -1,5 +1,10 @@
 #include <arch/x86/frame.h>
 
+#include <lib/types.h>
+#include <lib/bitwise.h>
+#include <lib/memory.h>
+#include <kernel/mm/heap.h>
+
 //Bitfield for allocated frames (1 for allocated
 //0 for free)
 static int8_t *framepool_alloc;

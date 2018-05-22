@@ -4,7 +4,6 @@
 #include <lib/string.h>
 #include <lib/types.h>
 #include <lib/bitwise.h>
-#include <lib/debug.h>
 #include <lib/timing.h>
 #include <lib/generic_ll.h>
 #include <lib/elf32.h>

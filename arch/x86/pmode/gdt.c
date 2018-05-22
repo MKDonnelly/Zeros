@@ -1,5 +1,9 @@
 #include <arch/x86/pmode/gdt.h>
 
+#include <lib/memory.h>
+#include <arch/x86/pmode/tss.h>
+#include <arch/x86/pmode/descriptors.h>
+
 //Our global descriptor table
 static gdt_entry_t gdt_table[GDT_ENTRIES];
 

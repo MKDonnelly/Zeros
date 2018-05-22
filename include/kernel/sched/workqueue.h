@@ -1,9 +1,6 @@
 #pragma once
 
-#include <kernel/mm/heap.h>
-#include <arch/x86/archx86.h>
-#include <lib/generic_ll.h>
-#include <kernel/sched/sched.h>
+#include <arch/current_arch>
 
 typedef struct tasklet{
    struct tasklet *next;

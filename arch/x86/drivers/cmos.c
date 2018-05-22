@@ -1,5 +1,7 @@
 #include <arch/x86/drivers/cmos.h>
 
+#include <arch/x86/portio.h>
+
 //The output of this is a BCD number, which
 //needs to be converted to a binary number to
 //be of use.

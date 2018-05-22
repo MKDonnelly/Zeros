@@ -1,9 +1,6 @@
 #pragma once
 
 #include <lib/types.h>
-#include <arch/x86/pmode/gdt.h>
-#include <arch/x86/cpu.h>
-#include <arch/x86/pmode/descriptors.h>
 
 #define TOTAL_INTERRUPTS 256
 

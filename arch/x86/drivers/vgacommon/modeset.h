@@ -1,5 +1,5 @@
 #pragma once
-#include <arch/x86/portio.h>
+#include <lib/types.h>
 
 //Much of this taken from 
 //http://files.osdev.org/mirrors/geezer/osd/graphics/modes.c

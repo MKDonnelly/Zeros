@@ -1,5 +1,8 @@
 #include <arch/x86/archx86.h>
 
+#include <arch/x86/pmode/gdt.h>
+#include <arch/x86/drivers/pic.h>
+
 void arch_init_system(int video_mode){
 
    //Initilize descriptors

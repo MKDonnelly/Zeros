@@ -1,5 +1,10 @@
 #include <kernel/sched/round_robin.h>
 
+#include <kernel/task.h>
+#include <lib/generic_ll.h>
+#include <lib/timing.h>
+
+
 //Linked list of tasks to run
 static ktask_t *task_list = NULL;
 
@@ -29,7 +34,7 @@ static void idle_task(){
 
 void rr_setup(){
    //Add idle task
-   ktask_t *idle = k_create_ktask(idle_task, NULL, NULL);
+   ktask_t *idle = ktask_create(idle_task, NULL, NULL);
    add_node_ll( task_list, idle, 0 );
    task_count++;
 }   

@@ -1,5 +1,10 @@
 #include <lib/timing.h>
 
+#include <kernel/mm/heap.h>
+#include <lib/generic_ll.h>
+#include <arch/x86/archx86.h>
+#include <lib/types.h>
+
 //Holds the system time
 system_time_t global_time = {0};
 

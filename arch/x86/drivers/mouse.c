@@ -1,5 +1,11 @@
 #include <arch/x86/drivers/mouse.h>
 
+#include <arch/x86/drivers/pic.h>
+#include <arch/x86/portio.h>
+#include <arch/x86/drivers/vgacommon/vgacommon.h>
+#include <arch/x86/pmode/isr.h>
+
+
 //Temporarily holds packets as they come in.
 //When a full packet has been accuumulated, it
 //is converted to a mouse_packet_t to the registered

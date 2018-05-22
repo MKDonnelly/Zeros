@@ -1,8 +1,6 @@
 #pragma once
 
 #include <lib/types.h>
-#include <lib/memory.h>
-#include <lib/bitwise.h>
 #include <kernel/mm/heap.h>
 
 //By default, we will allocate blocks of 64 bytes

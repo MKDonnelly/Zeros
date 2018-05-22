@@ -1,5 +1,11 @@
 #include <arch/x86/pmode/schedule.h>
 
+#include <lib/types.h>
+#include <arch/x86/cpu.h>
+#include <arch/x86/pmode/isr.h>
+#include <arch/x86/pmode/gdt.h>
+#include <arch/x86/pmode/pagingasm.h>
+
 //High-level kernel scheduling function
 static arch_task_t *current_task = NULL;
 

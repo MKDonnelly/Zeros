@@ -1,5 +1,7 @@
 #include <arch/x86/drivers/pic.h>
 
+#include <arch/x86/portio.h>
+
 //Initilize the PIC
 void remap_pic(){
 

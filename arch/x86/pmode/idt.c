@@ -1,5 +1,9 @@
 #include <arch/x86/pmode/idt.h>
 
+#include <arch/x86/pmode/gdt.h>
+#include <arch/x86/cpu.h>
+#include <arch/x86/pmode/descriptors.h>
+
 //The interrupt descriptor as well as the interrupt able
 static idt_entry_t idt_table[ TOTAL_INTERRUPTS ];
 static idt_descriptor_t idt_descriptor;

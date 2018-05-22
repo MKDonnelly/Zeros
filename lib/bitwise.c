@@ -1,4 +1,3 @@
-
 #include <lib/bitwise.h>
 
 //Routines to deal with bitfields.

@@ -1,5 +1,7 @@
 #include <arch/x86/pmode/loader.h>
-#include <include/kernel/task.h>
+
+#include <lib/string.h>
+#include <arch/x86/frame.h>
 
 uint8_t elf_verify_magic(Elf32_Ehdr *elf_header){
    return strncmp( (char*)elf_header, ELF_MAGIC, ELF_MAGIC_LEN ) == 0;

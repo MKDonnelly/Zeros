@@ -1,7 +1,6 @@
 #pragma once
 
-#include <arch/x86/drivers/vga3h/vga3h.h>
-#include <arch/x86/drivers/vga13h/vga13h.h>
+#include <lib/types.h>
 
 #define VGA3H_MODE 0
 #define VGA13H_MODE 1

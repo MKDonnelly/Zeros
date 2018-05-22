@@ -1,7 +1,5 @@
 #pragma once
 
-#include <arch/x86/archx86.h>
-
 #define SYSCALL_INT 0x31
 #define TOTAL_SYSCALLS 2
 

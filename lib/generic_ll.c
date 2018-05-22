@@ -1,5 +1,9 @@
 #include <lib/generic_ll.h>
 
+#include <lib/types.h>
+#include <kernel/mm/heap.h>
+
+
 //Internally used and NEVER used by outside code.
 //This is meant to cast an unknown list element into
 //something that we can work with. 

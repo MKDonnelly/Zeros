@@ -1,5 +1,8 @@
 #include <fs/initrd/initrd.h>
 
+#include <kernel/mm/heap.h>
+#include <lib/string.h>
+
 //This does the job of reading a file from the initrd
 //*node should be a pointer to a fs_node_t FILE
 //Since we designed a file/dir in the initrd to have an

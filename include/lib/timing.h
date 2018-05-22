@@ -1,9 +1,5 @@
 #pragma once
 
-#include <kernel/mm/heap.h>
-#include <lib/generic_ll.h>
-#include <arch/x86/archx86.h>
-
 typedef struct{
    int milliseconds;
    int seconds;

@@ -2,8 +2,6 @@
 
 #include <arch/x86/pmode/context.h>
 #include <arch/x86/pmode/paging.h>
-#include <arch/x86/pmode/loader.h>
-#include <lib/assert.h>
 
 //Arch-specific structure describing task
 //state. This is meant to be part of a larger
@@ -21,8 +19,8 @@ typedef struct{
    pd_t *task_pd;
 }arch_task_t;
 
-arch_task_t arch_create_ktask(void (*start)(), void *params,
+arch_task_t arch_ktask_create(void (*start)(), void *params,
                                    void (*exit)(), uint32_t *stack);
-arch_task_t arch_create_utask(void (*start)(), void *params,
+arch_task_t arch_utask_create(void (*start)(), void *params,
                                    void (*exit)(), uint32_t *stack);
-arch_task_t arch_load_utask_elf(char*);
+arch_task_t arch_utask_from_elf(char*);

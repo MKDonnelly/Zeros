@@ -1,5 +1,8 @@
 #include <kernel/syscall.h>
 
+#include <arch/current_arch>
+#include <kernel/sched/round_robin.h>
+
 //Maps all system calls to their respective
 //handlers
 void init_syscalls(){

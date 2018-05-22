@@ -1,5 +1,11 @@
 #include <kernel/sched/workqueue.h>
 
+#include <arch/x86/pmode/spinlock.h>
+#include <lib/generic_ll.h>
+#include <kernel/sched/sched.h>
+#include <kernel/task.h>
+#include <kernel/mm/heap.h>
+
 tasklet_t *tasklet_create( void (*function)(), void *data){
    tasklet_t *new_tasklet = k_malloc( sizeof(tasklet_t), 0 );
    new_tasklet->function = function;
@@ -7,7 +13,6 @@ tasklet_t *tasklet_create( void (*function)(), void *data){
    
    return new_tasklet;
 }
-
 
 workqueue_t *workqueue_create(){
    workqueue_t *workqueue = k_malloc( sizeof(workqueue_t), 0);
@@ -54,8 +59,8 @@ void workqueue_worker(workqueue_t *workqueue){
 }
 
 void workqueue_worker_spawn(workqueue_t *workqueue){
-   current_scheduler->scheduler_add_task(
-            k_create_ktask( workqueue_worker, workqueue, NULL ) );
+   current_scheduler->scheduler_add_task( 
+        ktask_create( workqueue_worker, workqueue, NULL ) );
 }
 
 

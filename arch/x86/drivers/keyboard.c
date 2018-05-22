@@ -1,5 +1,9 @@
 #include <arch/x86/drivers/keyboard.h>
 
+#include <arch/x86/pmode/isr.h>
+#include <arch/x86/portio.h>
+#include <arch/x86/drivers/pic.h>
+
 void (*keyboard_callback)(char) = 0;
 
 //Thin layer to transform the input scancode
@@ -34,8 +38,6 @@ static void keyboard_handler(){
 //the key character entered.
 void arch_keyboard_init( void (*keypress_callback)(char) ){
 
-   KASSERT( keypress_callback != NULL );
-
    //Enable the keyboard irq
    enable_irq( KEYBOARD_IRQ );
 
@@ -47,7 +49,6 @@ void arch_keyboard_init( void (*keypress_callback)(char) ){
 
 //Register a different callback if needed
 void arch_keyboard_register_callback( void (*keypress_callback)(char) ){
-   KASSERT( keypress_callback != NULL );
    keyboard_callback = keypress_callback;
 }
 

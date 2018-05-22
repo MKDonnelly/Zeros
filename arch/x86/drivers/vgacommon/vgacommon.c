@@ -1,5 +1,9 @@
 #include <arch/x86/drivers/vgacommon/vgacommon.h>
 
+#include <arch/x86/drivers/vga3h/vga3h.h>
+#include <arch/x86/drivers/vga13h/vga13h.h>
+
+
 //These are meant to be called by external code
 int k_cursor_position(){
    return kernel_vga_screen.cursor_position();

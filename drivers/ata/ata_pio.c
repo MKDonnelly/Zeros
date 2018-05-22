@@ -1,5 +1,8 @@
 #include <drivers/ata/ata_pio.h>
 
+#include <arch/x86/archx86.h>
+#include <kernel/mm/heap.h>
+
 //According to the ATA PIO specifications, if we can 
 //write a specific value to an ATA register (SECTOR_COUNT
 //used here), then we may assume that an ide controller is present

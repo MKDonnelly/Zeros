@@ -1,6 +1,6 @@
 #pragma once
 
-#include <arch/x86/portio.h>
+#include <lib/types.h>
 
 #define MASTER_PIC_CTRL_P 0x20
 #define MASTER_PIC_DATA_P 0x21

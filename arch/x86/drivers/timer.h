@@ -1,7 +1,6 @@
 #pragma once
 
-#include <arch/x86/portio.h>
-#include <arch/x86/pmode/isr.h>
+#include <lib/types.h>
 
 #define I8253_CH0_P   0x40 //This can generate an interrupt
 //CH1 @ 0x41 is not implemented

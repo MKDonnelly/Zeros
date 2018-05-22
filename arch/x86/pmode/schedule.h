@@ -1,6 +1,5 @@
 #pragma once
-#include <lib/types.h>
-#include <lib/timing.h>
+
 #include <arch/x86/pmode/arch_task.h>
 
 #define ARCH_SCHED_INT 50

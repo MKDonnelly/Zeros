@@ -1,5 +1,9 @@
 #include <arch/x86/drivers/timer.h>
 
+#include <arch/x86/portio.h>
+#include <arch/x86/pmode/isr.h>
+#include <arch/x86/drivers/pic.h>
+
 void arch_timer_init( void (*timer_callback)(context_t) ){
 
    //Set the timer to operate at 100HZ
@@ -27,4 +31,3 @@ void set_timer_count(uint16_t count){
    portb_write( I8253_CH0_P, lowerByte );
    portb_write( I8253_CH0_P, higherByte );
 }
-

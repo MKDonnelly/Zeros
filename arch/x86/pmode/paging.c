@@ -1,5 +1,16 @@
 #include <arch/x86/pmode/paging.h>
 
+#include <arch/x86/drivers/vgacommon/vgacommon.h>
+#include <arch/x86/pmode/isr.h>
+#include <arch/x86/frame.h>
+#include <arch/x86/pmode/pagingasm.h>
+#include <arch/x86/cpu.h>
+#include <arch/x86/pmode/context.h>
+#include <kernel/mm/heap.h>
+
+#include <lib/memory.h>
+#include <lib/types.h>
+
 //Points to current page directory in use as well
 //as the page directory used by the kernel.
 pd_t *current_page_dir = NULL;
@@ -165,6 +176,7 @@ pd_t *clone_pd(pd_t *clone_dir){
    return new_dir;
 }
  
+void page_int_handler(context_t r);
 void init_paging(){
    //Make the page directory for the kernel
    kernel_page_dir = (pd_t*)k_malloc( sizeof(pd_t), ARCH_PAGE_SIZE );

@@ -8,6 +8,7 @@ void create_heap(heap_t *heap_descriptor, uint32_t start, uint32_t len,
     heap_descriptor->actions.malloc = algs->malloc;
     heap_descriptor->actions.free = algs->free;
     heap_descriptor->actions.init_heap = algs->init_heap;
+    spinlock_init( &heap_descriptor->heap_lock );
 
     heap_descriptor->actions.init_heap( heap_descriptor );
 }

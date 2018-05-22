@@ -1,5 +1,7 @@
 #include <arch/x86/drivers/vgacommon/modeset.h>
 
+#include <arch/x86/portio.h>
+
 //Based on 
 //http://files.osdev.org/mirrors/geezer/osd/graphics/modes.c
 

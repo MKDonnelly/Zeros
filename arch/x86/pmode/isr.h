@@ -1,12 +1,7 @@
 #pragma once
 
-#include <arch/x86/pmode/idt.h>
-#include <arch/x86/drivers/vgacommon/vgacommon.h>
-#include <arch/x86/drivers/pic.h>
 #include <arch/x86/pmode/context.h>
-
 #include <lib/types.h>
-#include <lib/bitwise.h>
 
 #define ARCH_MAX_INTERRUPTS 256
 

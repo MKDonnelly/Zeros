@@ -1,7 +1,6 @@
 #pragma once
 
 #include <lib/types.h>
-#include <arch/x86/pmode/gdt.h>
 
 //When an interrupt is called, the context of the interrupted
 //task is saved. The registers are pushed from the bottom of this

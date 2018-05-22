@@ -1,8 +1,6 @@
 #pragma once
 
 #include <lib/types.h>
-#include <arch/x86/archx86.h>
-#include <kernel/mm/heap.h>
 
 //This is 256 16-bit values, for 512 bits total
 #define SECTOR_SIZE 256
@@ -41,7 +39,6 @@
 #define ATA_PIO_WRITE_C 0x30
 #define ATA_PIO_CFLUSH_C 0xE7
 #define ATA_PIO_IDENTIFY_C 0xEC
-
 
 uint16_t *identify_drive(uint8_t buf, uint8_t drive );
 uint16_t *ata_pio_read_sector( uint8_t sector_count, uint32_t lba );

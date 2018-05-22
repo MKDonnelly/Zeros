@@ -1,8 +1,5 @@
 #pragma once 
 
-#include <lib/types.h>
-#include <kernel/mm/heap.h>
-
 /*			Generic Linked List
    These functions comprise a data structure that is a greatly
    generalized linked list. An Generic Linked List (hereby abbreviated

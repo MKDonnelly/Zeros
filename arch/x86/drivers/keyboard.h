@@ -1,8 +1,6 @@
 #pragma once
 
-#include <arch/x86/pmode/isr.h>
 #include <lib/types.h>
-#include <lib/assert.h>
 
 //#define KEYBOARD_BUFFER_SIZE 128
 #define KEYBOARD_IRQ 1

@@ -1,5 +1,7 @@
 #include "syscall.h"
 
+#include <arch/x86/pmode/isr.h>
+
 static void syscall_handler(context_t regs);
 static uint32_t (*syscall_table[TOTAL_SYSCALLS])();
 

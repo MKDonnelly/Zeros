@@ -1,13 +1,5 @@
 #pragma once
 
-#include <arch/x86/pmode/isr.h>
-#include <arch/x86/frame.h>
-#include <arch/x86/pmode/pagingasm.h>
-#include <arch/x86/cpu.h>
-
-#include <kernel/mm/heap.h>
-
-#include <lib/memory.h>
 #include <lib/types.h>
 
 #define KERNEL_VADDR 0xC0000000
@@ -147,4 +139,4 @@ void copy_to_physical(char *vbuf, uint32_t paddr, uint32_t len);
 void init_paging();
 
 //Handles page interrupts
-void page_int_handler(context_t);
+//void page_int_handler(context_t);

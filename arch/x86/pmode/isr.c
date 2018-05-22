@@ -1,5 +1,13 @@
 #include <arch/x86/pmode/isr.h>
+
 #include <arch/x86/cpu.h>
+#include <arch/x86/pmode/idt.h>
+#include <arch/x86/drivers/vgacommon/vgacommon.h>
+#include <arch/x86/drivers/pic.h>
+#include <arch/x86/pmode/context.h>
+#include <arch/x86/portio.h>
+#include <lib/bitwise.h>
+#include <lib/memory.h>
 
 //Bitfield of which interrupts are currently
 //registered.

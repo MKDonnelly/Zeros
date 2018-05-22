@@ -1,9 +1,6 @@
 #pragma once
 
 #include <lib/types.h>
-#include <lib/memory.h>
-#include <arch/x86/pmode/tss.h>
-#include <arch/x86/pmode/descriptors.h>
 
 void set_kernel_stack(uint32_t);
 

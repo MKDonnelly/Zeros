@@ -1,7 +1,7 @@
 #pragma once
 
 #include <lib/types.h>
-#include <arch/x86/pmode/spinlock.h>
+#include <arch/current_arch>
 
 //Individual malloc algs will create this.
 typedef struct{
