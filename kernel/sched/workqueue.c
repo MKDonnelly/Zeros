@@ -26,7 +26,7 @@ void workqueue_add(workqueue_t *workqueue, tasklet_t *new_task){
    spinlock_acquire( &workqueue->workqueue_lock );
 
    workqueue->total_tasks++;
-   add_node_ll( workqueue->tasks, new_task, 0 );
+   list_add( workqueue->tasks, new_task, 0 );
 
    spinlock_release( &workqueue->workqueue_lock );
 }
@@ -36,7 +36,7 @@ tasklet_t *workqueue_get(workqueue_t *workqueue){
    
    tasklet_t *return_tasklet = NULL;
    if( workqueue->total_tasks > 0 ){
-      return_tasklet = rmi_node_ll( workqueue->tasks, 0 );
+      return_tasklet = list_rm_index( workqueue->tasks, 0 );
       workqueue->total_tasks--;
    }
 
@@ -62,6 +62,3 @@ void workqueue_worker_spawn(workqueue_t *workqueue){
    current_scheduler->scheduler_add_task( 
         ktask_create( workqueue_worker, workqueue, NULL ) );
 }
-
-
-

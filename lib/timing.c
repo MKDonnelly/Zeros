@@ -17,7 +17,7 @@ void timing_set_alarm(void (*alarm_function)(), int ms_period){
    new_alarm->callback = alarm_function;
    new_alarm->callback_period = new_alarm->time_left = ms_period;
 
-   add_node_ll( alarm_list, new_alarm, 0);
+   list_add( alarm_list, new_alarm, 0);
    total_alarms++;
 }
 
@@ -29,7 +29,7 @@ void timing_main_handler(){
 
    if( total_alarms ){
       //This runs down the list of alarms and handles each
-      foreach_in_gll( alarm_list, alarm_iter ){
+      list_foreach( alarm_list, alarm_iter ){
          alarm_iter->time_left -= ARCH_TIMER_MS_PERIOD;
          
          //Handle any alarms that go off

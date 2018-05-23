@@ -20,7 +20,7 @@ int current_task_index = 0;
 void rr_schedule(){
    do{
       current_task_index = (current_task_index + 1) % task_count;
-      current_task = get_node_ll( task_list, current_task_index);
+      current_task = list_get_node( task_list, current_task_index);
    }while( current_task->state != TASK_READY );
 
    arch_run_next( &(current_task->task_info) );
@@ -35,7 +35,7 @@ static void idle_task(){
 void rr_setup(){
    //Add idle task
    ktask_t *idle = ktask_create(idle_task, NULL, NULL);
-   add_node_ll( task_list, idle, 0 );
+   list_add( task_list, idle, 0 );
    task_count++;
 }   
 
@@ -48,14 +48,14 @@ void rr_start(){
    arch_register_scheduler( rr_schedule );
 
    //Index 0 is for the idle thread
-   current_task = get_node_ll( task_list, 0 );
+   current_task = list_get_node( task_list, 0 );
    arch_run_next( &current_task->task_info );
    idle_task();
 }
 
 
 void rr_add_task( ktask_t *new_task){
-   add_node_ll( task_list, new_task, task_count++);
+   list_add( task_list, new_task, task_count++);
 }
 
 
