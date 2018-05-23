@@ -1,5 +1,7 @@
 #include <arch/x86/drivers/vga3h/vga3h.h>
 
+#include <lib/string.h>
+
 #define VGA3H_NEWLINE 10
 #define VGA3H_ROWS 25
 #define VGA3H_COLS 80

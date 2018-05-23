@@ -24,3 +24,5 @@ typedef struct vmode{
 #define k_puts_at(str, x, y) \
         vmode_current->vmode_putstr_at( str, x, y )
 extern vmode_t *vmode_current;
+
+void vga_init( vmode_t *new_vmode );

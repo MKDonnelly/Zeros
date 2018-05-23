@@ -1,4 +1,4 @@
-#include <arch/x86/archx86.h>
+#include <arch/current_arch>
 
 #include <lib/keyboard.h>
 #include <lib/string.h>
@@ -57,7 +57,6 @@ void kmain(struct multiboot_info *multiboot_info){
    current_scheduler = &rr_scheduler;
    current_scheduler->scheduler_setup();
    syscalls_init();
-
 
    workqueue_t *kwq = workqueue_create();
    tasklet_t *first = tasklet_create( thread1, NULL );

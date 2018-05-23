@@ -1,4 +1,10 @@
-/*//TODO Fails when we print two chars in a row
+#include <lib/print.h>
+
+#include <arch/current_arch>
+#include <lib/types.h>
+#include <lib/string.h>
+
+//TODO Fails when we print two chars in a row
 //     i.e. k_printf("%c %c", 'Z', 'Z');
 //     Only the first char is printed
 void k_printf(char *str, ...){
@@ -7,10 +13,10 @@ void k_printf(char *str, ...){
 
    int i = 0;
    while( str[i] != 0 ){
+      //Used to store result
+      char buf[20];
 
       if( str[i] == '%' ){
-         //Used to store result
-         char buf[20];
 
          if( str[i+1] == 'd' ){
             int arg = va_get( args, int );
@@ -28,13 +34,13 @@ void k_printf(char *str, ...){
          } 
 
         //Print string representation
-        int j = 0;
-        while( buf[j] != 0 )
-          k_putchar( buf[j++] ); 
+        k_puts(buf);
         i += 2;
       }else{
-         k_putchar( str[i] );
+         buf[0] = str[i];
+         buf[1] = 0;
+         k_puts(buf);
          i++;
       }
    }
-}*/
+}
