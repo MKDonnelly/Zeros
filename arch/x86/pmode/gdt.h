@@ -2,11 +2,31 @@
 
 #include <lib/types.h>
 
-void set_kernel_stack(uint32_t);
-
 //Null, kernel data/code, userland
 //data/code, TSS
 #define GDT_ENTRIES 6
+
+//Masks for flags parameter
+#define GDT_RLEVEL_0    (0 << 0)
+#define GDT_RLEVEL_3    (0b11 << 0)
+
+#define GDT_ACCESSED    (1 << 3)
+#define GDT_NOT_ACCESSED (0 << 3)
+
+#define GDT_RW          (1 << 4)
+#define GDT_RO          (0 << 4)
+
+#define GDT_NOCONFORM   (1 << 5)
+#define GDT_CONFORM     (0 << 5)
+
+#define GDT_CODET       (1 << 6)
+#define GDT_DATAT       (0 << 6)
+
+#define GDT_STYPE       (0 << 7)
+#define GDT_CDTYPE      (1 << 7)
+
+#define GDT_GRAN4K      (1 << 8)
+#define GDT_GRAN1B      (0 << 8)
 
 struct gdt_entry{
    int16_t limit_low;    //Limit bits 0-15
@@ -39,10 +59,10 @@ struct gdt_entry{
   bit 0: granularity. are limit/base int terms of 4K (1) or 1b (0)
   bit 1: operand size. 0 for 16 bit, 1 for 32 bit
   bit 2: 1 for 64 bit mode code segment, 0 for no
-  bit 3: 1 for available for system use, 0 else
+  bit 3: no purpose specified, OS may use as pleases
 */
-   int8_t available : 1;
-   int8_t long_mode_code : 1;
+   int8_t available : 1; //NOT USED
+   int8_t long_mode_code : 1; //Always 0 in protected mode.
    int8_t operand_size : 1;
    int8_t granularity : 1;
    int8_t lim_high : 4;
@@ -69,3 +89,5 @@ extern const int16_t gdt_userland_data_rpl;
 //To simplify the process, no support is added to create
 //another gdt entry after setup.
 void gdt_init();
+void gdt_set_entry( gdt_entry_t *gdt_entry, uint32_t limit, uint32_t base,
+                    uint32_t flags);

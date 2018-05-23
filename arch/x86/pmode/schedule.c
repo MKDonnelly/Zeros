@@ -5,6 +5,7 @@
 #include <arch/x86/pmode/isr.h>
 #include <arch/x86/pmode/gdt.h>
 #include <arch/x86/pmode/pagingasm.h>
+#include <arch/x86/pmode/tss.h>
 
 //High-level kernel scheduling function
 static arch_task_t *current_task = NULL;
@@ -36,7 +37,8 @@ void arch_run_next(arch_task_t *next_task){
    //Kernel tasks will have a interrupt_stack of NULL
    //Make sure we do not load that.
    if( next_task->interrupt_stack != NULL )
-      set_kernel_stack( (uint32_t)next_task->interrupt_stack );
+      tss_set_kstack( (uint32_t)next_task->interrupt_stack );
+      //set_kernel_stack( (uint32_t)next_task->interrupt_stack );
 }
 
 //Explicitly calls scheduler (like with yield)

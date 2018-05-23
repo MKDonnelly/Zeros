@@ -31,7 +31,7 @@ void idt_init(){
    idt_setup_isrs();
 
    //Load the base and length of the idt into the idt descriptor
-   idt_descriptor.base_addr = (uint32_t) &idt_table;
+   idt_descriptor.base_addr = (uint32_t)&idt_table;
    //the actual size is len - 1
    idt_descriptor.length = TOTAL_INTERRUPTS * sizeof(idt_entry_t) - 1;
 

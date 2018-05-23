@@ -1,5 +1,8 @@
 #pragma once
 
+#include <lib/types.h>
+#include <arch/x86/pmode/gdt.h>
+
 struct tss{
    uint32_t previous_tss;
    uint32_t esp_ring0, ss_ring0;
@@ -17,3 +20,6 @@ struct tss{
    uint16_t iomap_base;
 }__attribute__((packed));
 typedef struct tss tss_t;
+
+void tss_create( gdt_entry_t *tss_in_gdt, uint16_t stack_gdt_segment);
+void tss_set_kstack(uint32_t kstack_addr);
