@@ -71,7 +71,7 @@ void main_interrupt_handler(context_t r){
       //If there is, call the function handler
       int_handlers[ r.int_number ]( r );
    }else{
-      k_printf("Caught unregistered interrupt %d\n", r.int_number);
+//      k_printf("Caught unregistered interrupt %d\n", r.int_number);
 
       //So far, we cannot recover from exceptions
       if( r.int_number < 33 )

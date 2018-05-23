@@ -9,12 +9,12 @@ void arch_system_init(int video_mode){
    gdt_init();
    interrupts_init();
 
-   //Re-map the pic
+   //Setup the PIC
    pic_init();
 
    //Setup the function points to use
    //the screen
-   vga_init(0);
+   vga_init( &vmode_vga3h );   
 
    arch_disable_ints();
 }

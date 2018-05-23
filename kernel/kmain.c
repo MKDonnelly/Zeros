@@ -1,4 +1,4 @@
-#include <arch/x86/archx86.h>
+#include <arch/current_arch>
 
 #include <lib/keyboard.h>
 #include <lib/string.h>
@@ -14,6 +14,7 @@
 #include <kernel/task.h>
 
 #include <kernel/mm/heap_blocklist.h>
+#include <kernel/mm/heap_bitmap.h>
 #include <kernel/mm/heap.h>
 
 #include <kernel/sched/sched.h>
@@ -28,7 +29,7 @@
 void thread1(){
    int t1count = 0;
    while(t1count < 5){
-      k_printf_at("1", t1count++, 0);
+      k_puts_at("1", t1count++, 0);
       for(int i = 0; i < 50000000; i++);
    }
 }
@@ -36,23 +37,17 @@ void thread1(){
 void thread2(){
    int t2count = 0;
    while(t2count < 5){
-      k_printf_at("2", t2count++, 1);
+      k_puts_at("2", t2count++, 1);
       for(int i = 0; i < 50000000; i++);
    }
 }
-
-void myf(void *string){
-   k_printf("myf called with \"%s\"\n", (char*)string);
-}
-
-#include <kernel/mm/heap_bitmap.h>
 
 void kmain(struct multiboot_info *multiboot_info){
 
    arch_system_init();
    arch_timer_init( timing_main_handler );
    arch_keyboard_init( keyboard_main_handler );
-   k_clear_screen();
+   k_puts("\\c");
 
    heap_create( &global_kernel_heap, KERNEL_VADDR+0x300000, 0x200000, 
                 &blocklist_heap);
@@ -62,7 +57,6 @@ void kmain(struct multiboot_info *multiboot_info){
    current_scheduler = &rr_scheduler;
    current_scheduler->scheduler_setup();
    syscalls_init();
-
 
    workqueue_t *kwq = workqueue_create();
    tasklet_t *first = tasklet_create( thread1, NULL );

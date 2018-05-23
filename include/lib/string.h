@@ -14,4 +14,5 @@ char *strstr(char*,char*);
 void reverse(char[]);
 void itoa(int, char[]);
 void itoh(int, char[]);
-
+int is_in(char c, char *str);
+int atoi(char *str);

@@ -93,6 +93,30 @@ void reverse(char s[]){
    }
 }
 
+int is_in(char c, char *str){
+   int present = 0;
+   for(int i = 0; str[i] != 0; i++){
+      if( c == str[i] )
+         present = 1;
+   }
+   return present;
+}
+
+//Converts a string into an integer
+int atoi(char *str){
+   int result = 0;
+   int i = 0;
+   while( is_in( str[i], "0123456789" ) ){
+      result *= 10;
+      result += (str[i] - '0');
+      i++;
+   }
+   if( str[0] == '-' )
+      result = -result;
+   return result;
+}
+
+
 //Convert the integer n into 
 //an ascii string.
 void itoa(int n, char s[]){
