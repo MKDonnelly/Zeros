@@ -28,7 +28,11 @@ void k_printf(char *str, ...){
             char *s = va_get( args, char* );
             strncpy( buf, s, 20 ); 
          }else if( str[i+1] == 'c' ){
-            char c = va_get(args, char);
+            //NOTE: Even though a char is 1 byte,
+            //pushing it onto the stack makes it 4 bytes
+            //due to stack alignment. va_get must then
+            //advance 4 bytes to get the next char.
+            char c = va_get(args, uint32_t);
             buf[0] = c;
             buf[1] = 0;
          } 

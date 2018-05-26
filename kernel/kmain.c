@@ -63,11 +63,7 @@ void open(char *addr){
 
    char buf[30];
    vm_copy_from_pdir( addr, ctask->task_info.task_pd, buf, 4);
-   k_printf("%c\n", buf[0]);
-   k_printf("%c\n", buf[1]);
-   k_printf("%c\n", buf[2]);
-   k_printf("%c\n", buf[3]);
-   
+   k_printf("%c%c%c%c\n", buf[0], buf[1], buf[2], buf[3]); 
 }
 
 void kmain(struct multiboot_info *multiboot_info){
