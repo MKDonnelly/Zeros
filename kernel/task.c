@@ -3,12 +3,15 @@
 #include <kernel/mm/heap.h>
 #include <lib/assert.h>
 
-
 //Internally used by k_create_task to assign
 //a unique id to every task
 int next_task_id = 0;
 
 #define STACK_SIZE 0x1000
+
+int get_pid(ktask_t *task){
+   return task->task_id;
+}
 
 ktask_t *ktask_create( void (*start)(), void *param, void (*exit)()){
 

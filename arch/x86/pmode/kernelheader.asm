@@ -99,3 +99,9 @@ stop:
     cli
     hlt
     jmp stop
+
+section .initrd
+;I include the initrd as part of the image, to make it easier
+;to manage. Note that the actual compiling happens in the parent
+;directory, so the initrd is referenced from the parent directory.
+incbin "./initrd"

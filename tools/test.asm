@@ -6,8 +6,11 @@ section .text
 
 global _start
 _start:
-   mov ecx, str
-   call write_str
+;   mov eax, 0
+;   mov ebx, str
+;   int 0x31
+;   mov ecx, str
+;   call write_str
 
 .end:
    mov eax, 1

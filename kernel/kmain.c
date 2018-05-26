@@ -46,6 +46,15 @@ void thread2(){
 extern unsigned int ldscript_text_start;
 extern unsigned int ldscript_text_end;
 extern unsigned int ldscript_kernel_end;
+extern unsigned int ldscript_initrd_start;
+
+void copy_from_userland(char *from, char *to, int len){
+   k_printf("Copy from %x\n", from); 
+}
+
+void open(char *addr){
+   copy_from_userland( addr, NULL, 0 );
+}
 
 void kmain(struct multiboot_info *multiboot_info){
 
@@ -54,7 +63,6 @@ void kmain(struct multiboot_info *multiboot_info){
    arch_keyboard_init( keyboard_main_handler );
    k_puts("\\c"); //clear screen
    
-
    //Have the heap start just after the text segment on an aligned boundary
    uint32_t heap_start = ALIGN_ON((int)&ldscript_kernel_end + 0x2000, 
                                   ARCH_PAGE_SIZE);
@@ -71,7 +79,9 @@ void kmain(struct multiboot_info *multiboot_info){
    current_scheduler = &rr_scheduler;
    current_scheduler->scheduler_setup();
    syscalls_init();
+   arch_register_syscall( open, 0 );
 
+/*
    workqueue_t *kwq = workqueue_create();
    tasklet_t *first = tasklet_create( thread1, NULL );
    tasklet_t *second = tasklet_create( thread2, NULL );
@@ -82,7 +92,7 @@ void kmain(struct multiboot_info *multiboot_info){
    workqueue_worker_spawn( kwq );
    workqueue_worker_spawn( kwq );
 
-   current_scheduler->scheduler_start();
+   current_scheduler->scheduler_start();*/
 
 /*
    char *s1 = k_malloc(kernel_heap, 1024, 0x1000);
@@ -91,21 +101,19 @@ void kmain(struct multiboot_info *multiboot_info){
    rr_add_task( k_create_ktask( thread2, NULL, rr_exit_task, STACK_HEAD(s2, 1024)));
 */
 
-/*
+
 //Read in first file from initrd (it will contain a test binary)
    char *program_buf = k_malloc( 5000, 0);
-   //identity map the lower part to make it easier to grab the initrd.
-   map_page_range( 0x0, 0x0, kernel_page_dir, PAGE_RW, PAGE_USR_ACCESS, 0x500000);
-   fs_root = init_initrd( ((struct module*)multiboot_info->mods)->start );
+   fs_root = init_initrd( &ldscript_initrd_start );
    fs_node_t *first = fs_root->readdir( fs_root, 0 );
    first->read( first, 0, first->length, program_buf);
 
-   ktask_t *new_task = k_create_utask_elf(program_buf);
+   ktask_t *new_task = utask_from_elf(program_buf);
    
    current_scheduler->scheduler_add_task(new_task);
 
    current_scheduler->scheduler_start();
-*/
+
    while(1) arch_halt_cpu();
 }
 

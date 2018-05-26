@@ -24,5 +24,15 @@ SECTIONS{
        *(.bss)
    }
    ldscript_bss_end = .;
+
+   /*It is easier to include the initrd as part of the
+     image, rather than having grub place it wherever
+     and then trying to map it in*/
+   ldscript_initrd_start = .;
+   .initrd : AT(ADDR(.initrd) - 0xC0000000) { 
+       *(.initrd)
+   }
+   ldscript_initrd_end = .;
+
    ldscript_kernel_end = .;
 }

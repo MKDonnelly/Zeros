@@ -28,10 +28,12 @@ build_staging:
 	@PREFIX=$(BUILDDIR)/staging/ make -C staging/ --no-print-directory
 
 run: all
-	@qemu-system-x86_64 -kernel build/Zeros.elf -append arg1 -initrd arch/x86/initrd -drive format=raw,file=./testdisk &
+	@qemu-system-x86_64 -kernel build/Zeros.elf -drive format=raw,file=./testdisk &
+	@#qemu-system-x86_64 -kernel build/Zeros.elf -append arg1 -initrd arch/x86/initrd -drive format=raw,file=./testdisk &
 
 debug: all
-	@qemu-system-x86_64 -kernel build/Zeros.elf -append arg1 -initrd arch/x86/initrd -drive format=raw,file=./testdisk -S -s &
+	@qemu-system-x86_64 -kernel build/Zeros.elf -drive format=raw,file=./testdisk -S -s &
+	@#qemu-system-x86_64 -kernel build/Zeros.elf -append arg1 -initrd arch/x86/initrd -drive format=raw,file=./testdisk -S -s &
 	@gdb -q -x .gdbdebug
 
 clean:

@@ -7,7 +7,6 @@ Multitasking
          Links to the same address w/ the default address
          do as well, but other address work fine.
    create systemcall interface 
-   Create guard page for ktask stacks
    Symmetric Multi Processing (SMP)
    Work on scheduler
    Create message passing interface and shared memory for IPC
@@ -37,7 +36,6 @@ advanced os examples:
    dragonfly bsd, minix, plan9, genode, haiku, helenos, redox
 
 low-priority
-
    add random number generator, md5 sum function
    add in arch-specific bitwise operators, optimizations (AVX, SIMD, etc)
    Get proper release/press code working with keyboard
