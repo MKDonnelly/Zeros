@@ -8,7 +8,7 @@
 #include <arch/x86/pmode/context.h>
 #include <kernel/mm/heap.h>
 
-#include <lib/memory.h>
+#include <lib/string.h>
 #include <lib/types.h>
 #include <lib/print.h>
 #include <lib/assert.h>

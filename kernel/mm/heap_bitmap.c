@@ -1,6 +1,6 @@
 #include <kernel/mm/heap_bitmap.h>
 
-#include <lib/memory.h>
+#include <lib/string.h>
 #include <lib/bitwise.h>
 
 //Operators for a dibit set. A dibit set is a bitfield comprised

@@ -8,7 +8,7 @@
 #include <arch/x86/portio.h>
 #include <arch/x86/pmode/descriptors.h>
 #include <lib/bitwise.h>
-#include <lib/memory.h>
+#include <lib/string.h>
 
 //Bitfield of which interrupts are currently
 //registered.

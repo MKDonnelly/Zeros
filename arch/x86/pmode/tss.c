@@ -1,7 +1,7 @@
 #include <arch/x86/pmode/tss.h>
 
 #include <arch/x86/pmode/gdt.h>
-#include <lib/memory.h>
+#include <lib/string.h>
 
 //The TSS used by the system
 static tss_t tss_entry;

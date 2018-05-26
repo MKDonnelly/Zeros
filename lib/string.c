@@ -1,5 +1,18 @@
 #include <lib/string.h>
 
+//Basic function to copy and set memory
+void memcpy( void *dest, void *src, int amount){
+   for(int i = 0; i < amount; i++)
+      ((char*)dest)[i] = ((char*)src)[i];
+}
+
+//Overwrite *dest with amount bytes of value val
+void memset( void *dest, int amount, int val){
+   for(int i = 0; i < amount; i++)
+      ((char*)dest)[i] = val;
+}
+
+
 //Find length of string
 int strlen(char inputarray[]){
    int i = 0;

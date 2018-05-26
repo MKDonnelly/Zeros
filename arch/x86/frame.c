@@ -2,7 +2,7 @@
 
 #include <lib/types.h>
 #include <lib/bitwise.h>
-#include <lib/memory.h>
+#include <lib/string.h>
 #include <kernel/mm/heap.h>
 
 //Bitfield for allocated frames (1 for allocated

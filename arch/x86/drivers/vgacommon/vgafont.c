@@ -2,7 +2,7 @@
 
 #include <arch/x86/portio.h>
 #include <arch/x86/drivers/vgacommon/modeset.h>
-#include <lib/memory.h>
+#include <lib/string.h>
 
  
 unsigned char g_8x16_font[4096] = {

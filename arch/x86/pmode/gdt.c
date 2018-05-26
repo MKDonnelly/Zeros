@@ -1,6 +1,6 @@
 #include <arch/x86/pmode/gdt.h>
 
-#include <lib/memory.h>
+#include <lib/string.h>
 #include <arch/x86/pmode/tss.h>
 #include <arch/x86/pmode/descriptors.h>
 
