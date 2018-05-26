@@ -42,16 +42,30 @@ void thread2(){
    }
 }
 
+//Defined in linker script
+extern unsigned int ldscript_text_start;
+extern unsigned int ldscript_text_end;
+extern unsigned int ldscript_kernel_end;
+
 void kmain(struct multiboot_info *multiboot_info){
 
    arch_system_init();
    arch_timer_init( timing_main_handler );
    arch_keyboard_init( keyboard_main_handler );
-   k_puts("\\c");
+   k_puts("\\c"); //clear screen
+   
 
-   heap_create( &global_kernel_heap, KERNEL_VADDR+0x300000, 0x200000, 
+   //Have the heap start just after the text segment on an aligned boundary
+   uint32_t heap_start = ALIGN_ON((int)&ldscript_kernel_end + 0x2000, 
+                                  ARCH_PAGE_SIZE);
+   //Keep in mind that only the first 4M of memory at the start of the
+   //kernel is mapped int. If the size is changed to be larger, this 
+   //may cause a page fault.
+   heap_create( &global_kernel_heap, heap_start, 0x200000, 
                 &blocklist_heap);
 
+   //Initilize vm subsystem. This requires the heap, so we cannot
+   //have arch_system_init do this.
    vm_init();
    
    current_scheduler = &rr_scheduler;
@@ -67,6 +81,7 @@ void kmain(struct multiboot_info *multiboot_info){
  
    workqueue_worker_spawn( kwq );
    workqueue_worker_spawn( kwq );
+
 
    current_scheduler->scheduler_start();
 

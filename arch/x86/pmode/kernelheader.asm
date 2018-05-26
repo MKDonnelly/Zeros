@@ -12,7 +12,6 @@ MULTIBOOT_HEADER_MAGIC equ 0x1BADB002
 MULTIBOOT_HEADER_FLAGS equ PAGE_ALIGN | MEMORY_INFO ;| VIDEO_INFO 
 KERNEL_VIRT_ADDR equ 0xC0000000
 KERNEL_PAGE equ (KERNEL_VIRT_ADDR >> 22)
-KERNEL_STACK_START equ 0x300000 + KERNEL_VIRT_ADDR
 
 section .data
 align 0x1000
@@ -49,6 +48,7 @@ global loader
 loader equ (arch_start - KERNEL_VIRT_ADDR )
 
 [extern kmain]
+[extern ldscript_kernel_end]
 
 arch_start:
 
@@ -77,8 +77,12 @@ arch_start:
     or eax, 0x80000000
     mov cr0, eax
 
-    ;Set the kernel stack
-    mov ebp, KERNEL_STACK_START
+    ;Set the kernel stack. Have it start 8K after the 
+    ;end of the kernel .text, .data, and .bss section.
+    ;The heap will start just after that.
+    mov eax, ldscript_kernel_end
+    add eax, 0x2000
+    mov ebp, eax
     mov esp, ebp
 
     ;Make sure to pass the multiboot header

@@ -19,10 +19,7 @@ drivers
    APIC, HPET, ATA PIO mode, PCI, network card
    basic ext2 filesystem, CMOS
 
-Resolve circula #include's
 make a modular kernel
-Use labels defined in liker script to start heap
-   at end of kernel text
 Use kassert often
 Go through and design a nice API
    i.e. all functions are formatted like
