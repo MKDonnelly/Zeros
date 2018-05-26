@@ -77,3 +77,7 @@ fs_node_t *readdir_fs(fs_node_t *node, uint32_t index);
 
 //Given the name of a file, try to locate it in the directory.
 fs_node_t *finddir_fs(fs_node_t *node, char *name);
+
+//system calls
+void sys_open(int a, char *addr);
+void sys_write(int fd, char *buf, int len);

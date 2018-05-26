@@ -1,14 +1,30 @@
 section .data
 str: db 'Hello', 0
 str_len: equ $-str
+my_pid: db 1
 
 section .text
 
 global _start
 _start:
-   mov eax, 0
-   mov ebx, str
+   mov eax, 2
+   mov ebx, 0
+   mov ecx, str
+   mov edx, str_len
    int 0x31
+
+   mov eax, 3
+   int 0x31
+
+   add eax, '0'
+   mov byte [my_pid], al
+   
+   mov eax, 2
+   mov ebx, 0
+   mov ecx, my_pid
+   mov edx, 1
+   int 0x31
+
 ;   mov ecx, str
 ;   call write_str
 

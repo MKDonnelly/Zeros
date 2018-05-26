@@ -2,18 +2,33 @@
 
 #include <arch/x86/pmode/isr.h>
 
-static void syscall_handler(context_t regs);
 static uint32_t (*syscall_table[TOTAL_SYSCALLS])();
 
 //All system calls are routed here
-static void syscall_handler(context_t regs){
+static void syscall_handler(){
+
+   context_t *current_context = get_current_context();
+
+   if( current_context->eax < 0 || current_context->eax > TOTAL_SYSCALLS )
+      return;
+
+   uint32_t (*syscall)() = syscall_table[current_context->eax];
+   current_context->eax = syscall(current_context->ebx, 
+                                  current_context->ecx, 
+                                  current_context->edx, 
+                                  current_context->esi, 
+                                  current_context->edi);
+}
+
+/*static void syscall_handler(context_t regs){
 
    if( regs.eax < 0 || regs.eax > TOTAL_SYSCALLS )
       return;
 
    uint32_t (*syscall)() = syscall_table[regs.eax];
    regs.eax = syscall(regs.ebx, regs.ecx, regs.edx, regs.esi, regs.edi);
-}
+}*/
+
 
 //Initilizes the system call interrupt
 void arch_syscalls_init(){

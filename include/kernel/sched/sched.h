@@ -1,5 +1,7 @@
 #pragma once
 
+#include <kernel/task.h>
+
 //Generic interface to scheduler routines
 typedef struct{
    //Does any pre-initilization for the scheduler
@@ -29,7 +31,7 @@ typedef struct{
    void *(*scheduler_join_task)();
 
    //Returns the current ktask 
-   void *(*scheduler_current_ktask)();
+   ktask_t *(*scheduler_current_ktask)();
 
    //This does the actual task switching and is
    //routinely called.
