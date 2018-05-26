@@ -62,7 +62,7 @@ arch_task_t arch_utask_from_elf( char *elf_file_buffer ){
    uint32_t start_addr = arch_create_from_elf( (Elf32_Ehdr*)elf_file_buffer, user_task.task_pd);
 
    //Map in a stack for the task
-   uint32_t ustack = first_free_frame();
+   uint32_t ustack = framepool_first_free();
    //Subtract the size of the page, since the stack head will be AT
    //USERLAND_STACK.
    vm_pmap( USERLAND_STACK - ARCH_PAGE_SIZE, ustack, user_task.task_pd, 1, 1 );

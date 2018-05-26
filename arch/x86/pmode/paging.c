@@ -128,7 +128,7 @@ static void clone_table(pde_t *dest_pde, pde_t *source_pde){
 
       //Only create a new page in the copy if the source has one
       if( source_pt->pt_entries[i].frame_addr != 0 ){
-         dest_pt->pt_entries[i].frame_addr = first_free_frame();
+         dest_pt->pt_entries[i].frame_addr = framepool_first_free();
          dest_pt->pt_entries[i].rw = source_pt->pt_entries[i].rw;
          dest_pt->pt_entries[i].user = source_pt->pt_entries[i].user;
          dest_pt->pt_entries[i].accessed = source_pt->pt_entries[i].accessed;
@@ -187,7 +187,7 @@ void vm_init(){
                  PAGE_KERNEL_ACCESS, 0x500000 );
 
    //Setup a frame pool
-   make_frame_pool( 0x600000, 100 );
+   framepool_create( 0x600000, 100 );
 
    //Setup the interrupt handler for paging BEFORE enabling paging
    arch_register_interrupt( PAGE_INTERRUPT, page_int_handler);

@@ -82,7 +82,6 @@ void kmain(struct multiboot_info *multiboot_info){
    workqueue_worker_spawn( kwq );
    workqueue_worker_spawn( kwq );
 
-
    current_scheduler->scheduler_start();
 
 /*

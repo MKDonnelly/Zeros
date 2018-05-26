@@ -31,7 +31,7 @@ uint32_t arch_create_from_elf(Elf32_Ehdr *elf_data, pd_t *task_pd){
                                     i * elf_data->e_phentsize);
       if( elf_pheader->p_type == PT_LOAD ){
 
-         uint32_t frame = first_free_frame(); 
+         uint32_t frame = framepool_first_free(); 
          vm_pmap( elf_pheader->p_vaddr, frame, task_pd, 1, 1);
          vm_copy_to_physical( (char*)elf_data + elf_pheader->p_offset, 
                            frame, elf_pheader->p_filesize);
