@@ -53,7 +53,21 @@ void copy_from_userland(char *from, char *to, int len){
 }
 
 void open(char *addr){
+   k_printf("Open called!\n");
    copy_from_userland( addr, NULL, 0 );
+   ktask_t *ctask = current_scheduler->scheduler_current_ktask();
+   uint32_t page_addr = virt_to_phys((uint32_t)addr, ctask->task_info.task_pd);
+   uint32_t page_offset = (uint32_t)addr & 0xFFF;
+   k_printf("Page addr: %x, page offset: %d\n", page_addr, page_offset);
+
+
+   char buf[30];
+   vm_copy_from_pdir( addr, ctask->task_info.task_pd, buf, 4);
+   k_printf("%c\n", buf[0]);
+   k_printf("%c\n", buf[1]);
+   k_printf("%c\n", buf[2]);
+   k_printf("%c\n", buf[3]);
+   
 }
 
 void kmain(struct multiboot_info *multiboot_info){

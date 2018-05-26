@@ -15,6 +15,10 @@ static ktask_t *current_task = NULL;
 static int task_count = 0;
 int current_task_index = 0;
 
+//Returns the current ktask.
+ktask_t *rr_current_ktask(){
+   return current_task;
+}
 
 //The main scheduler. Routinely called to manage tasks
 void rr_schedule(){
@@ -91,6 +95,7 @@ schedalg_t rr_scheduler = {
    .scheduler_yield_task = rr_yield_task,
    .scheduler_exit_task  = rr_exit_task,
    .scheduler_join_task  = rr_join_task,
-   .scheduler_schedule   = rr_schedule
+   .scheduler_schedule   = rr_schedule,
+   .scheduler_current_ktask = rr_current_ktask,
 };
 

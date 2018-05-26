@@ -3,5 +3,5 @@ How to compile and link a program to run
 Given the file test.asm, do the following
    -> nasm -f elf32 -g -o test.o test.asm
    -> ld -o test -T userland_link.ld -m elf_i386 test.o
-   -> ./makeinitrd test ../arch/x86/pmode/initrd
+   -> ./makeinitrd test ../arch/x86/initrd
 

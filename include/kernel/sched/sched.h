@@ -28,6 +28,9 @@ typedef struct{
    //Used to join with a given task
    void *(*scheduler_join_task)();
 
+   //Returns the current ktask 
+   void *(*scheduler_current_ktask)();
+
    //This does the actual task switching and is
    //routinely called.
    void (*scheduler_schedule)();

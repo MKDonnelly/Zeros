@@ -30,11 +30,11 @@
 //the offset within the page table.
 #define PT_INDEX(vaddr) ((vaddr >> 12) & 0x3ff)
 
-//Used to convert Virtual <=> Physical addresses. This may
-//be insufficient later. I assume that all of these will be called
-//with kernel addresses
+//Used to convert KERNEL Virtual <=> Physical addresses. THIS
+//ONLY WORKS FOR KERNEL ADDRESSES! 
 #define PHYS_TO_VIRT(paddr) ( (uint32_t)paddr + KERNEL_VADDR)
 #define VIRT_TO_PHYS(vaddr) ( (uint32_t)vaddr - KERNEL_VADDR)
+
 
 //Align a page on 4K boundary
 #define ALIGN_4K(address) (address & ~0xFFF)
@@ -134,6 +134,13 @@ pd_t *vm_pdir_clone(pd_t *page_directory);
 //Given a buffer, length, and physical address, copy the
 //buffer to the physical address.
 void vm_copy_to_physical(char *vbuf, uint32_t paddr, uint32_t len);
+
+//Copy memory from one page directory into a buffer
+void vm_copy_from_pdri(uint32_t vaddr, pd_t *page_directory,
+                       char *to, uint32_t len);
+
+//Used to find a mapping between virtual and physical addresses
+uint32_t virt_to_phys(uint32_t uaddr, pd_t *page_directory);
 
 //Initilized the paging structure
 void vm_init();

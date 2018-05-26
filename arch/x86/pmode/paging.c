@@ -11,6 +11,7 @@
 #include <lib/memory.h>
 #include <lib/types.h>
 #include <lib/print.h>
+#include <lib/assert.h>
 
 //Points to current page directory in use as well
 //as the page directory used by the kernel.
@@ -50,6 +51,13 @@ static pte_t *get_page( uint32_t vaddr, bool create_pt, pd_t *page_directory){
    //Get the page table entry from the page table
    pte_t *page_table_entry = &page_table->pt_entries[ PT_INDEX( vaddr ) ];
    return page_table_entry;
+}
+
+uint32_t virt_to_phys( uint32_t uaddr, pd_t *page_directory ){
+     pte_t *pte = get_page( uaddr, 0, page_directory );
+     if( pte != NULL )
+        return pte->frame_addr * ARCH_PAGE_SIZE;
+     return 0; //Address not mapped
 }
 
 void vm_pmap(uint32_t vaddr, uint32_t paddr, pd_t *page_directory, 
@@ -99,6 +107,27 @@ void vm_copy_to_physical(char *vbuf, uint32_t paddr, uint32_t len){
 
    //FIXME len is assumed to be less than the page size
    memcpy( (char*)0x0, vbuf, len );
+}
+
+//Copies data from a virtual address in a page directory to the given
+//buffer
+void vm_copy_from_pdir(uint32_t vaddr, pd_t *page_directory, 
+                       char *to, uint32_t len){
+
+   uint32_t physical_page_addr = virt_to_phys( vaddr, page_directory );
+
+   //physical_page_addr will only give us the addres of the page, not
+   //the actual offset within that page.
+   uint32_t offset_into_page = vaddr & 0xFFF;
+
+   uint32_t physical_addr = physical_page_addr + offset_into_page;
+
+   //Map it into the kernel address space
+   vm_pmap_temp( 0x0, physical_page_addr, page_directory );
+
+   //Note: currently we assume that the data remains within a page
+   KASSERT( len < ARCH_PAGE_SIZE );
+   memcpy( to, offset_into_page, len );
 }
 
 //Copies the page at one physical address to another 
