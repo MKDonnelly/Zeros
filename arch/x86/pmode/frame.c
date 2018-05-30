@@ -1,4 +1,4 @@
-#include <arch/x86/frame.h>
+#include <arch/x86/pmode/frame.h>
 
 #include <lib/types.h>
 #include <lib/bitwise.h>

@@ -13,22 +13,9 @@ MULTIBOOT_HEADER_FLAGS equ PAGE_ALIGN | MEMORY_INFO ;| VIDEO_INFO
 KERNEL_VIRT_ADDR equ 0xC0000000
 KERNEL_PAGE equ (KERNEL_VIRT_ADDR >> 22)
 
-section .data
-align 0x1000
-;A fixed page table for the early boot environment. This identity
-;maps the first 4M and maps 3G to the first 4M as well. This helps
-;when transitioning to a higher-half kernel. As soon as kmain is 
-;loaded, this page table is no longer used
-global page_directory_table
-page_directory_table:
-   dd 0x00000083
-   times (KERNEL_PAGE - 1) dd 0
-   dd 0x00000083
-   times (1024 - KERNEL_PAGE - 1) dd 0
-
 [bits 32]
-section .text
 
+section .boot
 align 4
 multiboot_header:
     dd MULTIBOOT_HEADER_MAGIC
@@ -38,18 +25,9 @@ multiboot_header:
 ;    dd 0 ;0 = set graphics mode
 ;    dd 1024, 768, 16 ;Width, height, and depth for display
 
-
 global arch_start
 
-;We are telling the linker to link to KERNEL_VIRT_ADDR,
-;so before we start executing at that address, we need the
-;physical address we are at
-global loader
-loader equ (arch_start - KERNEL_VIRT_ADDR )
-
 [extern kmain]
-[extern ldscript_kernel_end]
-
 arch_start:
 
     ;Setup a temporary page directory so that 
@@ -64,7 +42,7 @@ arch_start:
     
     ;Load in address of page directory. remember, we are linked
     ;to KERNEL_VIRT_ADDR and must adjust the memory reference.
-    mov eax, page_directory_table - KERNEL_VIRT_ADDR
+    mov eax, page_directory_table
     mov cr3, eax
  
     ;Set CR4.PSE
@@ -80,7 +58,7 @@ arch_start:
     ;Set the kernel stack. Have it start 8K after the 
     ;end of the kernel .text, .data, and .bss section.
     ;The heap will start just after that.
-    mov eax, ldscript_kernel_end
+    mov eax, 0xC0010000 
     add eax, 0x2000
     mov ebp, eax
     mov esp, ebp
@@ -100,8 +78,18 @@ stop:
     hlt
     jmp stop
 
+section .boot
+align 0x1000
+;A fixed page table for the early boot environment. This identity
+;maps the first 4M and maps 3G to the first 4M as well. This helps
+;when transitioning to a higher-half kernel. As soon as kmain is 
+;loaded, this page table is no longer used
+global page_directory_table
+page_directory_table:
+   dd 0x00000083
+   times (KERNEL_PAGE - 1) dd 0
+   dd 0x00000083
+   times (1024 - KERNEL_PAGE - 1) dd 0
+
 section .initrd
-;I include the initrd as part of the image, to make it easier
-;to manage. Note that the actual compiling happens in the parent
-;directory, so the initrd is referenced from the parent directory.
-incbin "./initrd"
+incbin "./arch/x86/initrd"

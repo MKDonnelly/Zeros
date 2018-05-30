@@ -37,6 +37,7 @@ arch_start:
 
     ;we should never get here
 
+
 global long_mode_jump
 long_mode_jump:
    call setup_page_tables

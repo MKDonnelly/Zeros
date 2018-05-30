@@ -4,7 +4,7 @@
 #include <arch/x86/pmode/loader.h>
 #include <lib/assert.h>
 #include <kernel/mm/heap.h>
-#include <arch/x86/frame.h>
+#include <arch/x86/pmode/frame.h>
 
 //Default userland stack address when loading through
 //ELF image.

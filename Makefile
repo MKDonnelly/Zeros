@@ -2,7 +2,6 @@ VERSION := 0.4
 
 ARCH ?= x64
 
-
 define make-build
    for dir in $(src_dirs); \
    do  \
@@ -14,7 +13,7 @@ include arch/rules-$(ARCH).mk
 
 $(objdir)/%.o: %.c
 	@echo "   CC    $<"
-	@$(CC) -c $(CFLAGS) $< -o $@
+	@$(CC) $(CFLAGS) -c $< -o $@
 
 $(objdir)/%.o: %.asm
 	@echo "   ASM   $<"

@@ -2,7 +2,7 @@
 
 #include <arch/x86/drivers/vgacommon/vgacommon.h>
 #include <arch/x86/pmode/isr.h>
-#include <arch/x86/frame.h>
+#include <arch/x86/pmode/frame.h>
 #include <arch/x86/pmode/pagingasm.h>
 #include <arch/x86/cpu.h>
 #include <arch/x86/pmode/context.h>

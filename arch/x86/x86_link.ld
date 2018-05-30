@@ -1,14 +1,20 @@
 OUTPUT_FORMAT(elf32-i386)
-ENTRY(loader)
+ENTRY(arch_start)
 
 SECTIONS{
 
+   /*Grub jumps to the virtual address of the ENTRY,
+     so we must have it reflect the physical location*/
+   . = 0x100000;
+   .boot : { *(.boot) }
+   boot_end = .;
+
    /*This sets the linker's Virtual Memory address*/
-   . = 0xC0100000;
+   . += 0xC0100000; 
    ldscript_text_start = .;
-   /*When using AT, we are actually setting the linker's
-     Load Memory Address, for use by GRUB when loading*/
-   .text : AT(ADDR(.text) - 0xC0000000 ) {
+   /*While we are linking somwhere above 0xC0000000, we want
+     the text to be placed in lower memory*/
+   .text  ALIGN(0x1000) : AT(ADDR(.text) - 0xC0000000 ) {
       *(.text)
    }
    ldscript_text_end = .;

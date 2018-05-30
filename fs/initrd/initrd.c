@@ -1,6 +1,7 @@
 #include <fs/initrd/initrd.h>
 
 #include <kernel/mm/heap.h>
+#include <lib/types.h>
 #include <lib/string.h>
 
 //This does the job of reading a file from the initrd
