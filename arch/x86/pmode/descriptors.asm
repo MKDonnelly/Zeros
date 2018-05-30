@@ -28,6 +28,19 @@ idt_load:
 [extern gdt_kernel_data]
 [extern gdt_kernel_code]
 
+; Why ljmp_to is needed:
+; There are a few times where it would be really
+; nice to do a long jump to a register. However,
+; this will not work. instead, this can be accomplished
+; by setting up a stack and ireting from it
+%macro LJMP_TO 2
+   pushf    ;eflags
+   push dword %1  ;segment
+   push %2  ;new eip
+   iret
+%endmacro
+  
+
 global gdt_load
 gdt_load:
    mov eax, [esp+4]
@@ -42,8 +55,9 @@ gdt_load:
    mov fs, ax
    mov gs, ax
    mov ss, ax
-   ; 0x08 is gdt_kernel_code
-   ; TODO try to put constant in
-   jmp 0x08:.gdt_return
+
+   ;Do a long jump to activate the GDT
+   LJMP_TO [gdt_kernel_code], .gdt_return
+
 .gdt_return:
    ret
