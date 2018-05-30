@@ -27,17 +27,15 @@ multiboot_header:
 
 KERNEL_STACK_START equ 0x300000
 
-
 arch_start:
+    ; setup the kernel stack
     mov ebp, KERNEL_STACK_START
     mov esp, ebp
-    mov byte [0xb8000], 'T'
+
+    ;jump to long mode
     call long_mode_jump
 
-stop:
-    cli
-    hlt
-    jmp stop
+    ;we should never get here
 
 global long_mode_jump
 long_mode_jump:
@@ -45,9 +43,8 @@ long_mode_jump:
    call enable_paging
 
    lgdt [gdt64.pointer]
-   jmp gdt64.code:kmain64
-.return:
-   ret
+   jmp gdt64.code:lmode_entry
+   ;never returns
 
 enable_paging:
    ;Load p4 to cr3 register for use
@@ -97,16 +94,16 @@ setup_page_tables:
 
 section .text
 [bits 64]
-kmain64:
-   mov rax, 0x1111111111111111
-   mov byte [0xb8000], 'Y'
+[extern kmain64]
+lmode_entry:
+   call kmain64
 .stop:
    cli
    hlt
    jmp .stop
 
 
-;;;;;; TEMPORARY FOR LONG MODE TEST
+;Temporary page table and GDT entry for long mode entry
 section .bss
 align 4096
 p4_table:
@@ -124,6 +121,3 @@ gdt64:
 .pointer:
    dw $ - gdt64 - 1
    dq gdt64
-
-
-

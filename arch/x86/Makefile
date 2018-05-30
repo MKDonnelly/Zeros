@@ -1,6 +1,6 @@
-CPROGS = $(shell find . -name '*\.c' -not -path './lmode/*')
+CPROGS = $(shell find . -name '*\.c' -not -path './pmode/*')
 COUTPUT = $(CPROGS:.c=.o)
-ASMPROGS = $(shell find . -name '*\.asm' -not -path './lmode/*')
+ASMPROGS = $(shell find . -name '*\.asm' -not -path './pmode/*')
 ASMOUTPUT  =$(ASMPROGS:.asm=.o)
 
 arch_build: $(COUTPUT) $(ASMOUTPUT)

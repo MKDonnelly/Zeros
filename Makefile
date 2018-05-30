@@ -1,40 +1,23 @@
+VERSION := 0.4
 
-BUILDDIR = $(shell realpath ./build)
-ROOTDIR = $(shell realpath .)
-include arch/x86/x86_config.mk
+ARCH ?= x64
 
-all: build_arch build_kernel build_fs build_drivers build_lib build_staging link 
 
-link:
-	@ld $(LDFLAGS) -o $(BUILDDIR)/Zeros.elf $(shell find $(BUILDDIR) -name $(KERNEL_HEADER)) $(shell find $(BUILDDIR) -name '*\.o' -and ! -name $(KERNEL_HEADER))
-	
+define make-build
+   for dir in $(src_dirs); \
+   do  \
+      mkdir -p $(objdir)/$$dir; \
+   done
+endef
 
-build_arch:
-	@PREFIX=$(BUILDDIR)/arch/x86 make -C arch/x86 --no-print-directory 
+include arch/rules-$(ARCH).mk
 
-build_kernel:
-	@PREFIX=$(BUILDDIR)/kernel/ make -C kernel/ --no-print-directory
+$(objdir)/%.o: %.c
+	@echo "   CC    $<"
+	@$(CC) -c $(CFLAGS) $< -o $@
 
-build_fs:
-	@PREFIX=$(BUILDDIR)/fs/ make -C fs/ --no-print-directory
+$(objdir)/%.o: %.asm
+	@echo "   ASM   $<"
+	@$(ASM) $(ASMFLAGS) $< -o $@
 
-build_drivers:
-	@PREFIX=$(BUILDDIR)/drivers/ make -C drivers/ --no-print-directory
-
-build_lib:
-	@PREFIX=$(BUILDDIR)/lib/ make -C lib/ --no-print-directory
-
-build_staging:
-	@PREFIX=$(BUILDDIR)/staging/ make -C staging/ --no-print-directory
-
-run: all
-	@qemu-system-x86_64 -kernel build/Zeros.elf -drive format=raw,file=./testdisk &
-	@#qemu-system-x86_64 -kernel build/Zeros.elf -append arg1 -initrd arch/x86/initrd -drive format=raw,file=./testdisk &
-
-debug: all
-	@qemu-system-x86_64 -kernel build/Zeros.elf -drive format=raw,file=./testdisk -S -s &
-	@#qemu-system-x86_64 -kernel build/Zeros.elf -append arg1 -initrd arch/x86/initrd -drive format=raw,file=./testdisk -S -s &
-	@gdb -q -x .gdbdebug
-
-clean:
-	@\rm -Rf ./build/
+.PHONY: pre-build all post-build clean run qemu qemu_gdb 

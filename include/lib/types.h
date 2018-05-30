@@ -12,6 +12,7 @@ typedef int                int32_t;
 typedef unsigned int       uint32_t;
 typedef unsigned long long uint64_t;
 typedef long long int      int64_t;
+typedef unsigned long long int uint64_t;
 
 //Used to align a memory address. Take the address
 //and add the align size minus 1 to have the address
