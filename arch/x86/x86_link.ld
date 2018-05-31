@@ -10,7 +10,7 @@ SECTIONS{
    boot_end = .;
 
    /*This sets the linker's Virtual Memory address*/
-   . += 0xC0100000; 
+   . += 0xC0000000;
    ldscript_text_start = .;
    /*While we are linking somwhere above 0xC0000000, we want
      the text to be placed in lower memory*/

@@ -23,7 +23,9 @@ vmode_t vmode_vga3h = {
    .vmode_putstr_at = vga3h_putstr_at,
 };
 
-static char *vidmem = (char*)(0xB8000 + 0xC0000000);
+//TODO fix this somehow. x86 kernel is higher-half, so it needs
+//to add 0xC0000000, while x64 is not.
+static char *vidmem = (char*)(0xB8000 /*+ 0xC0000000*/);
 
 static int screen_offset = 0;
 static int cursor_offset = 0;

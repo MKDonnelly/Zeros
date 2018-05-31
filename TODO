@@ -19,6 +19,7 @@ drivers
    basic ext2 filesystem, CMOS
 
 make a modular kernel
+priority lock based on priority queue implemented as min heap
 Use kassert often
 Go through and design a nice API
    i.e. all functions are formatted like

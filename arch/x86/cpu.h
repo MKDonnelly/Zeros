@@ -10,3 +10,4 @@ void arch_stop_cpu();
 void arch_halt_cpu();
 void arch_enable_ints();
 void arch_disable_ints();
+int cpuid_avail();

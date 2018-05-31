@@ -88,7 +88,7 @@ setup_page_tables:
    mov [p2_table + ecx * 8], eax
 
    inc ecx
-   cmp ecx, 3
+   cmp ecx, 3 ;Map only 3 2MB pages
    jne .map_p2_table
 
    ret
@@ -97,6 +97,14 @@ section .text
 [bits 64]
 [extern kmain64]
 lmode_entry:
+   ;Zero out the segment descriptors
+   mov ax, 0
+   mov ds, ax
+   mov es, ax
+   mov fs, ax
+   mov gs, ax
+   mov ss, ax
+
    call kmain64
 .stop:
    cli

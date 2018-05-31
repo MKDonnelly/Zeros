@@ -33,4 +33,3 @@ typedef unsigned long long int uint64_t;
 typedef char* va_arg;
 #define va_start( arg ) ( (char*)&arg + sizeof(arg) )
 #define va_get( args, type ) ( *((type*)args) ) ; (args += sizeof(type))
-

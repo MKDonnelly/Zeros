@@ -14,10 +14,12 @@ arch_c_srcs := 				\
 	arch/x86/drivers/vga3h/vga3h.c	\
 	arch/x86/drivers/vgacommon/modeset.c	\
 	arch/x86/drivers/vgacommon/vgacommon.c	\
-	arch/x86/drivers/vgacommon/vgafont.c
+	arch/x86/drivers/vgacommon/vgafont.c	\
+	arch/x86/archx64.c
 
 arch_asm_srcs :=			\
-	arch/x86/cpu.asm
+	arch/x86/cpu.asm		\
+	arch/x86/lmode/cpuidasm.asm
 
 arch_header = arch/x86/lmode/kernelheader.asm
 
@@ -66,11 +68,9 @@ kernel_objs = $(kernel_srcs:%.c=$(objdir)/%.o)
 lib_srcs := 				\
 	lib/bitwise.c			\
 	lib/generic_ll.c		\
-	lib/keyboard.c			\
 	lib/print.c			\
 	lib/random.c			\
-	lib/string.c			\
-	lib/timing.c
+	lib/string.c			
 
 lib_src_dirs := lib/
 
@@ -88,7 +88,7 @@ CFLAGS += -I$(ROOTDIR)/include -I. -I$(ROOTDIR)
 
 LDFLAGS = -m elf_x86_64 -z max-page-size=0x1000 -T arch/x86/x64_link.ld
 
-ASMFLAGS := -f elf64 -g
+ASMFLAGS := -f elf64 -g 
 
 #All directories to create under the build directory
 src_dirs := $(arch_src_dirs) $(drivers_src_dirs) $(fs_src_dirs) \

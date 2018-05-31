@@ -269,7 +269,6 @@ unsigned char g_8x16_font[4096] = {
 
 void write_font(unsigned char *buf, unsigned font_height){
 	unsigned char seq2, seq4, gc4, gc5, gc6;
-	unsigned i;
 
 // save registers
 //set_plane() modifies GC 4 and SEQ 2, so save them as well 
@@ -297,9 +296,9 @@ void write_font(unsigned char *buf, unsigned font_height){
 // write font to plane P4 
 	set_plane(2);
 // write font 0 
-	for(i = 0; i < 256; i++)
+	for(int i = 0; i < 256; i++)
 	{
-                memcpy( (char*)( 0xb8000 + (i * 32)), buf, font_height );
+                memcpy( (void*)( 0xb8000 + (i * 32) ), buf, font_height );
 		buf += font_height;
 	}
 // restore registers 
