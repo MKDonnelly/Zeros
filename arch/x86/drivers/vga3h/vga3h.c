@@ -33,7 +33,6 @@ static int fg_color = COLOR_WHITE;
 static int bg_color = COLOR_BLACK;
 
 static inline int vga3h_xy_to_linear(int x, int y){
-//   return y * VGA3H_COLS  + x;
    return y * VGA3H_COLCELLS + x;
 }
 
@@ -238,6 +237,4 @@ void vga3h_putstr_at(char *str, int xval, int yval){
             break;
       }
    }
-
 }
-

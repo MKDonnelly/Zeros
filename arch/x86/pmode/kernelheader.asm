@@ -55,11 +55,11 @@ arch_start:
     or eax, 0x80000000
     mov cr0, eax
 
-    ;Set the kernel stack. Have it start 8K after the 
+    ;Set the kernel stack. Have it start 4K after the 
     ;end of the kernel .text, .data, and .bss section.
     ;The heap will start just after that.
     mov eax, 0xC0010000 
-    add eax, 0x2000
+    add eax, 0x1000
     mov ebp, eax
     mov esp, ebp
 

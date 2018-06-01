@@ -25,6 +25,8 @@ void timing_set_alarm(void (*alarm_function)(), int ms_period){
 //Increment the global time and call any
 //alarms.
 void timing_main_handler(){
+   //TODO: actually, each time this is called,
+   //      10ms should have elapsed.
    global_time.seconds++;
 
    if( total_alarms ){

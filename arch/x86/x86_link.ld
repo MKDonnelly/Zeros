@@ -40,5 +40,8 @@ SECTIONS{
    }
    ldscript_initrd_end = .;
 
+   /*Add 0x1000 for the kernel stack*/
+   . += 0x1000;
+
    ldscript_kernel_end = .;
 }

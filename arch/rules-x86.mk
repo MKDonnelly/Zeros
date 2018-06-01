@@ -67,6 +67,7 @@ driver_objs = $(driver_srcs:%.c=$(objdir)/%.o)
 #fs stuff
 fs_srcs :=			\
 	fs/fs.c			\
+	fs/mbr.c		\
 	fs/initrd/initrd.c	
 
 fs_src_dirs := fs/initrd
@@ -143,6 +144,10 @@ post-build:
 
 run: all
 	@qemu-system-x86_64 os.iso -drive format=raw,file=./testdisk
+
+debug: all
+	@qemu-system-x86_64 os.iso -drive format=raw,file=./testdisk -S -s &
+	@gdb -x .gdbdebug
 
 clean:
 	@\rm -Rf ./build

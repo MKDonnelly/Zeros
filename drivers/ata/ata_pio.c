@@ -5,28 +5,38 @@
 
 #define SECTOR_SIZE 512
 
-//Primary bus base registers
-#define BASE_REG0_P 0x1F0
-#define CTRL_PORT_P 0x3F4
+//Primary registers
+#define PBUS_BASEREG 	0x1F0
+//Bit 1 - Set to stop interrupts
+//Bit 2 - Software reset of all ATA devices on bus
+//Bit 3 - Read back higher order byte from last lba48 request
+#define PBUS_CTRL_PORT 	0x3F6
+   #define CTRL_MASK_INTS	(1 << 1)
+   #define CTRL_RESET		(1 << 2)
+   #define CTRL_HOB		(1 << 3)
+
+//Secondary bus register
+#define SBUS_BASEREG	0x1E8
+#define SBUS_CTRL_PORT	0x3E6
 
 //Registers for use by the first buf
 //Data is sent to/from the drive here
-#define DATA_P 		BASE_REG0_P   
+#define DATA_P 		PBUS_BASEREG 
 //Various errors 
-#define ERROR_P 	(BASE_REG0_P + 1)
-#define FEATURE_P 	(BASE_REG0_P + 1)
+#define ERROR_P 	(PBUS_BASEREG + 1)
+#define FEATURE_P 	(PBUS_BASEREG + 1)
 //Sector count. Dictates how many sectors to r/w
-#define SCOUNT_P 	(BASE_REG0_P + 2)
+#define SCOUNT_P 	(PBUS_BASEREG + 2)
 //LBAX: The linear block address of the block to
 //start reading/writing at
-#define LBA0_P 		(BASE_REG0_P + 3)
-#define LBA1_P		(BASE_REG0_P + 4)
-#define LBA2_P		(BASE_REG0_P + 5)
+#define LBA0_P 		(PBUS_BASEREG + 3)
+#define LBA1_P		(PBUS_BASEREG + 4)
+#define LBA2_P		(PBUS_BASEREG + 5)
 //Bits 7, 6, and 5 must be 1, 0, 1.
 //Bit 4 of this port selects the drive. 0 selects 
 //drive 0 (master), 1 selects slave.
 //Bits 3-0 selects head (just set to 0)
-#define DSELECT_P 	(BASE_REG0_P + 6)
+#define DSELECT_P 	(PBUS_BASEREG + 6)
    #define DSELECT_HEAD	(0b101 << 5)
    #define MASTER_DRV	(0 << 4)
    #define SLAVE_DRV	(1 << 4)
@@ -39,71 +49,71 @@
 //Bit 2 - Disk read corrected
 //Bit 1 - set to 1 on every revolution
 //Bit 0 - Previous command errored out
-#define STAT_P		(BASE_REG0_P + 7)   //Read only
+#define STAT_P		(PBUS_BASEREG + 7)   //Read only
+   //Status port masks
+   #define STAT_ERR	(1 << 0)
+   #define STAT_DRQ	(1 << 3)
+   #define STAT_DRDY	(1 << 6)
+   #define STAT_BSY	(1 << 7)
+
 //Comand register. Note that this is the same as
 //STAT_P: STAT_P is for reading, CMD_P is for writing
-#define CMD_P		(BASE_REG0_P + 7)   //Write only
-#define SCOUNT1_P	(BASE_REG0_P + 8)
-#define LBA3_P		(BASE_REG0_P + 9)
-#define LBA4_P		(BASE_REG0_P + 10)
-#define LBA5_P		(BASE_REG0_P + 11)
-#define CTRL_P 		(BASE_REG0_P + 12)
-#define ALTSTAT_P	(BASE_REG0_P + 12)
-#define DEVADDR_P	(BASE_REG0_P + 13)
+#define CMD_P		(PBUS_BASEREG + 7)   //Write only
+   //Commands that can be send to CMD_P.
+   //EXT versions are for LBA48
+   //Read sectors with retry
+   #define READ_C	0x20
+   //Read sectors without retry
+   #define READNT_C	0x21
+   #define READ_DMA_C	0XC8
+   //Write sectors with retry
+   #define WRITE_C 	0x30
+   //write sectors without retry
+   #define WRITENT_C	0x31
+   #define WRITE_DMA_C	0xCA
+   #define CFLUSH_C	0xE7
+   #define SEND_CMD_C	0xA0
+   #define IDENT_C	0xEC
 
-//Status port masks
-#define STAT_ERR	(1 << 0)
-#define STAT_DRQ	(1 << 3)
-#define STAT_DRDY	(1 << 6)
-#define STAT_BSY	(1 << 7)
+   #define READ_EXT_C		0x24
+   #define READ_DMA_EXT_C 	0x25
+   #define WRITE_EXT_C		0x34
+   #define WRITE_DMA_EXT_C	0x35
+   #define CFLUSH_EXT_C		0xEA
 
-//Commands that can be send to CMD_P.
-//EXT versions are for LBA48
-//Read sectors with retry
-#define READ_C		0x20
-//Read sectors without retry
-#define READNT_C	0x21
-#define READ_DMA_C	0XC8
-//Write sectors with retry
-#define WRITE_C 	0x30
-//write sectors without retry
-#define WRITENT_C	0x31
-#define WRITE_DMA_C	0xCA
-#define CFLUSH_C	0xE7
-#define SEND_CMD_C	0xA0
-#define IDENT_C		0xEC
+   //Useful stuff in ident output
+   #define IDENT_DEVTYPE 	0
+   #define IDENT_CYLINDERS	2
+   #define IDENT_HEADS		6
+   #define IDENT_SECTORS	12
+   #define IDENT_SERIAL		20
+   #define IDENT_MODEL		54
+   //Offsets 60 and 61 taken together gives the
+   //total number of LBA28 sectors
+   #define IDENT_LBA28_1	60
+   #define IDENT_LBA28_2	61
+   //Bit 10 is set if LBA48 is supported
+   #define IDENT_LBA48		83
+   #define IDENT_CAPBLTS	98
+   //Offsets 100..103 taken as a uint64_t give the 
+   //total number of LBA48 sectors
+   #define IDENT_LBA48_1   	100
+   #define IDENT_LBA48_2   	101
+   #define IDENT_LBA48_3   	102
+   #define IDENT_LBA48_4   	103
+   #define IDENT_FLDVLD		106
+   #define IDENT_MAX_LBA	120
+   #define IDENT_CMDSET		164
+   #define IDENT_MAX_LBA_EXT 	200
 
-#define READ_EXT_C	0x24
-#define READ_DMA_EXT_C	0x25
-#define WRITE_EXT_C	0x34
-#define WRITE_DMA_EXT_C	0x35
-#define CFLUSH_EXT_C	0xEA
+#define SCOUNT1_P	(PBUS_BASEREG + 8)
+#define LBA3_P		(PBUS_BASEREG + 9)
+#define LBA4_P		(PBUS_BASEREG + 10)
+#define LBA5_P		(PBUS_BASEREG + 11)
+#define CTRL_P 		(PBUS_BASEREG + 12)
+#define ALTSTAT_P	(PBUS_BASEREG + 12)
+#define DEVADDR_P	(PBUS_BASEREG + 13)
 
-
-//Useful stuff in ident output
-#define IDENT_DEVTYPE 	0
-#define IDENT_CYLINDERS	2
-#define IDENT_HEADS	6
-#define IDENT_SECTORS	12
-#define IDENT_SERIAL	20
-#define IDENT_MODEL	54
-//Offsets 60 and 61 taken together gives the
-//total number of LBA28 sectors
-#define IDENT_LBA28_1	60
-#define IDENT_LBA28_2	61
-//Bit 10 is set if LBA48 is supported
-#define IDENT_LBA48	83
-#define IDENT_CAPBLTS	98
-//Offsets 100..103 taken as a uint64_t give the 
-//total number of LBA48 sectors
-#define IDENT_LBA48_1   100
-#define IDENT_LBA48_2   101
-#define IDENT_LBA48_3   102
-#define IDENT_LBA48_4   103
-#define IDENT_FLDVLD	106
-#define IDENT_MAX_LBA	120
-#define IDENT_CMDSET	164
-#define IDENT_MAX_LBA_EXT 200
 
 
 //According to the ATA PIO specifications, if we can 
@@ -122,8 +132,8 @@ uint8_t ata_controller_present(){
 //to reset all drives. We also need to clear this since it is not
 //done automatically
 void ata_reset(){
-   portb_write( CTRL_PORT_P, (1 << 2) );
-   portb_write( CTRL_PORT_P, 0 );
+   portb_write( PBUS_CTRL_PORT, (1 << 2) );
+   portb_write( PBUS_CTRL_PORT, 0 );
 }
 
 //According to the ATA specs, we need to have a 400ns delay before

@@ -137,7 +137,7 @@ void *bitmap_malloc(heap_t *heap, uint32_t size, uint32_t align){
             dibit_set( head->dibitmap, i + j, color );
          }
 
-         spinlock_acquire(&heap->heap_lock);
+         spinlock_release(&heap->heap_lock);
          return (void*)ALIGN_ON( (uint32_t)(head->free_space + 
                           i * head->blocksize), head->blocksize);
       }

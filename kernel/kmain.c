@@ -58,13 +58,24 @@ void kmain(struct multiboot_info *multiboot_info){
    k_puts("\\c"); //clear screen
    
    //Have the heap start just after the text segment on an aligned boundary
-   uint32_t heap_start = ALIGN_ON((int)&ldscript_kernel_end + 0x2000, 
+   //Add 0x2000 since the kernel stack starts there.
+   uint32_t heap_start = ALIGN_ON((int)&ldscript_kernel_end, 
                                   ARCH_PAGE_SIZE);
    //Keep in mind that only the first 4M of memory at the start of the
-   //kernel is mapped int. If the size is changed to be larger, this 
+   //kernel is mapped in. If the size is changed to be larger, this 
    //may cause a page fault.
    heap_create( &global_kernel_heap, heap_start, 0x200000, 
-                &blocklist_heap);
+                &bitmap_heap);
+   
+   //Copy the multiboot header since we will not be able to access
+   //it once paging is setup
+   struct multiboot_info *mb_copy = k_malloc(sizeof(struct multiboot_info), 0);
+   memcpy( mb_copy, multiboot_info, sizeof(struct multiboot_info));
+
+   //Also copy over the command line arguments
+   char *cmdline = k_malloc(strlen((char*)multiboot_info->cmdline), 0);
+   strcpy( cmdline, (char*)multiboot_info->cmdline);
+   k_printf("Cmdline: %s\n", cmdline);
 
    //Initilize vm subsystem. This requires the heap, so we cannot
    //have arch_system_init do this.
@@ -76,9 +87,10 @@ void kmain(struct multiboot_info *multiboot_info){
 
    //Partition test
    char *buf = ata_pio_read( 1, 0, 1 );
-   mbr_part_t *part = buf + MBR_PART_4;
-   k_printf("Start lba: %d\n", part->start_lba);
-   
+   mbr_read_parttable(buf);
+   k_free(buf);
+   mbr_part_t *first = get_mbr_entry(1);
+   k_printf("Part starts at %d\n", first->start_lba);
 
 /*
 //Read in first file from initrd (it will contain a test binary)

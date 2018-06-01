@@ -15,8 +15,8 @@ Multitasking
    use syscall/sysret instead of interrupt
 
 drivers
-   APIC, HPET, ATA PIO mode, PCI, network card
-   basic ext2 filesystem, CMOS
+   APIC, HPET, ATA non-PIO mode, PCI, network card
+   basic ext2 filesystem
 
 make a modular kernel
 priority lock based on priority queue implemented as min heap
@@ -41,7 +41,6 @@ low-priority
    add in arch-specific bitwise operators, optimizations (AVX, SIMD, etc)
    Get proper release/press code working with keyboard
    try to boot UEFI with grub-efi
-   add cpuid functions
    use timer channel 2 to play sound on pc speaker
    work on arm arch code with qemu-arm
 
