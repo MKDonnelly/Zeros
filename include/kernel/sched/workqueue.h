@@ -1,5 +1,17 @@
 #pragma once
 
+/*    Example usage
+   workqueue_t *kwq = workqueue_create();
+   tasklet_t *first = tasklet_create( thread1, NULL );
+   tasklet_t *second = tasklet_create( thread2, NULL );
+
+   workqueue_add(kwq, first);
+   workqueue_add(kwq, second);
+ 
+   workqueue_worker_spawn( kwq );
+   workqueue_worker_spawn( kwq );
+*/
+
 #include <arch/current_arch>
 
 typedef struct tasklet{

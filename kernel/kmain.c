@@ -24,6 +24,7 @@
 
 #include <fs/fs.h>
 #include <fs/initrd/initrd.h>
+#include <fs/mbr.h>
 #include <lib/assert.h>
 
 void thread1(){
@@ -73,27 +74,13 @@ void kmain(struct multiboot_info *multiboot_info){
    current_scheduler->scheduler_setup();
    syscalls_init();
 
-/*
-   workqueue_t *kwq = workqueue_create();
-   tasklet_t *first = tasklet_create( thread1, NULL );
-   tasklet_t *second = tasklet_create( thread2, NULL );
-
-   workqueue_add(kwq, first);
-   workqueue_add(kwq, second);
- 
-   workqueue_worker_spawn( kwq );
-   workqueue_worker_spawn( kwq );
-
-   current_scheduler->scheduler_start();*/
+   //Partition test
+   char *buf = ata_pio_read( 1, 0, 1 );
+   mbr_part_t *part = buf + MBR_PART_4;
+   k_printf("Start lba: %d\n", part->start_lba);
+   
 
 /*
-   char *s1 = k_malloc(kernel_heap, 1024, 0x1000);
-   char *s2 = k_malloc(kernel_heap, 1024, 0x1000);
-   rr_add_task( k_create_ktask( thread1, NULL, rr_exit_task, STACK_HEAD(s1, 1024)));
-   rr_add_task( k_create_ktask( thread2, NULL, rr_exit_task, STACK_HEAD(s2, 1024)));
-*/
-
-
 //Read in first file from initrd (it will contain a test binary)
    char *program_buf = k_malloc( 5000, 0);
    fs_root = init_initrd( &ldscript_initrd_start );
@@ -105,25 +92,10 @@ void kmain(struct multiboot_info *multiboot_info){
    current_scheduler->scheduler_add_task(new_task);
 
    current_scheduler->scheduler_start();
-
+*/
    while(1) arch_halt_cpu();
 }
 
-/*
-int y_offset = 0;
-int x_offset = 0;
-
-void m( mouse_packet_t p ){
-//   k_clear_screen();
-   //As we go down the screen, y increases.
-   //as we go up the screen, y decreases.
-   //But the delta_y is exactly the opposite:
-   //negative values go down and positive values
-   //go up, so negate delta_y.
-   y_offset += (-p.delta_y) / 2;
-   x_offset += p.delta_x / 2;
-   k_printf_at("*", x_offset, y_offset);
-}*/
 
 /*
 uint16_t start_state = 0xACF1;
@@ -137,28 +109,3 @@ int random(){
    ++period;
    return lfsr;
 }*/
-
-
-/*
-  //Disable irqs on ata
-  portb_write( ATA_PIO_CTRL_P, 0x02 );
-
-  ////////////////////
-  uint16_t *identify_data = identify_drive(0, 0);
-  uint32_t total_sectors = ( identify_data[61] << 16 ) | identify_data[60];
-  k_printf("Total sectors: %d\n", total_sectors);
-
-  //test write 
-
-  uint16_t *data = k_malloc( kernel_heap, sizeof(uint16_t)*256, 0);
-  memset( data, sizeof(uint16_t)*256, 7);
-  uint8_t sectors = 1;
-  uint32_t lba = 0;
-
-  ata_pio_write_sector( sectors, lba, data );
-
-  uint16_t *buf = ata_pio_read_sector( 1, 0 );
-  for(int i = 0; i < 10; i++)
-     k_printf("%d\n", (uint8_t)buf[i]);
-  ///////////////////
-*/

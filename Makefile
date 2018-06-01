@@ -1,6 +1,6 @@
 VERSION := 0.4
 
-ARCH ?= x64
+ARCH ?= x86
 
 define make-build
    for dir in $(src_dirs); \

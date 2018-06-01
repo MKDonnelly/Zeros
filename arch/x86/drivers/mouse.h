@@ -1,5 +1,24 @@
 #pragma once
 
+/*     Example usage
+int y_offset = 0;
+int x_offset = 0;
+
+void m( mouse_packet_t p ){
+   //As we go down the screen, y increases.
+   //as we go up the screen, y decreases.
+   //But the delta_y is exactly the opposite:
+   //negative values go down and positive values
+   //go up, so negate delta_y.
+   y_offset += (-p.delta_y) / 2;
+   x_offset += p.delta_x / 2;
+   k_printf_at("*", x_offset, y_offset);
+}
+...
+register_mouse_handler(m);
+
+*/
+
 #include <lib/types.h>
 
 #define MOUSE_ISR 12
@@ -44,5 +63,5 @@ typedef struct mouse_packet{
    int8_t right_button  : 1;
 } mouse_packet_t;
 
-void register_mouse_handler();
+void register_mouse_handler( void (*callback)(mouse_packet_t) );
 void unregister_mouse_handler();

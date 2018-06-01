@@ -59,7 +59,7 @@ arch_header_obj = $(arch_header:%.asm=$(objdir)/%.o)
 driver_srcs := 		\
 	drivers/ata/ata_pio.c
 
-driver_src_dirs := drivers/ata
+driver_src_dirs := drivers/ata/
 
 driver_objs = $(driver_srcs:%.c=$(objdir)/%.o)
 
@@ -121,7 +121,7 @@ LDFLAGS = -m elf_i386 -T arch/x86/x86_link.ld
 ASMFLAGS := -f elf32 -g
 
 #All directories to create under the build directory
-src_dirs := $(arch_src_dirs) $(drivers_src_dirs) $(fs_src_dirs) \
+src_dirs := $(arch_src_dirs) $(driver_src_dirs) $(fs_src_dirs) \
 		$(kernel_src_dirs) $(lib_src_dirs)
 
 all: pre-build $(kernel) post-build
@@ -130,11 +130,11 @@ pre-build:
 	@mkdir -p $(objdir)
 	@$(call make-build)
 
-$(kernel): $(arch_objs) $(drivers_objs) \
+$(kernel): $(arch_objs) $(driver_objs) \
 		$(fs_objs) $(kernel_objs) $(lib_objs) $(arch_header_obj)
 	@echo "   LD    $@"
 	@$(LD) $(LDFLAGS) $(arch_header_obj) $(arch_objs) 	\
-		$(drivers_objs) $(fs_objs) $(kernel_objs) 	\
+		$(driver_objs) $(fs_objs) $(kernel_objs) 	\
 		$(lib_objs) -o $@
 
 post-build:
@@ -142,7 +142,7 @@ post-build:
 	@grub-mkrescue isofiles -o os.iso 2> /dev/null
 
 run: all
-	@qemu-system-x86_64 os.iso
+	@qemu-system-x86_64 os.iso -drive format=raw,file=./testdisk
 
 clean:
 	@\rm -Rf ./build
