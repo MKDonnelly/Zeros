@@ -28,3 +28,13 @@ uint16_t portw_read(uint16_t port){
 void portw_write(uint16_t port, uint16_t data){
    asm( "out %%ax, %%dx" : : "a" (data), "d" (port));
 }
+
+uint32_t portd_read(uint16_t port){
+   uint32_t result;
+   asm("in %%dx, %%eax" : "=a"(result) : "d"(port));
+   return result;
+}
+
+void portd_write(uint16_t port, uint32_t data){
+   asm( "out %%eax, %%dx" : : "a"(data), "d"(port));
+}

@@ -57,9 +57,13 @@ arch_header_obj = $(arch_header:%.asm=$(objdir)/%.o)
 
 #Driver stuff
 driver_srcs := 		\
-	drivers/ata/ata_pio.c
+	drivers/ata/ata_pio.c	\
+	drivers/pci/pci.c	\
+	drivers/pci/pci_map.c
 
-driver_src_dirs := drivers/ata/
+driver_src_dirs := 	\
+	drivers/ata/	\
+	drivers/pci/
 
 driver_objs = $(driver_srcs:%.c=$(objdir)/%.o)
 

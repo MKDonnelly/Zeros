@@ -27,6 +27,9 @@
 #include <fs/mbr.h>
 #include <lib/assert.h>
 
+#include <drivers/pci/pci.h>
+#include <drivers/pci/pci_map.h>
+
 void thread1(){
    int t1count = 0;
    while(t1count < 5){
@@ -86,11 +89,41 @@ void kmain(struct multiboot_info *multiboot_info){
    syscalls_init();
 
    //Partition test
-   char *buf = ata_pio_read( 1, 0, 1 );
+/*   char *buf = ata_pio_read( 1, 0, 1 );
    mbr_read_parttable(buf);
    k_free(buf);
    mbr_part_t *first = get_mbr_entry(1);
-   k_printf("Part starts at %d\n", first->start_lba);
+   k_printf("Part starts at %d\n", first->start_lba);*/
+
+   //PCI test
+   for(int bus = 0; bus < 16; bus++){
+      for(int slot = 0; slot < 32; slot++){
+         uint16_t vendor = pci_get_vendor(bus, slot);
+         if( vendor != 0xFFFF ){
+            k_printf("PCI Device: ");
+            k_printf("Vendor %x, ", vendor);
+            k_printf("DevId: %x, ", pci_get_devid(bus, slot));
+            k_printf("Class: %x, ", pci_get_class(bus, slot));
+            k_printf("\n     ");
+            k_printf("Subclass: %x, ", pci_get_subclass(bus,slot));
+            k_printf("Htype: %x, ", pci_get_htype(bus, slot));
+            for(int i = 0; i < 5; i++){
+               uint32_t bar = pci_get_barnum(bus, slot, i);
+               if( bar & 0x1 ){
+                  k_printf("I/O BAR: %x, ", bar & 0xFFFFFFFC);
+               }else{
+                  k_printf("Mem BAR: %x, ", bar & 0xFFFFFFF0 );
+               }
+            }
+            k_printf("\n");
+            char *dev_name = pci_lookup_device(pci_get_devid(bus, slot));
+            if( dev_name != NULL )
+               k_printf("Found %s\n", dev_name);
+            
+         }
+      }
+   }
+    
 
 /*
 //Read in first file from initrd (it will contain a test binary)
