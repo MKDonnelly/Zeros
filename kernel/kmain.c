@@ -29,6 +29,7 @@
 
 #include <drivers/pci/pci.h>
 #include <drivers/pci/pci_map.h>
+#include <drivers/net/rtl8139.h>
 
 void thread1(){
    int t1count = 0;
@@ -95,35 +96,8 @@ void kmain(struct multiboot_info *multiboot_info){
    mbr_part_t *first = get_mbr_entry(1);
    k_printf("Part starts at %d\n", first->start_lba);*/
 
-   //PCI test
-   for(int bus = 0; bus < 16; bus++){
-      for(int slot = 0; slot < 32; slot++){
-         uint16_t vendor = pci_get_vendor(bus, slot);
-         if( vendor != 0xFFFF ){
-            k_printf("PCI Device: ");
-            k_printf("Vendor %x, ", vendor);
-            k_printf("DevId: %x, ", pci_get_devid(bus, slot));
-            k_printf("Class: %x, ", pci_get_class(bus, slot));
-            k_printf("\n     ");
-            k_printf("Subclass: %x, ", pci_get_subclass(bus,slot));
-            k_printf("Htype: %x, ", pci_get_htype(bus, slot));
-            for(int i = 0; i < 5; i++){
-               uint32_t bar = pci_get_barnum(bus, slot, i);
-               if( bar & 0x1 ){
-                  k_printf("I/O BAR: %x, ", bar & 0xFFFFFFFC);
-               }else{
-                  k_printf("Mem BAR: %x, ", bar & 0xFFFFFFF0 );
-               }
-            }
-            k_printf("\n");
-            char *dev_name = pci_lookup_device(pci_get_devid(bus, slot));
-            if( dev_name != NULL )
-               k_printf("Found %s\n", dev_name);
-            
-         }
-      }
-   }
-    
+   pci_enumerate();
+   rtl8139_test_send();
 
 /*
 //Read in first file from initrd (it will contain a test binary)

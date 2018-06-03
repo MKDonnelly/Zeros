@@ -59,11 +59,13 @@ arch_header_obj = $(arch_header:%.asm=$(objdir)/%.o)
 driver_srcs := 		\
 	drivers/ata/ata_pio.c	\
 	drivers/pci/pci.c	\
-	drivers/pci/pci_map.c
+	drivers/pci/pci_map.c	\
+	drivers/net/rtl8139.c
 
 driver_src_dirs := 	\
 	drivers/ata/	\
-	drivers/pci/
+	drivers/pci/	\
+	drivers/net/
 
 driver_objs = $(driver_srcs:%.c=$(objdir)/%.o)
 
@@ -147,7 +149,7 @@ post-build:
 	@grub-mkrescue isofiles -o os.iso 2> /dev/null
 
 run: all
-	@qemu-system-x86_64 os.iso -drive format=raw,file=./testdisk
+	@qemu-system-x86_64 os.iso -drive format=raw,file=./testdisk -net nic,model=rtl8139
 
 debug: all
 	@qemu-system-x86_64 os.iso -drive format=raw,file=./testdisk -S -s &
