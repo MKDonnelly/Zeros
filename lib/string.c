@@ -79,20 +79,15 @@ void strcat(char *str1, char *str2){
    }
 }
 
-/*
+
 char *strstr(char *source, char *substr){
    int source_len = strlen(source);
-   int substr_len = strlen(substr);
-   char *ret = NULL;
-
-   int i = 0;
-   while( ! ret && i < source_len && i < substr_len ){
-      int j = 0;
-      while( source[i] == substr[j] ) j++;
-      if( j == substr_len )
-         ret = source[i];
+   for(int i = 0; i < source_len; i++){
+      if( strcmp( &source[i], substr ) == 0 )
+         return &source[i];
    }
-}*/
+   return 0;
+}
 
 //Reverse the given string
 void reverse(char s[]){

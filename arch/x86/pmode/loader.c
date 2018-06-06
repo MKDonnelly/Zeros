@@ -17,6 +17,7 @@ int8_t elf_can_exec(Elf32_Ehdr *elf_header){
    return 1;
 }
 
+//TODO Not working properly without userland_link.ld
 //Returns starting address of program.
 uint32_t arch_create_from_elf(Elf32_Ehdr *elf_data, pd_t *task_pd){
 
@@ -30,7 +31,6 @@ uint32_t arch_create_from_elf(Elf32_Ehdr *elf_data, pd_t *task_pd){
       elf_pheader = (Elf32_Phdr*)( (char*)elf_data + elf_data->e_phoff +
                                     i * elf_data->e_phentsize);
       if( elf_pheader->p_type == PT_LOAD ){
-
          uint32_t frame = framepool_first_free(); 
          vm_pmap( elf_pheader->p_vaddr, frame, task_pd, 1, 1);
          vm_copy_to_physical( (char*)elf_data + elf_pheader->p_offset, 

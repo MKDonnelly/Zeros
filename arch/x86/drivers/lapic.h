@@ -1,0 +1,10 @@
+#pragma once
+
+#define APIC_BASE		0xFEE00000
+#define APIC_VERSION		APIC_BASE + 0x0030
+
+#define APIC_BASE_MSR		0x1B
+#define APIC_BASE_MSR_BSP 	0x1000
+#define APIC_BASE_MSR_ENABLE_M 	0x8000
+
+

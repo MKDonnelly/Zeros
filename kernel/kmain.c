@@ -96,10 +96,10 @@ void kmain(struct multiboot_info *multiboot_info){
    mbr_part_t *first = get_mbr_entry(1);
    k_printf("Part starts at %d\n", first->start_lba);*/
 
-   pci_enumerate();
-   rtl8139_test_send();
+//   pci_enumerate();
+//   rtl8139_test_send();
 
-/*
+
 //Read in first file from initrd (it will contain a test binary)
    char *program_buf = k_malloc( 5000, 0);
    fs_root = init_initrd( &ldscript_initrd_start );
@@ -111,7 +111,7 @@ void kmain(struct multiboot_info *multiboot_info){
    current_scheduler->scheduler_add_task(new_task);
 
    current_scheduler->scheduler_start();
-*/
+
    while(1) arch_halt_cpu();
 }
 

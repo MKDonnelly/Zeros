@@ -2,3 +2,6 @@
 *.elf
 *.log
 *.iso
+*.img
+*.so
+*.efi

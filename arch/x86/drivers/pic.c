@@ -2,7 +2,10 @@
 
 #include <arch/x86/portio.h>
 
-//Initilize the PIC
+//Initilize the PIC. Note that this is also called to disable
+//the PIC when enabling the APIC. This masks all interrupts and
+//re-maps the pic to higher interrupt levels to prevent a spurrious
+//interrupt from being interpreted as a cpu fault.
 void pic_init(){
 
   //Restart each PIC for configuration
@@ -25,9 +28,10 @@ void pic_init(){
   portb_write( SLAVE_PIC_DATA_P, PIC_ICW4_8086_MODE_C );
 
   //Mask all interrupts by setting every bit to 1
-  portb_write( MASTER_PIC_DATA_P, 0x00 );
-  portb_write( SLAVE_PIC_DATA_P, 0x00 );
+  portb_write( MASTER_PIC_DATA_P, 0xff );
+  portb_write( SLAVE_PIC_DATA_P, 0xff );
 }
+
 
 //When telling the PIC to enable/disable an IRQ, we must
 //keep in mind that we have two pics cascaded. Both are set 

@@ -1,7 +1,5 @@
 VERSION := 0.4
 
-ARCH ?= x86
-
 define make-build
    for dir in $(src_dirs); \
    do  \
@@ -9,7 +7,7 @@ define make-build
    done
 endef
 
-include arch/rules-$(ARCH).mk
+include arch/x86/rules-x64-uefi.mk
 
 $(objdir)/%.o: %.c
 	@echo "   CC    $<"

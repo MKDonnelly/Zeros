@@ -25,6 +25,9 @@ typedef unsigned long long int uint64_t;
 #define ALIGN_ON( addr, align_size ) \
         ( ((addr) + align_size - 1) & ~(align_size-1))
 
+#define ALIGN_DOWN( addr, align_size ) \
+	( ((addr) & ~(align_size-1)) )
+
 //Given an address, returns true if the address is aligned.
 #define IS_ALIGNED_ON( addr, align_size ) \
         ( ALIGN_ON( addr, align_size ) == addr ? 1 : 0 )
