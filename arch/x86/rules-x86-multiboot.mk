@@ -74,9 +74,10 @@ driver_objs = $(driver_srcs:%.c=$(objdir)/%.o)
 fs_srcs :=			\
 	fs/fs.c			\
 	fs/mbr.c		\
-	fs/initrd/initrd.c	
+	fs/initrd/initrd.c	\
+	fs/zsfs/zsfs.c
 
-fs_src_dirs := fs/initrd
+fs_src_dirs := fs/initrd fs/zsfs
 
 fs_objs := $(fs_srcs:%.c=$(objdir)/%.o)
 

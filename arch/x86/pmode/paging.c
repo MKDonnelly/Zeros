@@ -120,14 +120,12 @@ void vm_copy_from_pdir(uint32_t vaddr, pd_t *page_directory,
    //the actual offset within that page.
    uint32_t offset_into_page = vaddr & 0xFFF;
 
-   uint32_t physical_addr = physical_page_addr + offset_into_page;
-
    //Map it into the kernel address space
    vm_pmap_temp( 0x0, physical_page_addr, page_directory );
 
    //Note: currently we assume that the data remains within a page
    KASSERT( len < ARCH_PAGE_SIZE );
-   memcpy( to, offset_into_page, len );
+   memcpy( to, (char*)offset_into_page, len );
 }
 
 //Copies the page at one physical address to another 

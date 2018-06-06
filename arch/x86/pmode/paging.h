@@ -136,7 +136,7 @@ pd_t *vm_pdir_clone(pd_t *page_directory);
 void vm_copy_to_physical(char *vbuf, uint32_t paddr, uint32_t len);
 
 //Copy memory from one page directory into a buffer
-void vm_copy_from_pdri(uint32_t vaddr, pd_t *page_directory,
+void vm_copy_from_pdir(uint32_t vaddr, pd_t *page_directory,
                        char *to, uint32_t len);
 
 //Used to find a mapping between virtual and physical addresses

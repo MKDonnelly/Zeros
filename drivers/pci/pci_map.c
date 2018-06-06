@@ -39,7 +39,7 @@ pci_dmap_t devices[] = {
 char *pci_lookup_vendor(uint16_t vendor_id){
    for(int i = 0; i < TOTAL_VENDORS; i++){
       if( vendors[i].vendor_id == vendor_id )
-         return &vendors[i].vendor_name;
+         return vendors[i].vendor_name;
    }
    return NULL;
 }
@@ -47,16 +47,15 @@ char *pci_lookup_vendor(uint16_t vendor_id){
 char *pci_lookup_device(uint16_t device_id){
    for(int i = 0; i < TOTAL_DEVICES; i++){
       if( devices[i].device_id == device_id )
-         return &devices[i].device_name;
+         return devices[i].device_name;
    }
    return NULL;
 }
 
-char *pci_lookup_devinit(uint16_t device_id){
+void *pci_lookup_devinit(uint16_t device_id){
    for(int i = 0; i < TOTAL_DEVICES; i++){
       if( devices[i].device_id == device_id )
          return devices[i].device_init;
    }
    return NULL;
-
 }

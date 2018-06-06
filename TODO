@@ -19,6 +19,7 @@ drivers
 
 make a modular kernel
 priority lock based on priority queue implemented as min heap
+make a queue-based mutex
 Use kassert often
 
 misc tasks 
@@ -29,6 +30,9 @@ misc tasks
    port zeros to xen
    port over a c library (newlib, uClib, musl)
    look into the timestamp counter 
+   Add a how-to to explain how each subsystem works
+   Add examples for each subsystem for reference
+      and list the dependencies
 
 advanced os examples:
    dragonfly bsd, minix, plan9, genode, haiku, helenos, redox
@@ -37,26 +41,20 @@ low-priority
    add random number generator, md5 sum function
    add in arch-specific bitwise operators, optimizations (AVX, SIMD, etc)
    Get proper release/press code working with keyboard
-   try to boot UEFI with grub-efi
    use timer channel 2 to play sound on pc speaker
    work on arm arch code with qemu-arm
 
 printing/screen manipulation:
   Double buffering, frame buffer
-  Add escape sequences for vga colors in 3h mode
   VGA 13h mode driver (shapes, graphics)
   Get a dump of the vga font and create custom font 
   Add more vga register modes (get higher res dumps using qemu)
   use hwinfo --framebuffer to see and program video modes
     also use grub gfx directive to boot into a higher video mode
   make routines for 1024x768 graphics mode (set by multiboot header)
-  make BGA driver
 
 initrd
    Add in cpio or tar support
    Add directory support to initrd
 
-documentation/testing
-   Add a how-to to explain how each subsystem works
-      Add examples for each subsystem for reference
-      and list the dependencies
+

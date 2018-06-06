@@ -1,24 +1,14 @@
 #pragma once
 
 #include <lib/types.h>
+#include <drivers/drive.h>
 
+#define MAX_MBR_PARTITIONS	4
 #define MBR_PART_1	0x1BE //446 bytes in
+#define MBR_PARTINFO_START	MBR_PART_1
 #define MBR_PART_2	0x1CE //462 bytes in
 #define MBR_PART_3	0x1DE //478 bytes in
 #define MBR_PART_4	0x1EE //494 bytes in
-
-static inline uint32_t mbr_part_number(uint8_t num){
-   switch(num){
-       case 1:
-          return MBR_PART_1;
-       case 2:
-          return MBR_PART_2;
-       case 3:
-          return MBR_PART_3;
-       case 4:
-          return MBR_PART_3;
-   }
-}
 
 //MBR Partition entry. Each entry is
 //16 bytes in length
@@ -54,5 +44,21 @@ typedef struct{
    uint32_t total_sectors;
 } __attribute__((packed)) mbr_part_t;
 
-void mbr_read_parttable(char *mbr);
-mbr_part_t *get_mbr_entry(int num);
+
+static inline uint32_t mbr_part_number(uint8_t num){
+   switch(num){
+       case 1:
+          return MBR_PART_1;
+       case 2:
+          return MBR_PART_2;
+       case 3:
+          return MBR_PART_3;
+       case 4:
+          return MBR_PART_3;
+   }
+   return 0;
+}
+
+void mbr_setup_parttable(drive_t *drive);
+uint32_t mbr_get_partstart_lba(drive_t *drive, int part_number);
+uint32_t mbr_get_partsize(drive_t *drive, int part_number);

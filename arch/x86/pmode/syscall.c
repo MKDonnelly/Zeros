@@ -2,6 +2,7 @@
 
 #include <arch/x86/pmode/isr.h>
 
+extern context_t *get_current_context();
 static uint32_t (*syscall_table[TOTAL_SYSCALLS])();
 
 //All system calls are routed here

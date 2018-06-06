@@ -7,14 +7,14 @@ define make-build
    done
 endef
 
-include arch/x86/rules-x64-uefi.mk
+include arch/x86/rules-x86-multiboot.mk
 
 $(objdir)/%.o: %.c
-	@echo "   CC    $<"
+	@echo "   CC    $<" 
 	@$(CC) $(CFLAGS) -c $< -o $@
 
 $(objdir)/%.o: %.asm
-	@echo "   ASM   $<"
+	@echo "   ASM   $<" 
 	@$(ASM) $(ASMFLAGS) $< -o $@
 
 .PHONY: pre-build all post-build clean run qemu qemu_gdb 

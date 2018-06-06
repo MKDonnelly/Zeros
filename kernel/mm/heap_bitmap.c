@@ -1,6 +1,7 @@
 #include <kernel/mm/heap_bitmap.h>
 
 #include <lib/string.h>
+#include <lib/assert.h>
 #include <lib/bitwise.h>
 
 //Operators for a dibit set. A dibit set is a bitfield comprised
@@ -101,6 +102,8 @@ void *bitmap_malloc(heap_t *heap, uint32_t size, uint32_t align){
    //Add 1 to catch any fractional part of a block required
    int blocks_needed = (size / head->blocksize) + 1;
    
+   KASSERT( blocks_needed < (head->dibitmap_len * 4) );
+
    //Multiply by 4 since there are 4 groups of 2 bits in a byte
    //and dibitmap_len is in bytes.
    for(int i = 0; i < head->dibitmap_len * 4; i++){
@@ -142,6 +145,7 @@ void *bitmap_malloc(heap_t *heap, uint32_t size, uint32_t align){
                           i * head->blocksize), head->blocksize);
       }
    }
+   spinlock_release( &heap->heap_lock );
    //No memory left.
    return NULL;
 }

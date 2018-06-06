@@ -1,6 +1,8 @@
 #include <drivers/pci/pci.h>
 
 #include <lib/print.h>
+#include <drivers/pci/pci_map.h>
+#include <arch/current_arch>
 
 #define CONFIG_VENDOR	0
 #define CONFIG_DEVID	2
@@ -30,7 +32,6 @@ void pci_config_write_word(uint8_t bus, uint8_t slot, uint8_t func, uint8_t offs
    uint32_t lbus = (uint32_t)bus;
    uint32_t lslot = (uint32_t)slot;
    uint32_t lfunc = (uint32_t)func;
-   uint16_t tmp = 0;
 
    //Create configuration address
    address = (uint32_t)((lbus << 16) | (lslot << 11) | (lfunc << 8) | 
@@ -49,7 +50,6 @@ uint32_t pci_config_read_dword(uint8_t bus, uint8_t slot, uint8_t func, uint8_t 
    uint32_t lbus = (uint32_t)bus;
    uint32_t lslot = (uint32_t)slot;
    uint32_t lfunc = (uint32_t)func;
-   uint16_t tmp = 0;
 
    //Create configuration address
    address = (uint32_t)((lbus << 16) | (lslot << 11) | (lfunc << 8) | 

@@ -2,6 +2,8 @@
 #include <kernel/sched/sched.h>
 #include <arch/current_arch>
 #include <kernel/task.h>
+#include <lib/print.h>
+#include <arch/current_arch>
 
 fs_node_t *fs_root = NULL;
 
@@ -11,7 +13,7 @@ void sys_open(int fd, char *addr){
    ktask_t *ctask = current_scheduler->scheduler_current_ktask();
 
    char buf[30];
-   vm_copy_from_pdir( addr, ctask->task_info.task_pd, buf, 5);
+   vm_copy_from_pdir( (uint32_t)addr, ctask->task_info.task_pd, buf, 5);
    k_printf("%c%c%c%c%c\n", buf[0], buf[1], buf[2], buf[3], buf[4]); 
 }
 
@@ -19,7 +21,7 @@ void sys_write(int fd, char *ubuf, int len){
    ktask_t *ctask = current_scheduler->scheduler_current_ktask();
 
    char kbuf[30];
-   vm_copy_from_pdir( ubuf, ctask->task_info.task_pd, kbuf, 5 );
+   vm_copy_from_pdir( (uint32_t)ubuf, ctask->task_info.task_pd, kbuf, 5 );
    kbuf[5] = 0;
    k_printf("Stdout: %s\n", kbuf);
 }

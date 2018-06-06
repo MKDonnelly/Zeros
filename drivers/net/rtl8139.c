@@ -1,6 +1,8 @@
 #include <drivers/net/rtl8139.h>
 
 #include <arch/current_arch>
+#include <drivers/pci/pci.h>
+#include <lib/print.h>
 #include <kernel/mm/heap.h>
 
 netdev_t rtl8139_device;
@@ -80,7 +82,7 @@ void rtl8139_init(uint8_t bus, uint8_t slot){
    //Wait for the reset to complete by checking the RST bit.
    //once clear, the device is ready.
    for(int i = 1000; i > 0; i--){
-      if( portb_read( rtl8139_device.basereg + CMD) & RST_BIT == 0) break;
+      if( (portb_read( rtl8139_device.basereg + CMD) & RST_BIT) == 0) break;
       for(int i = 100; i > 0; i--);
    }
 //   while( portb_read(rtl8139_device.basereg + CMD) & RST_BIT );
@@ -121,7 +123,7 @@ void rtl8139_test_send(){
    portd_write( TSTAT1 + rtl8139_device.basereg, tstat );
 
    //Wait for the packet to complete sending
-   while( portd_read( TSTAT1 + rtl8139_device.basereg ) & 0x00001000 ==0);
+   while( (portd_read( TSTAT1 + rtl8139_device.basereg ) & 0x00001000) == 0);
    k_printf("Packet Sent!!!!!\n");
 
 }

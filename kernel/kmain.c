@@ -25,8 +25,10 @@
 #include <fs/fs.h>
 #include <fs/initrd/initrd.h>
 #include <fs/mbr.h>
+#include <fs/zsfs/zsfs.h>
 #include <lib/assert.h>
 
+#include <drivers/drive.h>
 #include <drivers/pci/pci.h>
 #include <drivers/pci/pci_map.h>
 #include <drivers/net/rtl8139.h>
@@ -89,12 +91,15 @@ void kmain(struct multiboot_info *multiboot_info){
    current_scheduler->scheduler_setup();
    syscalls_init();
 
-   //Partition test
-/*   char *buf = ata_pio_read( 1, 0, 1 );
-   mbr_read_parttable(buf);
-   k_free(buf);
-   mbr_part_t *first = get_mbr_entry(1);
-   k_printf("Part starts at %d\n", first->start_lba);*/
+   drive_t *ata_drive = ata_pio_create_drive(0, 1);
+   char *buffer = k_malloc(512, 0);
+   memset(buffer, 512, 0 );
+   ata_drive->drive_read_lba(ata_drive, buffer, 0, 1);
+   mbr_setup_parttable(ata_drive);   
+
+//   zsfs_create(ata_drive, 1);
+   superblock_t *zsb = zsfs_get_superblock(ata_drive, 1);
+   k_printf("%d, %d, %d, %d, %d\n", zsb->block_size, zsb->total_blocks, zsb->freelist_block, zsb->fsentries_block, zsb->fsentries_count);
 
 //   pci_enumerate();
 //   rtl8139_test_send();
