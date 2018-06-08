@@ -15,13 +15,16 @@ arch_c_srcs := 				\
 	arch/x86/drivers/vgacommon/modeset.c	\
 	arch/x86/drivers/vgacommon/vgacommon.c	\
 	arch/x86/drivers/vgacommon/vgafont.c	\
-	arch/x86/archx64.c
+	arch/x86/archx64.c		\
+	arch/x86/lmode/gdt.c
 
 arch_asm_srcs :=			\
 	arch/x86/cpu.asm		\
-	arch/x86/lmode/cpuidasm.asm
+	arch/x86/lmode/cpuidasm.asm	\
+	arch/x86/lmode/pagingasm.asm	\
+	arch/x86/lmode/descriptors.asm
 
-arch_header = arch/x86/lmode/kernelheader.asm
+arch_header = arch/x86/lmode/mbheader.asm
 
 arch_src_dirs :=		\
 	arch/			\
@@ -112,6 +115,10 @@ post-build:
 
 run: all
 	@qemu-system-x86_64 os.iso
+
+debug: all
+	@qemu-system-x86_64 os.iso -S -s &
+	@gdb -q -x .gdbdebug64
 
 clean:
 	@\rm -Rf ./build

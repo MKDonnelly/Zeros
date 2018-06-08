@@ -67,7 +67,7 @@ context_t *arch_ucontext_create( void (*start)(void*), void *param,
 
    context->eip = (uint32_t)start;
    //The gdt selectors for userland code/data, with 
-   //the requested privilege level (0b11 = ring 3) ored
+   //the requestor's privilege level (0b11 = ring 3) ored
    //onto the end.
    context->cs = gdt_userland_code_rpl;
    context->ss = gdt_userland_data_rpl;

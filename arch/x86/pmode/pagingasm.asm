@@ -34,6 +34,7 @@ inval_page:
 global load_pd
 load_pd:
    ;eax is all that is used
+   ;TODO remove this - SysV ABI says eax is a scratch register
    push eax 
    
    ;Load the address of the page 

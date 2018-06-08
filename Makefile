@@ -7,7 +7,7 @@ define make-build
    done
 endef
 
-include arch/x86/rules-x86-multiboot.mk
+include arch/x86/rules-x64-multiboot.mk
 
 $(objdir)/%.o: %.c
 	@echo "   CC    $<" 

@@ -58,7 +58,6 @@ void kmain64(struct multiboot_header *mbh){
    arch_init_system();
 
    //feature_detect();
-   k_printf("%d %d", 111, 222);
-
+   k_puts("Working...");
    while(1) arch_halt_cpu();
 }

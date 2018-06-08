@@ -15,6 +15,7 @@ tss_load:
 ; IDT as an argument. 
 global idt_load
 idt_load:
+   ;TODO remove this - SysV ABI says eax is a scratch register
    push eax
 
    mov eax, [esp+8]

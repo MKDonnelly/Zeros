@@ -123,6 +123,7 @@ p2_table:
    resb 4096
 
 section .rodata
+global gdt64
 gdt64:
    dq 0
 .code: equ $ - gdt64
