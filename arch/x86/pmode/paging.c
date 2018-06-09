@@ -21,7 +21,7 @@ pd_t *kernel_page_dir;
 //pte corresponding to it. If create_pt is set, create any
 //page tables needed. If create_pt is not set and the pt
 //is not allocated, return null
-static pte_t *get_page( uint32_t vaddr, bool create_pt, pd_t *page_directory){
+static pte_t *get_page( uint32_t vaddr, uint8_t create_pt, pd_t *page_directory){
 
    //Get the page table
    pde_t *page_dir_entry = &page_directory->pd_entries[ PD_INDEX( vaddr ) ];

@@ -1,6 +1,7 @@
 #Compiler is gcc
-CC := gcc
-LD := ld
+TOOL_DIR := $(HOME)/bin/bos/tools/bin/
+CC := $(TOOL_DIR)i686-elf-gcc
+LD := $(TOOL_DIR)i686-elf-ld
 ASM := nasm
 
 #Build artifacts
@@ -120,11 +121,10 @@ lib_objs = $(lib_srcs:%.c=$(objdir)/%.o)
 #Compile and directory stuff
 ROOTDIR := .
 
-CFLAGS := -fno-pie -m32 -ffreestanding -fno-stack-protector -nostdlib 
-CFLAGS +=  -Wall -g
+CFLAGS := -ffreestanding -nostdlib -Wall -g
 CFLAGS += -I$(ROOTDIR)/include -I. -I$(ROOTDIR)
 
-LDFLAGS = -m elf_i386 -T arch/x86/x86_link.ld
+LDFLAGS = -T arch/x86/x86_link.ld
 
 ASMFLAGS := -f elf32 -g
 

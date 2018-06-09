@@ -10,8 +10,8 @@ void bit_set( void *mem, int bitNum ){
    //need to find the index and offset
    //of the bit in memory (with regard
    //to a char type).
-   int index = bitNum / CHAR_BITS;
-   int offset = bitNum % CHAR_BITS;
+   int index = bitNum / 8;
+   int offset = bitNum % 8;
 
    //In this ugly expression, we are casting
    //the void* of the first parameter into
@@ -26,8 +26,8 @@ void bit_clear( void *mem, int bitNum ){
    //need to find the index and offset
    //of the bit in memory (with regard
    //to a char type).
-   int index = bitNum / CHAR_BITS;
-   int offset = bitNum % CHAR_BITS;
+   int index = bitNum / 8;
+   int offset = bitNum % 8;
 
    //In this ugly expression, we are casting
    //the void* of the first parameter into
@@ -45,8 +45,8 @@ uint8_t bit_get( void *mem, int bitNum ){
    //need to find the index and offset
    //of the bit in memory (with regard
    //to a char type).
-   int index = bitNum / CHAR_BITS;
-   int offset = bitNum % CHAR_BITS;
+   int index = bitNum / 8;
+   int offset = bitNum % 8;
 
    //In this ugly expression, we are casting
    //the void* of the first parameter into

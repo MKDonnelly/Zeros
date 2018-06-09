@@ -1,5 +1,3 @@
-use a cross compiler
-
 Multitasking
    program execution
       work on elf linking and loading

@@ -50,7 +50,8 @@ void bitmap_init_heap(heap_t *heap){
 
    //Add 1 to round up. 
    int total_blocks = heap->len / DEFAULT_BLOCKSIZE + 1;
-   head->dibitmap_len = (total_blocks * 2) / CHAR_BITS;
+   //Divide by 8 since there are 8 bits in a char
+   head->dibitmap_len = (total_blocks * 2) / 8;
    head->dibitmap = (char*)(heap->start + sizeof(heap_t) + sizeof(bitmap_heap_t));
    memset( head->dibitmap, head->dibitmap_len, 0);
 

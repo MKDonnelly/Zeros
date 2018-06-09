@@ -1,6 +1,7 @@
 #Compiler is gcc
-CC := gcc
-LD := ld
+TOOL_DIR := $(HOME)/bin/bos/tools64/bin/
+CC := $(TOOL_DIR)x86_64-elf-gcc
+LD := $(TOOL_DIR)x86_64-elf-ld
 ASM := nasm
 
 #Build artifacts
@@ -89,11 +90,10 @@ lib_objs = $(lib_srcs:%.c=$(objdir)/%.o)
 ROOTDIR := .
 
 CFLAGS := -mcmodel=large -mno-red-zone -mno-mmx -mno-sse -mno-sse2 
-CFLAGS += -fno-pie -m64 -ffreestanding -fno-stack-protector -nostdlib 
-CFLAGS += -nostdinc -fno-builtin -Wall -g
+CFLAGS += -ffreestanding -Wall -g
 CFLAGS += -I$(ROOTDIR)/include -I. -I$(ROOTDIR)
 
-LDFLAGS = -m elf_x86_64 -z max-page-size=0x1000 -T arch/x86/x64_link.ld
+LDFLAGS = -z max-page-size=0x1000 -T arch/x86/x64_link.ld
 
 ASMFLAGS := -f elf64 -g 
 

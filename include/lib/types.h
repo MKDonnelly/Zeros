@@ -1,20 +1,7 @@
 #pragma once
-
-
-#define NULL ((void*)0)
-#define CHAR_BITS ( sizeof(char) * 8 )
+#include <stdarg.h>
+#include <stddef.h>
 #include <stdint.h>
-
-typedef char               bool;
-/*typedef char               int8_t;
-typedef unsigned char      uint8_t;
-typedef short int          int16_t;
-typedef unsigned short int uint16_t;
-typedef int                int32_t;
-typedef unsigned int       uint32_t;
-typedef unsigned long long uint64_t;
-typedef long long int      int64_t;
-typedef unsigned long long int uint64_t;*/
 
 //Used to align a memory address. Take the address
 //and add the align size minus 1 to have the address
@@ -33,8 +20,3 @@ typedef unsigned long long int uint64_t;*/
 //Given an address, returns true if the address is aligned.
 #define IS_ALIGNED_ON( addr, align_size ) \
         ( ALIGN_ON( addr, align_size ) == addr ? 1 : 0 )
-
-//va_args type and macro
-typedef char* va_arg;
-#define va_start( arg ) ( (char*)&arg + sizeof(arg) )
-#define va_get( args, type ) ( *((type*)args) ) ; (args += sizeof(type))
