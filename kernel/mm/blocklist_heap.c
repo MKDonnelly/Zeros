@@ -1,4 +1,4 @@
-#include <kernel/mm/heap_blocklist.h>
+#include <kernel/mm/blocklist_heap.h>
 
 heap_algs_t blocklist_heap = {
    .malloc = blocklist_malloc,

@@ -5,4 +5,8 @@ SECTIONS{
    .text : {*(.text) }
    .data : {*(.data) }
    .bss : { *(.bss) }
+
+   /*Early kernel stack*/
+   . += 0x1000;
+   ldscript_kernel_end = .;
 }

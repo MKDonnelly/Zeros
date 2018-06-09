@@ -1,4 +1,4 @@
-#include <kernel/mm/heap_bitmap.h>
+#include <kernel/mm/bitmap_heap.h>
 
 #include <lib/string.h>
 #include <lib/assert.h>

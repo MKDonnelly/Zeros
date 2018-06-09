@@ -86,8 +86,8 @@ fs_objs := $(fs_srcs:%.c=$(objdir)/%.o)
 kernel_srcs := 		\
 	kernel/kmain.c		\
 	kernel/mm/heap.c	\
-	kernel/mm/heap_bitmap.c	\
-	kernel/mm/heap_blocklist.c	\
+	kernel/mm/bitmap_heap.c	\
+	kernel/mm/blocklist_heap.c	\
 	kernel/sched/round_robin.c	\
 	kernel/sched/sched.c	\
 	kernel/sched/workqueue.c	\
@@ -121,7 +121,7 @@ lib_objs = $(lib_srcs:%.c=$(objdir)/%.o)
 ROOTDIR := .
 
 CFLAGS := -fno-pie -m32 -ffreestanding -fno-stack-protector -nostdlib 
-CFLAGS += -nostdinc -fno-builtin -Wall -g
+CFLAGS +=  -Wall -g
 CFLAGS += -I$(ROOTDIR)/include -I. -I$(ROOTDIR)
 
 LDFLAGS = -m elf_i386 -T arch/x86/x86_link.ld
@@ -137,6 +137,8 @@ all: pre-build $(kernel) post-build
 pre-build:
 	@mkdir -p $(objdir)
 	@$(call make-build)
+	@-\rm ./arch/current_arch
+	@ln -s x86/archx86.h ./arch/current_arch
 
 $(kernel): $(arch_objs) $(driver_objs) \
 		$(fs_objs) $(kernel_objs) $(lib_objs) $(arch_header_obj)

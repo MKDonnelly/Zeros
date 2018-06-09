@@ -1,5 +1,4 @@
 #include <arch/x86/lmode/gdt.h>
-#include <lib/string.h>
 
 static gdt_entry_t gdt[2];
 static gdt_descriptor_t gdt_desc;

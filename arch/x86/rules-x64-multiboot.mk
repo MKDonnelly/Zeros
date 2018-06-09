@@ -22,7 +22,8 @@ arch_asm_srcs :=			\
 	arch/x86/cpu.asm		\
 	arch/x86/lmode/cpuidasm.asm	\
 	arch/x86/lmode/pagingasm.asm	\
-	arch/x86/lmode/descriptors.asm
+	arch/x86/lmode/descriptors.asm	\
+	arch/x86/lmode/spinlock.asm
 
 arch_header = arch/x86/lmode/mbheader.asm
 
@@ -60,9 +61,12 @@ driver_objs = $(driver_srcs:%.c=$(objdir)/%.o)
 
 #kernel stuff
 kernel_srcs :=				\
-	kernel/kmain64.c
+	kernel/kmain64.c		\
+	kernel/mm/heap.c		\
+	kernel/mm/bitmap_heap.c		\
+	kernel/mm/blocklist_heap.c
 
-kernel_src_dirs := kernel/
+kernel_src_dirs := kernel/ kernel/mm/
 
 kernel_objs = $(kernel_srcs:%.c=$(objdir)/%.o)
 
@@ -102,6 +106,8 @@ all: pre-build $(kernel) post-build
 pre-build:
 	@mkdir -p $(objdir)
 	@$(call make-build)
+	@\rm ./arch/current_arch
+	@ln -s x86/archx64.h ./arch/current_arch
 
 $(kernel): $(arch_header_obj) $(arch_objs) $(drivers_objs) \
 	$(fs_objs) $(kernel_objs) $(lib_objs)

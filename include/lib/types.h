@@ -1,10 +1,12 @@
 #pragma once
 
+
 #define NULL ((void*)0)
 #define CHAR_BITS ( sizeof(char) * 8 )
+#include <stdint.h>
 
 typedef char               bool;
-typedef char               int8_t;
+/*typedef char               int8_t;
 typedef unsigned char      uint8_t;
 typedef short int          int16_t;
 typedef unsigned short int uint16_t;
@@ -12,7 +14,7 @@ typedef int                int32_t;
 typedef unsigned int       uint32_t;
 typedef unsigned long long uint64_t;
 typedef long long int      int64_t;
-typedef unsigned long long int uint64_t;
+typedef unsigned long long int uint64_t;*/
 
 //Used to align a memory address. Take the address
 //and add the align size minus 1 to have the address

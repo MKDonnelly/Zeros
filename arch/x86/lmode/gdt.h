@@ -2,6 +2,7 @@
 
 #include <lib/bitwise.h>
 #include <lib/types.h>
+#include <lib/string.h>
 
 //Note: most of the gdt fields are ignored.
 //The only flags that are recognized are
@@ -24,5 +25,5 @@ typedef struct{
 
 static inline void setup_gdt_entry(gdt_entry_t *gdt_entry, uint8_t dpl){
    memset(gdt_entry, sizeof(gdt_entry_t), 0);
-   *gdt_entry |= (1<<43) | (1<<44) | (1<<47) || (1<<53);
+   *gdt_entry |= (1<<43) | (1<<44) | (1<<47) | (1<<53);
 }

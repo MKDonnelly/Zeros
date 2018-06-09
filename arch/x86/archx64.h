@@ -4,5 +4,6 @@
 #include <arch/x86/drivers/vga3h/vga3h.h>
 #include <arch/x86/cpu.h>
 #include <arch/x86/lmode/cpuid.h>
+#include <arch/x86/lmode/spinlock.h>
 
 void arch_init_system();

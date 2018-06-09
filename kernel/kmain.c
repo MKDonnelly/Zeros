@@ -13,8 +13,8 @@
 #include <kernel/multiboot.h>
 #include <kernel/task.h>
 
-#include <kernel/mm/heap_blocklist.h>
-#include <kernel/mm/heap_bitmap.h>
+#include <kernel/mm/blocklist_heap.h>
+#include <kernel/mm/bitmap_heap.h>
 #include <kernel/mm/heap.h>
 
 #include <kernel/sched/sched.h>
@@ -32,6 +32,8 @@
 #include <drivers/pci/pci.h>
 #include <drivers/pci/pci_map.h>
 #include <drivers/net/rtl8139.h>
+
+#include <stdint.h>
 
 void thread1(){
    int t1count = 0;
@@ -64,7 +66,6 @@ void kmain(struct multiboot_info *multiboot_info){
    k_puts("\\c"); //clear screen
    
    //Have the heap start just after the text segment on an aligned boundary
-   //Add 0x2000 since the kernel stack starts there.
    uint32_t heap_start = ALIGN_ON((int)&ldscript_kernel_end, 
                                   ARCH_PAGE_SIZE);
    //Keep in mind that only the first 4M of memory at the start of the
@@ -72,7 +73,7 @@ void kmain(struct multiboot_info *multiboot_info){
    //may cause a page fault.
    heap_create( &global_kernel_heap, heap_start, 0x200000, 
                 &bitmap_heap);
-   
+  
    //Copy the multiboot header since we will not be able to access
    //it once paging is setup
    struct multiboot_info *mb_copy = k_malloc(sizeof(struct multiboot_info), 0);

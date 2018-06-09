@@ -25,13 +25,17 @@ multiboot_header:
 ;    dd 0 ;0 = set graphics mode
 ;    dd 1024, 768, 16 ;Width, height, and depth for display
 
-KERNEL_STACK_START equ 0x300000
+;KERNEL_STACK_START equ 0x300000
 
+[extern ldscript_kernel_end]
 arch_start:
-    ; setup the kernel stack
-    mov ebp, KERNEL_STACK_START
+    ; setup the kernel stack to
+    ; start 4K after the end of the 
+    ; kernel, and grow down towards it.
+    mov ebp, ldscript_kernel_end
+    add ebp, 0x1000
     mov esp, ebp
-
+    
     ;jump to long mode
     call long_mode_jump
 

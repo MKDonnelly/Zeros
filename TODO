@@ -1,3 +1,5 @@
+use a cross compiler
+
 Multitasking
    program execution
       work on elf linking and loading
@@ -24,9 +26,7 @@ Use kassert often
 
 misc tasks 
    use syscall/sysret instead of interrupt
-   use a cross compiler
    Create /dev virtual directory
-   make as much as possible work through the VFS 
    port zeros to xen
    port over a c library (newlib, uClib, musl)
    look into the timestamp counter 
@@ -56,5 +56,3 @@ printing/screen manipulation:
 initrd
    Add in cpio or tar support
    Add directory support to initrd
-
-

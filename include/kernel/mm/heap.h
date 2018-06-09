@@ -41,4 +41,3 @@ heap_t global_kernel_heap;
 
 void heap_create(heap_t *heap, uint32_t start_addr, uint32_t len,
                  heap_algs_t *algs );
-
