@@ -1,5 +1,5 @@
 #pragma once
-
+#include <lib/types.h>
 
 /*      Set of escape sequences that each mode must understand
     \c = Clear screen
@@ -16,6 +16,13 @@ typedef struct vmode{
 
    //Prints a string to the screen at a certain (x, y)
    void (*vmode_putstr_at)(char*,int,int);
+
+   //Performs any initilization needed by the video mode
+   void (*vmode_init)(struct vmode *mode);
+
+   //Virtual address of kernel base. Used when finding
+   //the VGA buffer
+   size_t kernel_vbase;
 }vmode_t;
 
 #define k_puts( str ) \
@@ -25,4 +32,4 @@ typedef struct vmode{
         vmode_current->vmode_putstr_at( str, x, y )
 extern vmode_t *vmode_current;
 
-void vga_init( vmode_t *new_vmode );
+void vga_init( vmode_t *new_vmode, size_t kernel_vbase );

@@ -1,6 +1,8 @@
 #pragma once
 #include <lib/types.h>
 
+//#define KERNEL_VBASE	0
+
 //NOTE: Only 4K pages are supported
 //maybe I will add 4M and 1G pages later
 
@@ -63,14 +65,14 @@ typedef struct pde{
    uint64_t accessed : 1;
    uint64_t ignored : 1;
    uint64_t page_size : 1; //always 0 for 4K
-   uint64_t ignored : 1;
+   uint64_t ignored2 : 1;
    uint64_t avl     : 3;
    uint64_t base_addr : 40;
    uint64_t os_available : 11;
    uint64_t no_exec : 1;
 }pde_t;
 
-typedef stuct pdt{
+typedef struct pdt{
    //Contains pde_t's
    pde_t entries[ENTRIES_IN_LEVEL];
 }pdt_t;
@@ -86,7 +88,7 @@ typedef struct pdpe{
    uint64_t accessed : 1;
    uint64_t ignored : 1;
    uint64_t page_size : 1; //Always 0 for 4K paging
-   uint64_t ignored : 1;
+   uint64_t ignored2 : 1;
    uint64_t avl     : 3;
    uint64_t base_addr : 40;
    uint64_t os_available : 11;
@@ -109,7 +111,7 @@ typedef struct pml4e{
    uint64_t accessed : 1;
    uint64_t ignored : 1;
    uint64_t page_size : 1; //Always 0 for 4K paging
-   uint64_t ignored : 1;
+   uint64_t ignored2 : 1;
    uint64_t avl     : 3;
    uint64_t base_addr : 40;
    uint64_t os_available : 11;

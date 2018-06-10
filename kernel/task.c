@@ -46,7 +46,7 @@ ktask_t *utask_create( void (*start)(), void *param,
                          void (*exit)(), size_t stack_addr){
 
    KASSERT( stack_addr != 0 );
-   KASSERT( stack_addr < KERNEL_VADDR );
+   KASSERT( stack_addr < KERNEL_VBASE );
    KASSERT( IS_ALIGNED_ON( stack_addr, ARCH_PAGE_SIZE ) );
 
    //Create a thread descriptor

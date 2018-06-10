@@ -12,9 +12,9 @@ void arch_system_init(int video_mode){
    //Setup the PIC
    pic_init();
 
-   //Setup the function points to use
-   //the screen
-   vga_init( &vmode_vga3h );   
+   //Setup the function pointers to use
+   //the screen and 
+   vga_init( &vmode_vga3h, KERNEL_VBASE );
 
    arch_disable_ints();
 }

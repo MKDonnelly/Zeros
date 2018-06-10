@@ -209,8 +209,8 @@ void vm_init(){
    memset( kernel_page_dir, sizeof(pd_t), 0 );
 
    //Create the kernel page table mapping. Map 5M of the kernel starting
-   //at KERNEL_VADDR to the first 5M of physical memory
-   vm_pmap_range( KERNEL_VADDR, 0, kernel_page_dir, PAGE_RW, 
+   //at KERNEL_VBASE to the first 5M of physical memory
+   vm_pmap_range( KERNEL_VBASE, 0, kernel_page_dir, PAGE_RW, 
                  PAGE_KERNEL_ACCESS, 0x500000 );
 
    //Setup a frame pool

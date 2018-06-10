@@ -2,7 +2,7 @@
 
 #include <lib/types.h>
 
-#define KERNEL_VADDR 0xC0000000
+#define KERNEL_VBASE 0xC0000000
 
 #define ARCH_PAGE_SIZE  0x1000
 #define TABLE_SIZE 0x1000
@@ -32,8 +32,8 @@
 
 //Used to convert KERNEL Virtual <=> Physical addresses. THIS
 //ONLY WORKS FOR KERNEL ADDRESSES! 
-#define PHYS_TO_VIRT(paddr) ( (uint32_t)paddr + KERNEL_VADDR)
-#define VIRT_TO_PHYS(vaddr) ( (uint32_t)vaddr - KERNEL_VADDR)
+#define PHYS_TO_VIRT(paddr) ( (uint32_t)paddr + KERNEL_VBASE)
+#define VIRT_TO_PHYS(vaddr) ( (uint32_t)vaddr - KERNEL_VBASE)
 
 
 //Align a page on 4K boundary
