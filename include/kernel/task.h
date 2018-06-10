@@ -17,15 +17,13 @@ typedef struct ktask{
    arch_task_t task_info;
 
    //Generic information related to every task
-   void *task_stack; //Pointer to top of stack
+   size_t task_stack; //Address of the top of the stack
    void *task_brk;   //Pointer to end of heap
-   uint32_t task_brk_len; //Length of task heap, in bytes
    enum TASK_STATE state;
    void *ret_val;
-   uint32_t task_id;
-   uint8_t is_kernel_task;
+   int task_id;
+   int is_kernel_task;
 
-   fs_node_t *file_handles[5];
    //Later, I might add a void* to point to a structure to
    //store scheduler-specific data.
 } ktask_t;
@@ -36,10 +34,10 @@ int sys_getpid();
 //k_malloc will return a pointer to the beginning of the memory
 //block, but the head of the stack is at the end of the memory block.
 //This converts from a pointer from k_malloc to a stack head pointer
-#define STACK_HEAD( ptr, stack_size ) (uint32_t*)( (uint8_t*)ptr + stack_size )
+#define STACK_HEAD( ptr, stack_size ) (size_t)((char*)ptr + stack_size )
 ktask_t *ktask_create(void (*start)(), void *param, void (*exit)());
 
 ktask_t *utask_create(void (*start)(), void *param,
-                        void (*exit)(), uint32_t *stack);
+                        void (*exit)(), size_t stack_addr);
 
 ktask_t *utask_from_elf(char *elf_data);

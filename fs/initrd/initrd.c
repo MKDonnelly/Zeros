@@ -24,7 +24,8 @@ void initrd_close(fs_node_t *node){
 }
 
 //TODO: Make some meaningful error codes to be returned
-static uint32_t initrd_readfile(fs_node_t *node, uint32_t offset, uint32_t size, int8_t *buffer){
+static int initrd_readfile(fs_node_t *node, size_t offset, 
+                           size_t size, char *buffer){
 
    struct initrd_object *obj = &current_initrd.initrdObjects[node->inode];
 
@@ -32,14 +33,14 @@ static uint32_t initrd_readfile(fs_node_t *node, uint32_t offset, uint32_t size,
    //memory address of the initrd (from the initrdHeader) and add
    //the offset from the header stored in the individual initrdObject
    //Also add a provided offset within the file.
-   int32_t fileLocation = (uint32_t)current_initrd.initrdHeader + obj->offset + offset;
+   size_t fileLocation = (size_t)current_initrd.initrdHeader 
+                                 + obj->offset + offset;
    //We want an 8-bit pointer, since we will
    //be reading 1 byte values
-   int8_t *ptr = (int8_t*)fileLocation;
+   char *ptr = (char*)fileLocation;
 
    //Now we can start reading
-   int i;
-   for(i = 0; i < size && i < node->length; i++){
+   for(size_t i = 0; i < size && i < node->length; i++){
       buffer[i] = ptr[i];
    }
 
@@ -51,7 +52,8 @@ static uint32_t initrd_readfile(fs_node_t *node, uint32_t offset, uint32_t size,
 //not expand a file; if we have a 100 byte file, we can only
 //write to those 100 bytes, period. Later on, we will design a
 //more complicated ramfs to allow expansion of files.
-static uint32_t initrd_writefile(fs_node_t *node, uint32_t offset, uint32_t size, int8_t *buffer){
+static int initrd_writefile(fs_node_t *node, size_t offset, 
+                            size_t size, char *buffer){
 
    struct initrd_object *obj = &current_initrd.initrdObjects[node->inode];
 
@@ -59,14 +61,12 @@ static uint32_t initrd_writefile(fs_node_t *node, uint32_t offset, uint32_t size
    //memory address of the initrd (from the initrdHeader) and add
    //the offset from the header stored in the individual initrdObject
    //Also add a provided offset within the file.
-   int32_t fileLocation = (uint32_t)current_initrd.initrdHeader + obj->offset + offset;
-   //We want an 8-bit pointer, since we will
-   //be reading 1 byte values
-   int8_t *ptr = (int8_t*)fileLocation;
+   size_t fileLocation = (size_t)current_initrd.initrdHeader + 
+                         obj->offset + offset;
 
-   //Now we can start writing!
-   int i;
-   for(i = 0; i < size && i < node->length; i++){
+   char *ptr = (char*)fileLocation;
+
+   for(size_t i = 0; i < size && i < node->length; i++){
       ptr[i] = buffer[i];
    }
    return 0;
@@ -75,7 +75,7 @@ static uint32_t initrd_writefile(fs_node_t *node, uint32_t offset, uint32_t size
 //This function reads the given directory within the
 //initrd and returns a fs_node_t to whatever is at
 //the given index in the directory. Indexes start at 0!
-static fs_node_t *initrd_readdir(fs_node_t *node, uint32_t index){
+static fs_node_t *initrd_readdir(fs_node_t *node, int index){
 
    //Check to make sure we did not 
    //go over the end.
@@ -112,7 +112,7 @@ static fs_node_t *initrd_finddir(fs_node_t *node, char *name){
 
    fs_node_t *fsNode;
 
-   for(int item = 0; item < current_initrd.numFiles; item++){
+   for(size_t item = 0; item < current_initrd.numFiles; item++){
       //We have found the file!
       if( ! strcmp( name, current_initrd.initrdObjects[item].name) ){
          fsNode = (fs_node_t*)k_malloc(sizeof(fs_node_t), 0);
@@ -145,7 +145,7 @@ static fs_node_t *initrd_finddir(fs_node_t *node, char *name){
 //in the initrd will be created on an as-needed basis
 //This is the only function that any outside code needs
 //to know about.
-fs_node_t *init_initrd(uint32_t *addr){
+fs_node_t *init_initrd(size_t *addr){
    //Verify the initrd magic number
    if( *addr != INITRD_MAGIC )
       return NULL;

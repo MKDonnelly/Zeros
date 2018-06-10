@@ -34,5 +34,5 @@ struct cur_initrd{
 //This is all a calling process should need to
 //know. The fs_node_t interface is adequate for
 //everything else.
-fs_node_t *init_initrd(uint32_t*);
+fs_node_t *init_initrd(size_t *start_addr);
 

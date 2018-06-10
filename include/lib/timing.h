@@ -1,13 +1,13 @@
 #pragma once
 
 typedef struct{
-   int milliseconds;
-   int seconds;
-   int minutes;
-   int hours;
-   int days;
-   int months;
-   int years;
+   unsigned int milliseconds;
+   unsigned int seconds;
+   unsigned int minutes;
+   unsigned int hours;
+   unsigned int days;
+   unsigned int months;
+   unsigned int years;
 }system_time_t;
 
 //Represents a kernel task to
@@ -21,14 +21,14 @@ typedef struct alarm{
    void (*callback)();
 
    //this many milliseconds.
-   int callback_period;
+   unsigned int callback_period;
 
    //current countdown
    int time_left;
 }alarm_t;
 
 //Calls alarm_function every ms_period milliseconds
-void timing_set_alarm( void (*alarm_function)(), int ms_period);
+void timing_set_alarm( void (*alarm_function)(), unsigned int ms_period);
 
 //Handles periodic interrupts from arch code
 void timing_main_handler();

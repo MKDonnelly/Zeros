@@ -11,15 +11,14 @@
 #define USERLAND_STACK 0xB0000000
 
 arch_task_t arch_ktask_create(void (*start)(), void *param,
-                                   void (*exit)(), uint32_t *stack){
-   KASSERT( start != NULL );
-   KASSERT( stack != NULL );
+                                   void (*exit)(), size_t stack_addr){
+   KASSERT( stack_addr != 0 );
 
    arch_task_t kernel_task;
 
    //Create the context
    kernel_task.task_context = 
-                arch_kcontext_create(start, param, exit, stack);
+                arch_kcontext_create(start, param, exit, stack_addr);
    
    //Kernel tasks will always inherit from kernel_page_dir
    kernel_task.task_pd = kernel_page_dir;
@@ -35,14 +34,14 @@ arch_task_t arch_ktask_create(void (*start)(), void *param,
 //the kernel code. This is for testing only, since all userland
 //programs will be loaded from and ELF file.
 arch_task_t arch_utask_create(void (*start)(), void *param,
-                                   void (*exit)(), uint32_t *stack){
-   KASSERT( start != NULL );
-   KASSERT( stack != NULL );
+                                   void (*exit)(), size_t stack_addr){
+   KASSERT( stack_addr != 0 );
 
    arch_task_t user_task;
 
    //Create context
-   user_task.task_context = arch_ucontext_create(start, param, exit, stack);
+   user_task.task_context = arch_ucontext_create(start, param, 
+                                                 exit, stack_addr);
 
    //Userland tasks will clone the page directory of kernel_page_dir
    user_task.task_pd = vm_pdir_clone( kernel_page_dir );
@@ -77,7 +76,7 @@ arch_task_t arch_utask_from_elf( char *elf_file_buffer ){
    //ARCH_PAGE_SIZE since arch_create_ucontext assumes that is is
    //passed the head of the stack.
    user_task.task_context = arch_ucontext_create((void*)start_addr, 
-                               NULL, NULL, (uint32_t*)USERLAND_STACK );
+                               NULL, NULL, USERLAND_STACK );
 
    //Setup a syscall stack of 4K aligned on page boundary
    user_task.interrupt_stack = k_malloc( 1024, 0x1000 );

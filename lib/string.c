@@ -1,20 +1,20 @@
 #include <lib/string.h>
 
 //Basic function to copy and set memory
-void memcpy( void *dest, void *src, int amount){
+void memcpy( void *dest, void *src, size_t amount){
    for(int i = 0; i < amount; i++)
       ((char*)dest)[i] = ((char*)src)[i];
 }
 
 //Overwrite *dest with amount bytes of value val
-void memset( void *dest, int amount, int val){
+void memset( void *dest, size_t amount, int val){
    for(int i = 0; i < amount; i++)
       ((char*)dest)[i] = val;
 }
 
 
 //Find length of string
-int strlen(char inputarray[]){
+size_t strlen(char inputarray[]){
    int i = 0;
    while( inputarray[i] != '\0')
       i++;
@@ -35,9 +35,9 @@ void strcpy( char *str1, char *str2 ){
 
 //Copies str2 into str1, copying no
 //more than num bytes
-void strncpy( char *str1, char *str2, int num){
-   int i = 0;
-   while( str2[i] != 0 && i < num){
+void strncpy( char *str1, char *str2, size_t len){
+   size_t i = 0;
+   while( str2[i] != 0 && i < len){
       str1[i] = str2[i];
       i++;
    }
@@ -45,14 +45,14 @@ void strncpy( char *str1, char *str2, int num){
 }
 
 int strcmp(char *str1, char *str2){
-   int i = 0;
+   size_t i = 0;
    while( ! (str1[i] - str2[i]) && str1[i] != 0 && str2[i] != 0)
       i++;
    return (str1[i] - str2[i]);
 }
 
-int strncmp(char *str1, char *str2, int max){
-   for(int i = 0; i < max; i++){
+int strncmp(char *str1, char *str2, size_t len){
+   for(size_t i = 0; i < len; i++){
       if( str1[i] != str2[i] )
          return (str1[i] - str2[i]);
    }
@@ -61,7 +61,7 @@ int strncmp(char *str1, char *str2, int max){
 
 
 char *strchr(char *str, char c){
-   int i = 0;
+   size_t i = 0;
    while( str[i] != 0 ){
       if( str[i] == c )
          return &str[i];
@@ -72,8 +72,8 @@ char *strchr(char *str, char c){
 //We will assume that str1 has enough space
 //to place str2 at the end.
 void strcat(char *str1, char *str2){
-   int s1len = strlen(str1);
-   int s2len = strlen(str2);
+   size_t s1len = strlen(str1);
+   size_t s2len = strlen(str2);
    for(int j = 0; j < s2len; j++){
       str1[s1len+j] = str2[j];
    }
@@ -81,7 +81,7 @@ void strcat(char *str1, char *str2){
 
 
 char *strstr(char *source, char *substr){
-   int source_len = strlen(source);
+   size_t source_len = strlen(source);
    for(int i = 0; i < source_len; i++){
       if( strcmp( &source[i], substr ) == 0 )
          return &source[i];
@@ -94,7 +94,7 @@ void reverse(char s[]){
    int i, j;
    char c;
 
-   for(i = 0, j = strlen(s)-1; i< j ; i++, j--){
+   for(i = 0, j = strlen(s)-1; i < j ; i++, j--){
       c = s[i];
       s[i] = s[j];
       s[j] = c;
@@ -113,7 +113,7 @@ int is_in(char c, char *str){
 //Converts a string into an integer
 int atoi(char *str){
    int result = 0;
-   int i = 0;
+   size_t i = 0;
    while( is_in( str[i], "0123456789" ) ){
       result *= 10;
       result += (str[i] - '0');
@@ -127,31 +127,31 @@ int atoi(char *str){
 
 //Convert the integer n into 
 //an ascii string.
-void itoa(int n, char s[]){
+void itoa(int number, char *buf){
    int i, sign;
 
-   if( (sign = n) < 0)
-      n = -n;
+   if( (sign = number) < 0)
+      number = -number;
    i = 0;
    do{
-      s[i++] = n % 10 + '0';
-   }while( (n /= 10) > 0);
+      buf[i++] = number % 10 + '0';
+   }while( (number /= 10) > 0);
    if(sign < 0)
-      s[i++] = '-';
-   s[i] = '\0';
-   reverse(s);
+      buf[i++] = '-';
+   buf[i] = '\0';
+   reverse(buf);
 }
 
-void itoh(int num, char s[]){
+void itoh(int number, char *buf){
 
    char hex_digits[] = "0123456789ABCDEF";
 
-   for(int i = 0; i < 8; i++){
-      int val = num & 0xF;
-      s[i] = hex_digits[val];
-      num = num >> 4;
+   for(size_t i = 0; i < 8; i++){
+      int val = number & 0xF;
+      buf[i] = hex_digits[val];
+      number = number >> 4;
    }
    //Add the null bit
-   s[8] = 0;
-   reverse(s);
+   buf[8] = 0;
+   reverse(buf);
 }

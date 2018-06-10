@@ -19,7 +19,7 @@
 //<free><allocation><allocation><allocation><allocation><free.......>
 //--------------------------------------------------------------------
 
-void dibit_set(void *mem, int index, uint8_t val){
+void dibit_set(void *mem, int index, int val){
    if( val & 0x2 )
       bit_set(mem, index * 2);
    else
@@ -31,7 +31,7 @@ void dibit_set(void *mem, int index, uint8_t val){
       bit_clear(mem, index * 2 + 1);
 }
 
-uint8_t dibit_get(void *mem, int idx){
+int dibit_get(void *mem, size_t idx){
    return (bit_get( mem, idx * 2 ) << 1) | bit_get(mem, idx * 2 + 1);
 }
 
@@ -56,7 +56,7 @@ void bitmap_init_heap(heap_t *heap){
    memset( head->dibitmap, head->dibitmap_len, 0);
 
    //Align the start of the heap on a block size for easier alignment
-   head->free_space = (char*)ALIGN_ON((uint32_t)(head->dibitmap + 
+   head->free_space = (char*)ALIGN_ON((size_t)(head->dibitmap + 
                       head->dibitmap_len), head->blocksize);
 
    spinlock_init(&heap->heap_lock);
@@ -67,13 +67,13 @@ void bitmap_free(heap_t *heap, void *memblock){
 
    spinlock_acquire(&heap->heap_lock);
 
-   uint32_t offset = (uint32_t)memblock - (uint32_t)head->free_space;
-   uint32_t index = offset / head->blocksize;
+   size_t offset = (size_t)memblock - (size_t)head->free_space;
+   size_t index = offset / head->blocksize;
 
    int color = dibit_get(head->dibitmap, index);
 
    //Clear all blocks forward
-   int i = 0;
+   size_t i = 0;
    while( dibit_get( head->dibitmap, index + i) == color ){
       dibit_set( head->dibitmap, index + i, DIBIT_FREE );
       i++;
@@ -96,24 +96,24 @@ void bitmap_free(heap_t *heap, void *memblock){
 #define ALIGN_WITHIN( addr, align_size, block_size )\
         ( (ALIGN_ON( addr, align_size ) - addr) < block_size ? 1 : 0 )
 
-void *bitmap_malloc(heap_t *heap, uint32_t size, uint32_t align){
+void *bitmap_malloc(heap_t *heap, size_t size, size_t align){
    bitmap_heap_t *head = (bitmap_heap_t*)heap->start;
    spinlock_acquire( &heap->heap_lock );
 
    //Add 1 to catch any fractional part of a block required
-   int blocks_needed = (size / head->blocksize) + 1;
+   size_t blocks_needed = (size / head->blocksize) + 1;
    
    KASSERT( blocks_needed < (head->dibitmap_len * 4) );
 
    //Multiply by 4 since there are 4 groups of 2 bits in a byte
    //and dibitmap_len is in bytes.
-   for(int i = 0; i < head->dibitmap_len * 4; i++){
+   for(size_t i = 0; i < head->dibitmap_len * 4; i++){
       int found = 1;
       for(int j = 0; j < blocks_needed; j++){
          if( dibit_get( head->dibitmap, i + j) != 0 )
             found = 0;
          
-         if( align != 0 && !ALIGN_WITHIN( (uint32_t)(head->free_space + 
+         if( align != 0 && !ALIGN_WITHIN( (size_t)(head->free_space + 
              i * head->blocksize), align, head->blocksize ) )
             found = 0;
       }
@@ -137,12 +137,12 @@ void *bitmap_malloc(heap_t *heap, uint32_t size, uint32_t align){
          }
 
          //Color the blocks
-         for(int j = 0; j < blocks_needed; j++){
+         for(size_t j = 0; j < blocks_needed; j++){
             dibit_set( head->dibitmap, i + j, color );
          }
 
          spinlock_release(&heap->heap_lock);
-         return (void*)ALIGN_ON( (uint32_t)(head->free_space + 
+         return (void*)ALIGN_ON( (size_t)(head->free_space + 
                           i * head->blocksize), head->blocksize);
       }
    }

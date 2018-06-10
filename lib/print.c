@@ -17,10 +17,10 @@ void k_printf(char *str, ...){
       if( str[i] == '%' ){
 
          if( str[i+1] == 'd' ){
-            int arg = va_arg( valist, int );
+            int arg = va_arg( valist, size_t );
             itoa( arg, buf );
          }else if( str[i+1] == 'x' ){
-            int arg = va_arg( valist, int );
+            int arg = va_arg( valist, size_t );
             itoh( arg, buf );
          }else if( str[i+1] == 's' ){
             char *s = va_arg( valist, char* );
@@ -30,7 +30,7 @@ void k_printf(char *str, ...){
             //pushing it onto the stack makes it 4 bytes
             //due to stack alignment. va_get must then
             //advance 4 bytes to get the next char.
-            char c = va_arg( valist, uint32_t );
+            char c = va_arg( valist, size_t );
             buf[0] = c;
             buf[1] = 0;
          } 

@@ -22,7 +22,7 @@ typedef struct heap_block{
 
    //The size of this chunk of memory,
    //not including the header
-   uint32_t size;
+   size_t size;
 
    //Various attributes such as if the
    //memory is free or allocated.
@@ -36,7 +36,7 @@ extern heap_algs_t blocklist_heap;
 void blocklist_init_heap(heap_t *heap);
 
 //Dynamically allocate memory
-void *blocklist_malloc(heap_t *heap, uint32_t size, uint32_t align);
+void *blocklist_malloc(heap_t *heap, size_t size, size_t align);
 
 //Free dynamic memory
 void blocklist_free(heap_t *heap, void *memblock);

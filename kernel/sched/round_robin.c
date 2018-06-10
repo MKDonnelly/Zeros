@@ -98,4 +98,3 @@ schedalg_t rr_scheduler = {
    .scheduler_schedule   = rr_schedule,
    .scheduler_current_ktask = rr_current_ktask,
 };
-

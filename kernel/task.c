@@ -25,46 +25,43 @@ ktask_t *ktask_create( void (*start)(), void *param, void (*exit)()){
    //WE MUST ALIGN THE THREAD STACK TO PAGE_SIZE OR ELSE THE
    //THREADS WILL GET ASYMETRIC PROCESSING TIME DUE TO ALIGNMENT!
    //new_task->task_stack = stack;
-   uint32_t *stack = k_malloc( STACK_SIZE, ARCH_PAGE_SIZE );
+   size_t *stack = k_malloc( STACK_SIZE, ARCH_PAGE_SIZE );
    KASSERT( stack != NULL );
    new_task->task_stack = STACK_HEAD( stack, ARCH_PAGE_SIZE );
 
    //Intilize the arch-specific member task_info 
-   new_task->task_info = arch_ktask_create(start, param, exit, stack);
+   new_task->task_info = arch_ktask_create(start, param, 
+                                           exit, (size_t)stack);
 
    // Setup generic task info
    new_task->state = TASK_READY;
    new_task->ret_val = NULL;
    new_task->task_id = next_task_id++;
    new_task->is_kernel_task = 1;
-   new_task->task_brk_len = 0;
-   new_task->task_brk = NULL;
 
    return new_task;
 }
 
 ktask_t *utask_create( void (*start)(), void *param, 
-                         void (*exit)(), uint32_t *stack){
+                         void (*exit)(), size_t stack_addr){
 
-   KASSERT( start != NULL );
-   KASSERT( stack != NULL && (uint32_t)stack < KERNEL_VADDR );
-   KASSERT( IS_ALIGNED_ON( (uint32_t)stack, ARCH_PAGE_SIZE ) );
+   KASSERT( stack_addr != 0 );
+   KASSERT( stack_addr < KERNEL_VADDR );
+   KASSERT( IS_ALIGNED_ON( stack_addr, ARCH_PAGE_SIZE ) );
 
    //Create a thread descriptor
    ktask_t *new_task = k_malloc( sizeof(ktask_t), 0 );
    KASSERT( new_task != NULL );
-   new_task->task_stack = stack;
+   new_task->task_stack = stack_addr;
 
    //Create bare arch-specific task info
-   new_task->task_info = arch_utask_create(start, param, exit, stack);
+   new_task->task_info = arch_utask_create(start, param, exit, stack_addr);
 
    //Initilize generic task info
    new_task->state = TASK_READY;
    new_task->ret_val = NULL;
    new_task->task_id = next_task_id++;
    new_task->is_kernel_task = 0;
-   new_task->task_brk_len = 0;
-   new_task->task_brk = NULL;
 
    return new_task;
 }
@@ -85,8 +82,6 @@ ktask_t *utask_from_elf( char *elf_data ){
    new_task->ret_val = NULL;
    new_task->task_id = next_task_id++;
    new_task->is_kernel_task = 0;
-   new_task->task_brk_len = 0;
-   new_task->task_brk = NULL;
 
    return new_task;
 }

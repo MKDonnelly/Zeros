@@ -6,12 +6,12 @@
 #include <lib/types.h>
 
 //Holds the system time
-system_time_t global_time = {0};
+static system_time_t global_time = {0};
 
-alarm_t *alarm_list = NULL;
-int total_alarms = 0;
+static alarm_t *alarm_list = NULL;
+static unsigned int total_alarms = 0;
 
-void timing_set_alarm(void (*alarm_function)(), int ms_period){
+void timing_set_alarm(void (*alarm_function)(), unsigned int ms_period){
 
    alarm_t *new_alarm = (alarm_t*)k_malloc( sizeof(alarm_t), 0);
    new_alarm->callback = alarm_function;

@@ -1,6 +1,6 @@
 #include <kernel/mm/heap.h>
 
-void heap_create(heap_t *heap_descriptor, uint32_t start, uint32_t len, 
+void heap_create(heap_t *heap_descriptor, size_t start, size_t len, 
                  heap_algs_t *algs){
 
     heap_descriptor->start = start;

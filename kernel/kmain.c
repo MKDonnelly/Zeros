@@ -66,7 +66,7 @@ void kmain(struct multiboot_info *multiboot_info){
    k_puts("\\c"); //clear screen
    
    //Have the heap start just after the text segment on an aligned boundary
-   uint32_t heap_start = ALIGN_ON((int)&ldscript_kernel_end, 
+   size_t heap_start = ALIGN_ON((size_t)&ldscript_kernel_end, 
                                   ARCH_PAGE_SIZE);
    //Keep in mind that only the first 4M of memory at the start of the
    //kernel is mapped in. If the size is changed to be larger, this 
@@ -108,7 +108,7 @@ void kmain(struct multiboot_info *multiboot_info){
 
 //Read in first file from initrd (it will contain a test binary)
    char *program_buf = k_malloc( 5000, 0);
-   fs_root = init_initrd( &ldscript_initrd_start );
+   fs_root = init_initrd( (size_t*)&ldscript_initrd_start );
    fs_node_t *first = fs_root->readdir( fs_root, 0 );
    first->read( first, 0, first->length, program_buf);
 

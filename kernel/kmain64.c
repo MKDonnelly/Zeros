@@ -12,7 +12,7 @@ extern uint64_t ldscript_kernel_end;
 void kmain64(struct multiboot_header *mbh){
    arch_init_system();
 
-   k_printf("Test: %d %d %d\n", 111, 222, 333);
+   k_printf("Size: %d\n", sizeof(size_t));
    k_puts("Working..."); 
 
    while(1) arch_halt_cpu();
