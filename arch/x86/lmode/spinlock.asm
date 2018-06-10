@@ -2,25 +2,29 @@
 
 global spinlock_init
 spinlock_init:
-   mov rax, [rsp+0x08]
+   ;caller put address in rax
    mov rcx, 0
    mov [rax], rcx
    ret
 
 global spinlock_acquire
 spinlock_acquire:
-   mov rax, [rsp+0x8]
+   ;caller put address in rax
    mov rcx, 1
+   ;save address in rax for next iter
+   mov rdi, rax 
 
    xchg [rax], rcx
    cmp rcx, 1
+
+   mov rax, rdi
 
    je spinlock_acquire
    ret
 
 global spinlock_release
 spinlock_release:
-   mov rax, [rsp+0x8]
+   ;caller puts address in rax
    mov rcx, 0
 
    xchg [rax], rcx

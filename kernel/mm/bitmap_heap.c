@@ -58,8 +58,6 @@ void bitmap_init_heap(heap_t *heap){
    //Align the start of the heap on a block size for easier alignment
    head->free_space = (char*)ALIGN_ON((size_t)(head->dibitmap + 
                       head->dibitmap_len), head->blocksize);
-
-   spinlock_init(&heap->heap_lock);
 }
 
 void bitmap_free(heap_t *heap, void *memblock){
@@ -68,12 +66,12 @@ void bitmap_free(heap_t *heap, void *memblock){
    spinlock_acquire(&heap->heap_lock);
 
    size_t offset = (size_t)memblock - (size_t)head->free_space;
-   size_t index = offset / head->blocksize;
+   int index = offset / head->blocksize;
 
    int color = dibit_get(head->dibitmap, index);
 
    //Clear all blocks forward
-   size_t i = 0;
+   int i = 0;
    while( dibit_get( head->dibitmap, index + i) == color ){
       dibit_set( head->dibitmap, index + i, DIBIT_FREE );
       i++;
@@ -81,7 +79,7 @@ void bitmap_free(heap_t *heap, void *memblock){
 
    //Clear all blocks backwards
    i = 1;
-   while( (index - i >= 0) && dibit_get( head->dibitmap, index -i ) == color ){
+   while( (index - i >= 0) && dibit_get( head->dibitmap, index - i ) == color ){
       dibit_set( head->dibitmap, index - i, DIBIT_FREE );
       i++;
    }

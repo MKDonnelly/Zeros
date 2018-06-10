@@ -19,15 +19,13 @@ void blocklist_init_heap(heap_t *heap_descriptor){
     heap_descriptor->size_left -= sizeof(heap_block_t);
     head->free_mem = ( (char*)head + sizeof(heap_block_t) );
     head->allocated = 0;
-
-    spinlock_init(&heap_descriptor->heap_lock);
 }
 
 
 //Allocate "size" piece of memory on the heap. If align is non-zero
 //align the memory to it's size. If phys is non-null, return the physical
 //address of the allocate memory (different when using paging)
-void *blocklist_malloc(heap_t *heap_descriptor, size_t size, size_t align){
+void *blocklist_malloc(heap_t *heap_descriptor, int size, int align){
 
    //Lock the heap to prevent corruption
    spinlock_acquire( &heap_descriptor->heap_lock );

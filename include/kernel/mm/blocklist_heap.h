@@ -36,7 +36,7 @@ extern heap_algs_t blocklist_heap;
 void blocklist_init_heap(heap_t *heap);
 
 //Dynamically allocate memory
-void *blocklist_malloc(heap_t *heap, size_t size, size_t align);
+void *blocklist_malloc(heap_t *heap, int size, int align);
 
 //Free dynamic memory
 void blocklist_free(heap_t *heap, void *memblock);
