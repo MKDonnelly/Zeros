@@ -25,15 +25,13 @@ multiboot_header:
 ;    dd 0 ;0 = set graphics mode
 ;    dd 1024, 768, 16 ;Width, height, and depth for display
 
-;KERNEL_STACK_START equ 0x300000
-
 [extern ldscript_kernel_end]
 arch_start:
     ; setup the kernel stack to
     ; start 4K after the end of the 
     ; kernel, and grow down towards it.
     mov ebp, ldscript_kernel_end
-    add ebp, 0x1000
+    sub ebp, 0x10 ;subtract 16 bytes to be safe. Is this needed?
     mov esp, ebp
     
     ;jump to long mode
@@ -92,7 +90,7 @@ setup_page_tables:
    mov [p2_table + ecx * 8], eax
 
    inc ecx
-   cmp ecx, 3 ;Map only 3 2MB pages
+   cmp ecx, 2 ;Map only 2 2MB pages
    jne .map_p2_table
 
    ret

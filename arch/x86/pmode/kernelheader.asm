@@ -57,7 +57,8 @@ arch_start:
 
     ;Set the kernel stack. Have it start 4K after the 
     ;end of the kernel .text, .data, and .bss section.
-    ;The heap will start just after that.
+    ;The heap will start just after that. 
+    ;TODO fix this. i have no idea why this has not caused a problem
     mov eax, 0xC0010000 
     add eax, 0x1000
     mov ebp, eax

@@ -5,15 +5,13 @@
 ;been altered
 global inval_page
 inval_page:
-   invlpg [rsp+0x10]
+   ;caller passes argument in rdi
+   invlpg [rdi]
    ret
 
 ;Load address of pml4 into cr3
 global load_pml4
 load_pml4:
-   ;load address of page structure
-   mov rax, [rsp+0x10]
-   mov cr3, rax
- 
-   ret 
-
+   ;caller passes address in rdi
+   mov cr3, rdi
+   ret

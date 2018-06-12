@@ -1,8 +1,6 @@
 #pragma once
 #include <lib/types.h>
 
-//#define KERNEL_VBASE	0
-
 //NOTE: Only 4K pages are supported
 //maybe I will add 4M and 1G pages later
 
@@ -16,10 +14,10 @@
 
 //Macros to find the offset of an address
 //within a specific page entity
-#define PML4_OFFSET( addr ) (( addr & 0xFF80000000000000) >> 39)
-#define PDP_OFFSET( addr ) (( addr & 0x007FC00000000000) >> 30)
-#define PD_OFFSET( addr ) (( addr & 0x00003FE00000) >> 21)
-#define PT_OFFSET( addr ) (( addr & 0x0000001FF000) >> 21
+#define PML4_OFFSET(addr) ( (addr >> 39) & 0x1FF )
+#define PDPT_OFFSET(addr) ( (addr >> 30) & 0x1FF )
+#define PDT_OFFSET(addr) ( (addr >> 21) & 0x1FF )
+#define PT_OFFSET(addr) ( (addr >> 12) & 0x1FF )
 
 //Flags meaning
 //   present - page is present if set to 1. PF if accessed and 0
@@ -46,7 +44,7 @@ typedef struct pte{
    uint64_t avl     : 3;
    uint64_t base_addr : 40;
    uint64_t os_available : 11;
-   uint64_t no_exec;
+   uint64_t no_exec : 1;
 }pte_t;
 
 typedef struct pt{

@@ -13,10 +13,9 @@ extern size_t ldscript_kernel_end;
 void kmain64(struct multiboot_header *mbh){
    arch_init_system();
 
-   heap_create( &global_kernel_heap,(size_t)&ldscript_kernel_end, 0x200000,
+   heap_create( &global_kernel_heap,(size_t)&ldscript_kernel_end, 0x100000,
                 &blocklist_heap);
-   char *mem = k_malloc( 1024, 0 );
-   k_free(mem);
+   init_paging();
    k_puts("Working..."); 
 
    while(1) arch_halt_cpu();
