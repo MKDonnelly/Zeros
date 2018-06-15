@@ -27,18 +27,19 @@ multiboot_header:
 
 [extern ldscript_kernel_end]
 arch_start:
-    ; setup the kernel stack to
-    ; start 4K after the end of the 
-    ; kernel, and grow down towards it.
+    ;Setup the heap to start 4K after the end of the kernel.
+    ;Subtract 1 byte since the heap also starts at the same
+    ;address to prevent the two from overlapping.
     mov ebp, ldscript_kernel_end
-    sub ebp, 0x10 ;subtract 16 bytes to be safe. Is this needed?
+    sub ebp, 1
+    ;align the address on a 16 byte boundary
+    and ebp, 0xFFFFFFF0
     mov esp, ebp
     
     ;jump to long mode
     call long_mode_jump
 
     ;we should never get here
-
 
 global long_mode_jump
 long_mode_jump:
@@ -48,6 +49,7 @@ long_mode_jump:
    lgdt [gdt64.pointer]
    jmp gdt64.code:lmode_entry
    ;never returns
+
 
 enable_paging:
    ;Load p4 to cr3 register for use

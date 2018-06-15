@@ -7,11 +7,15 @@ Multitasking
          Links to the same address w/ the default address
          do as well, but other address work fine.
    create systemcall interface 
-   Symmetric Multi Processing (SMP)
+   Symmetric Multi Processing (SMP) (see intel multiprocessor spec)
    Work on scheduler
    Create message passing interface and shared memory for IPC
    Add name to task_t
    Utilize page faults better (kill task that makes a page fault,etc)
+   create a task pool for fast task creation
+
+filesystem
+   use inodes as the interface between the VFS and the file system
 
 drivers
    APIC, HPET, ATA non-PIO mode, PCI, network card
@@ -32,6 +36,10 @@ misc tasks
    Add a how-to to explain how each subsystem works
    Add examples for each subsystem for reference
       and list the dependencies
+   Create a slab allocator to be placed over the generic
+      heap. e.g. paging stuff requires a lot of 4K pages
+      aligned on 4K; have a slab allocator catch those and
+      have the generic slab as a backup
 
 advanced os examples:
    dragonfly bsd, minix, plan9, genode, haiku, helenos, redox

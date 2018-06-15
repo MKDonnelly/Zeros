@@ -266,7 +266,7 @@ unsigned char g_8x16_font[4096] = {
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-
+//TODO re-write this
 void write_font(unsigned char *buf, unsigned font_height){
 	unsigned char seq2, seq4, gc4, gc5, gc6;
 
@@ -296,8 +296,7 @@ void write_font(unsigned char *buf, unsigned font_height){
 // write font to plane P4 
 	set_plane(2);
 // write font 0 
-	for(int i = 0; i < 256; i++)
-	{
+	for(int i = 0; i < 256; i++){
                 memcpy( (void*)( 0xb8000 + (i * 32) ), buf, font_height );
 		buf += font_height;
 	}

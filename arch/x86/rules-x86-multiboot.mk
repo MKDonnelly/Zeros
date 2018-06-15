@@ -42,7 +42,7 @@ arch_asm_srcs :=			\
 	arch/x86/pmode/pagingasm.asm	\
 	arch/x86/pmode/spinlock.asm	
 
-arch_header := arch/x86/pmode/kernelheader.asm
+arch_header := arch/x86/pmode/mbheader.asm
 
 arch_src_dirs :=		\
 	arch/x86/pmode/		\

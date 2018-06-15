@@ -154,9 +154,11 @@ drive_t *ata_pio_create_drive(int bus, int drive_number){
    drive->drive_data = ata_pio_drive;
 
    //Have identify populate the drive_max_lba field
-//   ata_pio_identify_drive( drive );
-//   ata_pio_reset( drive );
-//   ata_pio_select(drive);
+   ata_pio_reset( drive );
+   ata_pio_identify_drive( drive );
+
+   //Enable interrupts
+   irq_enable(15);   
 
    return drive;
 }

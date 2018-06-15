@@ -15,7 +15,7 @@ void kmain64(struct multiboot_header *mbh){
 
    heap_create( &global_kernel_heap,(size_t)&ldscript_kernel_end, 0x100000,
                 &blocklist_heap);
-   init_paging();
+   vm_init();
    k_puts("Working..."); 
 
    while(1) arch_halt_cpu();

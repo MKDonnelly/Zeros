@@ -15,12 +15,9 @@
 #define PAGE_RES_M     0x8
 #define PAGE_ID_M      0x10
 
-//PD = Page directory
-//PDE = Page directory entry
-//PT = Page Table
-//PTE = Page Table Entry
-#define PDE_IN_PD 1024
-#define PTE_IN_PT 1024
+//There are 1024 32-bit entries (pte_t, pde_t, etc) in
+//each level of the paging structure
+#define ENTRIES_IN_LEVEL	1024
 
 //The upper 10 bits of the address specifies the 
 //offset within the page directory.
@@ -69,9 +66,7 @@ typedef struct pte pte_t;
 //Each of these page entries maps a virtual to physical
 //address using a page_table_entry_t.
 struct pt{
-
-   pte_t pt_entries[ PTE_IN_PT ];
-
+   pte_t pt_entries[ENTRIES_IN_LEVEL];
 }__attribute__((packed));
 typedef struct pt pt_t;
 
@@ -96,13 +91,7 @@ typedef struct pde pde_t;
 
 //A page directory is composed of page table descriptors.
 struct pd{
-
-   pde_t pd_entries[PDE_IN_PD];
-
-   //pd_entries is used by the hardware paging translation mechanism.
-   //it can only work with physical addresses. However, we as the OS
-   //can only work with virtual addresses.
-
+   pde_t pd_entries[ENTRIES_IN_LEVEL];
 }__attribute__((packed));
 typedef struct pd pd_t;
 

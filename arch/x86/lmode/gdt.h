@@ -22,8 +22,5 @@ typedef struct{
    int64_t base;   
 }gdt_descriptor_t;
 
-
-static inline void setup_gdt_entry(gdt_entry_t *gdt_entry, uint8_t dpl){
-   memset(gdt_entry, sizeof(gdt_entry_t), 0);
-   *gdt_entry |= (1<<43) | (1<<44) | (1<<47) | (1<<53);
-}
+//Initilize the GDT for tye system
+void gdt_init();

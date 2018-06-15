@@ -23,7 +23,12 @@ global inval_page
 inval_page:
    invlpg [esp+0x8]
    ret
-   
+
+;Returns the address of the page fault
+global get_pfault_addr
+get_pfault_addr:
+   mov eax, cr2
+   ret   
 
 ; Used to load a page directory
 ; First argument is pointer to pd_t*

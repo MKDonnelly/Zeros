@@ -120,3 +120,5 @@ typedef struct pml4t{
    //contains PML4E's
    pml4e_t entries[ENTRIES_IN_LEVEL];
 }pml4t_t;
+
+void vm_init();

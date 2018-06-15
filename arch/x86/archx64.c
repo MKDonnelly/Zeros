@@ -3,6 +3,6 @@
 
 void arch_init_system(){
    asm volatile("cli");
-   init_gdt();
+   gdt_init();
    vga_init( &vmode_vga3h, 0 );
 }

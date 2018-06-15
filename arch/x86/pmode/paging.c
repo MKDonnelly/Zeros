@@ -151,7 +151,7 @@ static void clone_table(pde_t *dest_pde, pde_t *source_pde){
 
    //For every page descriptor in the source table, make a new page
    //descriptor in the destination and copy the data
-   for(int i = 0; i < PTE_IN_PT; i++){
+   for(int i = 0; i < ENTRIES_IN_LEVEL; i++){
 
       //Only create a new page in the copy if the source has one
       if( source_pt->pt_entries[i].frame_addr != 0 ){
@@ -179,7 +179,7 @@ pd_t *vm_pdir_clone(pd_t *clone_dir){
    pd_t *new_dir = k_malloc( sizeof(pd_t), ARCH_PAGE_SIZE );
    memset( new_dir, sizeof(pd_t), 0 );
 
-   for(int i = 0; i < PDE_IN_PD; i++){
+   for(int i = 0; i < ENTRIES_IN_LEVEL; i++){
 
       //Map in the kernel virtual addresses to the cloned page directory.
       //We unconditionally map the kernel in since, when switching tasks,
@@ -226,9 +226,7 @@ void vm_init(){
 
 //TODO have a page fault callback instead of this.
 void page_int_handler(context_t r){
-   int fault_addr;
-   //TODO convert to assembly
-   asm volatile("mov %%cr2, %0" : "=r" (fault_addr));
+   int fault_addr = get_pfault_addr();
 
    uint8_t present = !(r.error & PAGE_PRESENT_M);
    uint8_t rw = r.error & PAGE_RW_M;
