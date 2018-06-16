@@ -8,8 +8,9 @@
 */
 
 #include <lib/types.h>
-#include <drivers/drive.h>
+#include <kernel/blkdev/drive.h>
 
+void ata_enumerate();
 //Returns a drive_t* given the bus and drive number.
 //Returns NULL if the drive does not exist.
 drive_t *ata_pio_create_drive(int bus, int drive);

@@ -2,7 +2,6 @@
 
 #include <arch/current_arch>
 #include <lib/types.h>
-#include <fs/fs.h>
 
 enum TASK_STATE { TASK_RUNNING, TASK_READY, TASK_EXIT, TASK_BLOCKED };
 
@@ -25,7 +24,6 @@ typedef struct ktask{
    uint32_t task_id;
    uint8_t is_kernel_task;
 
-   fs_node_t *file_handles[5];
    //Later, I might add a void* to point to a structure to
    //store scheduler-specific data.
 } ktask_t;

@@ -22,13 +22,12 @@
 #include <kernel/syscall.h>
 #include <kernel/sched/workqueue.h>
 
-#include <fs/fs.h>
+#include <fs/vfs/fs.h>
 #include <fs/initrd/initrd.h>
 #include <fs/mbr.h>
-#include <fs/zsfs/zsfs.h>
 #include <lib/assert.h>
+#include <kernel/blkdev/blkdev.h>
 
-#include <drivers/drive.h>
 #include <drivers/pci/pci.h>
 #include <drivers/pci/pci_map.h>
 #include <drivers/net/rtl8139.h>
@@ -91,20 +90,34 @@ void kmain(struct multiboot_info *multiboot_info){
    current_scheduler->scheduler_setup();
    syscalls_init();
 
-   drive_t *ata_drive = ata_pio_create_drive(0, 1);
-   char *buffer = k_malloc(512, 0);
-   memset(buffer, 512, 0 );
-   ata_drive->drive_read_lba(ata_drive, buffer, 0, 1);
-   mbr_setup_parttable(ata_drive);   
+   zsfs_init();
+   ata_enumerate();
 
-//   zsfs_create(ata_drive, 1);
-   superblock_t *zsb = zsfs_get_superblock(ata_drive, 1);
-   k_printf("%d, %d, %d, %d, %d\n", zsb->block_size, zsb->total_blocks, zsb->freelist_block, zsb->fsentries_block, zsb->fsentries_count);
+   blkdev_t *z = blkfs_find_id(0x1234ABCD);
+   if( z != NULL )
+      k_printf("YES!\n");
+   //blkdev_t *bd = blkdev_find(0);
+   //k_printf("%d, %d, %d\n", bd->min_lba, bd->max_lba, bd->block_size);
+   //zsfs_create(bd);
+   
+
+   //zsfs_create( ata_drive, 1 );
+   //superblock_t *zsb = zsfs_get_superblock(ata_drive, partition);
+   //k_printf("Got %d, %d, %d, %d, %d, %d\n", zsb->block_size, 
+   //   zsb->total_blocks, zsb->freelist_len, zsb->freelist_start_block,
+   //   zsb->fsentries_count, zsb->fsentries_block);
+   
+//   zsfs_create_file( ata_drive, partition, zsb, "hello");
+/*   fsentry_t *entry = zfs_read_file(ata_drive, partition, zsb);
+   k_printf("Name is %s\n", entry->name);
+   k_printf("Length is %d\n", entry->byte_len);*/
+
+   //k_printf("%d, %d, %d, %d, %d\n", zsb->block_size, zsb->total_blocks, zsb->freelist_block, zsb->fsentries_block, zsb->fsentries_count);
 
 //   pci_enumerate();
 //   rtl8139_test_send();
 
-
+/*
 //Read in first file from initrd (it will contain a test binary)
    char *program_buf = k_malloc( 5000, 0);
    fs_root = init_initrd( &ldscript_initrd_start );
@@ -115,21 +128,8 @@ void kmain(struct multiboot_info *multiboot_info){
    
    current_scheduler->scheduler_add_task(new_task);
 
-   current_scheduler->scheduler_start();
+   current_scheduler->scheduler_start();*/
 
+   k_printf("HERE!\n");
    while(1) arch_halt_cpu();
 }
-
-
-/*
-uint16_t start_state = 0xACF1;
-uint16_t lfsr = 0xACF1;
-uint16_t bit;
-int period = 0;
-
-int random(){
-   bit = ((lfsr >> 0) ^ (lfsr >> 2) ^ (lfsr >> 3) ^ (lfsr >> 5)) & 1;
-   lfsr = (lfsr >> 1) | (bit << 15);
-   ++period;
-   return lfsr;
-}*/

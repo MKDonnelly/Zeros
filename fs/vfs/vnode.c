@@ -1,4 +1,4 @@
-#include <fs/fs.h>
+#include <fs/vfs/vnode.h>
 #include <kernel/sched/sched.h>
 #include <arch/current_arch>
 #include <kernel/task.h>

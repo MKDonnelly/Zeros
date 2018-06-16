@@ -1,7 +1,7 @@
 #pragma once
 
 #include <lib/types.h>
-#include <drivers/drive.h>
+#include <kernel/blkdev/drive.h>
 
 #define MAX_MBR_PARTITIONS	4
 #define MBR_PART_1	0x1BE //446 bytes in

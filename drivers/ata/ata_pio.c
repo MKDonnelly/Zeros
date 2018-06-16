@@ -134,16 +134,22 @@ typedef struct ata_pio_drive{
 //Used to determine if we need to switch drives.
 ata_pio_drive_t *current_drive;
 
+void ata_enumerate(){
+   drive_t *ata_drive = ata_pio_create_drive(0, 1);
+   mbr_setup_parttable(ata_drive);
+   drive_register(ata_drive);   
+}
+
 //Returns a drive_t* to a structure representing this drive
 //Currently only supports the primary bus
 drive_t *ata_pio_create_drive(int bus, int drive_number){
    drive_t *drive = k_malloc(sizeof(drive_t), 0);
   
    //Set the various functions 
-   drive->drive_write_lba = ata_pio_write;
-   drive->drive_read_lba = ata_pio_read;
-   drive->drive_reset = ata_pio_reset;
-   drive->drive_block_size = BLOCK_SIZE;
+   drive->write_lba = ata_pio_write;
+   drive->read_lba = ata_pio_read;
+   drive->reset = ata_pio_reset;
+   drive->blksize = BLOCK_SIZE;
 
    //Create a structure representing the drive
    ata_pio_drive_t *ata_pio_drive = k_malloc(sizeof(ata_pio_drive_t), 0);
@@ -154,9 +160,8 @@ drive_t *ata_pio_create_drive(int bus, int drive_number){
    drive->drive_data = ata_pio_drive;
 
    //Have identify populate the drive_max_lba field
-//   ata_pio_identify_drive( drive );
-//   ata_pio_reset( drive );
-//   ata_pio_select(drive);
+   ata_pio_reset( drive );
+   ata_pio_identify_drive( drive );
 
    return drive;
 }
@@ -250,7 +255,7 @@ void ata_pio_identify_drive( drive_t *drive ){
    //Grab some of the more useful information from the buffer
    
    //Get the maximum LBA value for the drive.
-   drive->drive_max_lba = (identify_data[IDENT_LBA28_2] << 16) |
+   drive->maxlba = (identify_data[IDENT_LBA28_2] << 16) |
                            identify_data[IDENT_LBA28_1];
 }
 

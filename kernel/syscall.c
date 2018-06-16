@@ -2,7 +2,7 @@
 
 #include <arch/current_arch>
 #include <kernel/sched/sched.h>
-#include <fs/fs.h>
+#include <fs/vfs/fs.h>
 #include <kernel/task.h>
 #include <kernel/sched/sched.h>
 

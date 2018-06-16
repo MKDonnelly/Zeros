@@ -39,7 +39,8 @@ arch_asm_srcs :=			\
 	arch/x86/pmode/descriptors.asm	\
 	arch/x86/pmode/int.asm		\
 	arch/x86/pmode/pagingasm.asm	\
-	arch/x86/pmode/spinlock.asm	
+	arch/x86/pmode/spinlock.asm	\
+	arch/x86/pmode/tsc.asm
 
 arch_header := arch/x86/pmode/kernelheader.asm
 
@@ -72,12 +73,13 @@ driver_objs = $(driver_srcs:%.c=$(objdir)/%.o)
 
 #fs stuff
 fs_srcs :=			\
-	fs/fs.c			\
+	fs/vfs/vnode.c		\
 	fs/mbr.c		\
-	fs/initrd/initrd.c	\
+	fs/vfs/blkfs.c		\
 	fs/zsfs/zsfs.c
+#	fs/initrd/initrd.c	\
 
-fs_src_dirs := fs/initrd fs/zsfs
+fs_src_dirs := fs/initrd fs/zsfs fs/vfs
 
 fs_objs := $(fs_srcs:%.c=$(objdir)/%.o)
 
@@ -92,11 +94,14 @@ kernel_srcs := 		\
 	kernel/sched/sched.c	\
 	kernel/sched/workqueue.c	\
 	kernel/syscall.c	\
-	kernel/task.c	
+	kernel/task.c		\
+	kernel/blkdev/blkdev.c	\
+	kernel/blkdev/drive.c
 
 kernel_src_dirs := 		\
 	kernel/mm		\
-	kernel/sched
+	kernel/sched		\
+	kernel/blkdev
 
 kernel_objs := $(kernel_srcs:%.c=$(objdir)/%.o)
 
