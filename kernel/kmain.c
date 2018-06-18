@@ -22,8 +22,9 @@
 #include <kernel/syscall.h>
 #include <kernel/sched/workqueue.h>
 
-#include <fs/vfs/fs.h>
+#include <fs/vfs/fsmanager.h>
 #include <fs/initrd/initrd.h>
+#include <fs/zsfs/zsfs.h>
 #include <fs/mbr.h>
 #include <lib/assert.h>
 #include <kernel/blkdev/blkdev.h>
@@ -93,26 +94,15 @@ void kmain(struct multiboot_info *multiboot_info){
    zsfs_init();
    ata_enumerate();
 
-   blkdev_t *z = blkfs_find_id(0x1234ABCD);
-   if( z != NULL )
+   fstype_t *z = fsmanager_find_id(0x1234ABCD);
+   if( z != NULL ){
       k_printf("YES!\n");
-   //blkdev_t *bd = blkdev_find(0);
-   //k_printf("%d, %d, %d\n", bd->min_lba, bd->max_lba, bd->block_size);
-   //zsfs_create(bd);
-   
+      zsfs_sb_t *sb = z->get_superblock(z);
+      k_printf("From superblock: %x, %d, %d\n", sb->fs_id, sb->freeblock_block, sb->fsentry_block);
+   }
 
-   //zsfs_create( ata_drive, 1 );
-   //superblock_t *zsb = zsfs_get_superblock(ata_drive, partition);
-   //k_printf("Got %d, %d, %d, %d, %d, %d\n", zsb->block_size, 
-   //   zsb->total_blocks, zsb->freelist_len, zsb->freelist_start_block,
-   //   zsb->fsentries_count, zsb->fsentries_block);
-   
-//   zsfs_create_file( ata_drive, partition, zsb, "hello");
-/*   fsentry_t *entry = zfs_read_file(ata_drive, partition, zsb);
-   k_printf("Name is %s\n", entry->name);
-   k_printf("Length is %d\n", entry->byte_len);*/
-
-   //k_printf("%d, %d, %d, %d, %d\n", zsb->block_size, zsb->total_blocks, zsb->freelist_block, zsb->fsentries_block, zsb->fsentries_count);
+//   blkdev_t *blkdev = blkdev_find(0);
+//   zsfs_create(blkdev);   
 
 //   pci_enumerate();
 //   rtl8139_test_send();
@@ -130,6 +120,5 @@ void kmain(struct multiboot_info *multiboot_info){
 
    current_scheduler->scheduler_start();*/
 
-   k_printf("HERE!\n");
    while(1) arch_halt_cpu();
 }

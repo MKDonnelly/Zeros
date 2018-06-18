@@ -1,6 +1,6 @@
 #pragma once
 #include <lib/types.h>
-#include <fs/vfs/fs.h>
+#include <fs/vfs/fsmanager.h>
 #include <kernel/blkdev/blkdev.h>
 
 extern fstype_t zsfs_fs;
@@ -15,21 +15,14 @@ typedef struct zsfs_sb{
    char *magic[ZSFS_LEN];
    //The file system id (like the uuid)
    uint32_t fs_id;
-   
+
+   //The freeblock list
+   int freeblock_block;
+
+   //The root directory entry
+   int fsentry_block;
 }zsfs_sb_t;
 
+void zsfs_init();
 void zsfs_create(blkdev_t *block);
 uint32_t zsfs_get_id(char *block);
-/*
-//A file system entry.
-//Note: EXACTLY 6 of these will fit into a 512 byte block,
-//with 4 bytes left over for the next block pointer.
-typedef struct fsentry{
-   char name[16];
-   uint32_t byte_len;
-   uint32_t blocks[16];
-}fsentry_t;
-
-void zsfs_create(drive_t *drive, int partition);
-superblock_t *zsfs_get_superblock(drive_t *drive, int partition_number);
-void zsfs_create_file( drive_t *drive, int partition_number, superblock_t *superblock, char *name);*/

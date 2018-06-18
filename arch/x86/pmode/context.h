@@ -13,8 +13,9 @@ typedef struct{
    //when we were interrupted; that value is in esp_pushed.
    uint32_t edi, esi, ebp, USELESS_ESP_VALUE, ebx, edx, ecx, eax;
 
-   //int_number and error are 8 bit numbers, but the
-   //stack is aligned to 32 bits.
+   //The interrupt number and error code could technically fit
+   //into 8 bits each, but the stack is aligned to 32 bits. As a result,
+   //these are 32 bits.
    uint32_t int_number, error;
 
    //automatically pushed by cpu

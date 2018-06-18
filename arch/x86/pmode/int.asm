@@ -25,12 +25,8 @@ get_current_context:
 
 global set_current_context
 set_current_context:
-   push eax
-
    mov eax, [esp+8]
    mov [current_context], eax
-
-   pop eax
    ret
 
 
@@ -48,7 +44,7 @@ set_current_context:
 ;     32 bits EIP
 ;
 ;     ;;;;; PUSHED BY INTERRUPT_COMMON ;;;;;;;;
-;     8 bits error code, int #
+;     32 bits error code, int #
 ;     <pushad stuff>
 ;        32 bits e[a,c,d,b]x, edi, esi, esp, ebp
 
@@ -64,7 +60,7 @@ interrupt_common:
    push gs
 
    ;Load in kernel land segment registers
-   mov ax, 0x10
+   mov ax, 0x10 ;kernel code
    mov ds, ax
    mov es, ax
    mov fs, ax
@@ -74,13 +70,15 @@ interrupt_common:
    ;for use by the scheduler.
    mov [current_context], esp
 
-   ;TODO make a call here to save the current context
-   ;     into the arch_task_t structure (int arch_task.c)
-   ;     then decouple the timer all in arch_task.c
+   ;Save the current context of the stopped task.
+   ;This is done so that the scheduler can swap out tasks
+   ;if needed.
    call arch_save_context
 
    call main_interrupt_handler 
 
+   ;Restore the context. This may be different than the
+   ;context we saved if the scheduler switched tasks.
    call arch_set_context
 
    ;Restore context after scheduler call
@@ -109,16 +107,15 @@ interrupt_common:
 ; handler that will be automatically
 ; called when the cpu triggers the isr. 
 %macro DEFINE_INTERRUPT 1
-global isr%1
 isr%1:
    ;Push an error code if none is
    ;provided by the cpu to keep the
    ;stack constant through each interrupt.
    %if %1 < 8 || %1 == 9 || %1 > 14
-      push byte 0
+      push dword 0
    %endif
 
-   push byte %1
+   push dword %1
    jmp interrupt_common 
 %endmacro
 
@@ -127,7 +124,7 @@ isr%1:
 ; to point to the main 
 ; interrupt handler
 %assign i 0
-%rep 100 
+%rep 256
    DEFINE_INTERRUPT i
 %assign i i+1
 %endrep
@@ -142,19 +139,26 @@ global idt_setup_isrs
 idt_setup_isrs:
    push ebp
    mov ebp, esp
-   sub esp, 0x8
 
 %assign j 0
-%rep 100
+%rep 256
+   ;Get address of j'th ISR
    mov eax, isr %+ j
-   sub esp, 0x8
+
+   ;Push the address of the j'th ISR and
+   ;the interrupt number that it handles
    push eax
-   push byte j
+   push dword j
+   
+   ;Add the entry to the IDT
    call idt_add_entry
-   add esp, 0x10
+
+   ;Remove the two values pushed onto the stack
+   add esp, 0x8
+
    %assign j j+1
 %endrep
 
-   leave
+   mov esp, ebp
+   pop ebp
    ret
-

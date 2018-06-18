@@ -23,8 +23,6 @@ void drive_register(drive_t *drive){
                                    drive->partitions.part_len(drive, i);
       new_blkdev->block_size = drive->blksize;
       
-      k_printf("Blkdev %d: %d, %d, %d\n", i, 
-          new_blkdev->min_lba, new_blkdev->max_lba, new_blkdev->block_size);
       blkdev_register(new_blkdev);
    }
 }
@@ -34,5 +32,6 @@ drive_t *drive_search(int id){
       if( drives[i]->id == id )
          return &drives[i];
    }
+   return NULL;
 }
 

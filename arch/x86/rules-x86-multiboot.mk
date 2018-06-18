@@ -42,7 +42,7 @@ arch_asm_srcs :=			\
 	arch/x86/pmode/spinlock.asm	\
 	arch/x86/pmode/tsc.asm
 
-arch_header := arch/x86/pmode/kernelheader.asm
+arch_header := arch/x86/pmode/mbheader.asm
 
 arch_src_dirs :=		\
 	arch/x86/pmode/		\
@@ -75,7 +75,7 @@ driver_objs = $(driver_srcs:%.c=$(objdir)/%.o)
 fs_srcs :=			\
 	fs/vfs/vnode.c		\
 	fs/mbr.c		\
-	fs/vfs/blkfs.c		\
+	fs/vfs/fsmanager.c	\
 	fs/zsfs/zsfs.c
 #	fs/initrd/initrd.c	\
 
@@ -131,7 +131,7 @@ CFLAGS += -I$(ROOTDIR)/include -I. -I$(ROOTDIR)
 
 LDFLAGS = -m elf_i386 -T arch/x86/x86_link.ld
 
-ASMFLAGS := -f elf32 -g
+ASMFLAGS := -f elf32 -g 
 
 #All directories to create under the build directory
 src_dirs := $(arch_src_dirs) $(driver_src_dirs) $(fs_src_dirs) \

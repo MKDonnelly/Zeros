@@ -19,3 +19,6 @@ typedef struct blkdev{
    void (*read_lba)(struct blkdev *blkdev, char *buffer,
                     uint32_t lba, uint32_t size);
 }blkdev_t;
+
+void blkdev_register(blkdev_t *blkdev);
+blkdev_t *blkdev_find(int id);

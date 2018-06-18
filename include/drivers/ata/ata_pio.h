@@ -1,4 +1,5 @@
 #pragma once
+#include <fs/mbr.h>
 
 /*    Example usage
    char *buf = ata_pio_read( 1, 0, 1 );

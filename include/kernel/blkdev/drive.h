@@ -1,6 +1,7 @@
 #pragma once
 #include <lib/types.h>
 
+struct drive;
 typedef struct part{
    //Information on partitions:
    //the total number of partitions and
@@ -11,13 +12,14 @@ typedef struct part{
 
    //Used for finding out information about
    //parititions.
-   uint32_t (*part_start)(void *drive, 
+   uint32_t (*part_start)(struct drive *drive, 
                           int part_num);
-   uint32_t (*part_len)(void *drive,
+   uint32_t (*part_len)(struct drive *drive,
                         int part_num);
 }part_t;
 
 //Represents a storage drive attached
+
 typedef struct drive{
    int id, type, blksize, maxlba;
    

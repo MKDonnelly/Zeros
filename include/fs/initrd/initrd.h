@@ -1,7 +1,7 @@
 #pragma once
 
 #include <lib/types.h>
-#include <fs/vfs/fs.h>
+#include <fs/vfs/vnode.h>
 
 #define INITRD_MAGIC 0x12345678
 #define FILENAME_MAX_LEN 32

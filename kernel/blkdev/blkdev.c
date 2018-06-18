@@ -1,4 +1,5 @@
 #include <kernel/blkdev/blkdev.h>
+#include <fs/vfs/fsmanager.h>
 
 //A block device is intended to represent a single partition
 //on a drive. To do that, we need to limit the range of the 
@@ -37,7 +38,7 @@ void blkdev_register(blkdev_t *blkdev){
    
    //Now see if there is any file system to register
    //on this block device
-   blkfs_register_blkdev(blkdev);
+   fsmanager_check(blkdev);
 }
 
 blkdev_t *blkdev_find(int id){
