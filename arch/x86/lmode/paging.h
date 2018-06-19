@@ -121,4 +121,11 @@ typedef struct pml4t{
    pml4e_t entries[ENTRIES_IN_LEVEL];
 }pml4t_t;
 
+extern pml4t_t *kernel_pdir;
+
 void vm_init();
+
+#define VMAP_W		0x1
+#define VMAP_USR	0x2
+void vm_pmap(uint64_t vaddr, uint64_t paddr, pml4t_t *page_dir,
+             uint8_t flags);

@@ -11,7 +11,7 @@ static inline uint64_t phys_to_virt(uint64_t addr){
    return addr;
 }
 
-static pml4t_t *kernel_pdir;
+pml4t_t *kernel_pdir;
 
 //Retrieves the given pte_t given a page table and virtual address
 //If create == 1, entries are created if needed. If create == 0 and
@@ -86,14 +86,22 @@ static pte_t *get_page( uint64_t vaddr, int create, pml4t_t *page_table){
    return &pt_table->entries[ PT_OFFSET(vaddr) ];
 }
 
-void map_page( uint64_t virtual, uint64_t physical, pml4t_t *pd){
+void vm_pmap( uint64_t virtual, uint64_t physical, pml4t_t *pd, 
+              uint8_t flags){
    pte_t *page = get_page(virtual, 1, pd);
    KASSERT(page != NULL);
 
    page->base_addr = (physical / 0x1000);
    page->present = 1;
-   page->rw = 1;
-   page->usr = 1;
+   if( flags & VMAP_W)
+      page->rw = 1;
+   else
+      page->rw = 0;
+
+   if( flags & VMAP_USR )
+      page->usr = 1;
+   else
+      page->usr = 0;
 }
 
 void vm_init(){
@@ -102,7 +110,7 @@ void vm_init(){
    memset( kernel_pdir, sizeof(pml4t_t), 0);
 
    for(uint64_t i = 0; i < 0x300000; i += 0x1000 ){
-      map_page( i, i, kernel_pdir );
+      vm_pmap( i, i, kernel_pdir, VMAP_W | VMAP_USR );
    }
 
    //Test to make sure the mapping worked

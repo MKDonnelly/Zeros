@@ -60,6 +60,7 @@ uint32_t virt_to_phys( uint32_t uaddr, pd_t *page_directory ){
      return 0; //Address not mapped
 }
 
+//TODO combine rw and user_access using flags
 void vm_pmap(uint32_t vaddr, uint32_t paddr, pd_t *page_directory, 
              uint8_t rw, uint8_t user_access){
 
@@ -217,7 +218,7 @@ void vm_init(){
    framepool_create( 0x600000, 100 );
 
    //Setup the interrupt handler for paging BEFORE enabling paging
-   arch_register_interrupt( PAGE_INTERRUPT, page_int_handler);
+   //arch_register_interrupt( PAGE_INTERRUPT, page_int_handler);
 
    //Let the processor know where our page table is
    //and enable paging.

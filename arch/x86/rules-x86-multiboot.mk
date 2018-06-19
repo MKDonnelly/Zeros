@@ -23,6 +23,7 @@ arch_c_srcs := 				\
 	arch/x86/drivers/vgacommon/modeset.c	\
 	arch/x86/drivers/vgacommon/vgacommon.c	\
 	arch/x86/drivers/vgacommon/vgafont.c	\
+	arch/x86/drivers/lapic.c		\
 	arch/x86/pmode/arch_task.c	\
 	arch/x86/pmode/context.c	\
 	arch/x86/pmode/frame.c		\
@@ -40,7 +41,8 @@ arch_asm_srcs :=			\
 	arch/x86/pmode/descriptors.asm	\
 	arch/x86/pmode/int.asm		\
 	arch/x86/pmode/pagingasm.asm	\
-	arch/x86/pmode/spinlock.asm	
+	arch/x86/pmode/spinlock.asm	\
+	arch/x86/drivers/lapic-asm.asm
 
 arch_header := arch/x86/pmode/mbheader.asm
 

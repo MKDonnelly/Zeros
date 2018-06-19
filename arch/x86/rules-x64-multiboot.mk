@@ -18,7 +18,8 @@ arch_c_srcs := 				\
 	arch/x86/drivers/vgacommon/vgafont.c	\
 	arch/x86/archx64.c		\
 	arch/x86/lmode/gdt.c		\
-	arch/x86/lmode/paging.c
+	arch/x86/lmode/paging.c		\
+	arch/x86/drivers/lapic.c
 
 arch_asm_srcs :=			\
 	arch/x86/cpu.asm		\
