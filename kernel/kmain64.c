@@ -17,6 +17,8 @@ void kmain64(struct multiboot_header *mbh){
                 &blocklist_heap);
    vm_init();
    apic_enable();
+   idt_init();
+   arch_enable_ints();
    k_puts("Working..."); 
 
    while(1) arch_halt_cpu();

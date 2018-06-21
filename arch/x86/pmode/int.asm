@@ -132,7 +132,7 @@ isr%1:
 ; interrupt #x to point to 
 ; isr#x. Without this, we would
 ; have to go
-;    add_idt_entry(#x, isr#x)
+;    idt_add_entry(#x, isr#x)
 ; 256 times in c!
 global idt_setup_isrs
 idt_setup_isrs:

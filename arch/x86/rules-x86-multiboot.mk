@@ -23,7 +23,6 @@ arch_c_srcs := 				\
 	arch/x86/drivers/vgacommon/modeset.c	\
 	arch/x86/drivers/vgacommon/vgacommon.c	\
 	arch/x86/drivers/vgacommon/vgafont.c	\
-	arch/x86/drivers/lapic.c		\
 	arch/x86/pmode/arch_task.c	\
 	arch/x86/pmode/context.c	\
 	arch/x86/pmode/frame.c		\

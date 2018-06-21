@@ -6,6 +6,5 @@
 #include <arch/x86/cpu.h>
 #include <arch/x86/lmode/cpuid.h>
 #include <arch/x86/lmode/spinlock.h>
-#include <arch/x86/lmode/gdt.h>
 
 void arch_init_system();

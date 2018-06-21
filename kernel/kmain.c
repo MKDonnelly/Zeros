@@ -88,8 +88,6 @@ void kmain(struct multiboot_info *multiboot_info){
    //have arch_system_init do this.
    vm_init();
   
-   apic_enable();
- 
 /*
    current_scheduler = &rr_scheduler;
    current_scheduler->scheduler_setup();

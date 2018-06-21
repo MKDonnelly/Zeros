@@ -29,6 +29,8 @@ priority lock based on priority queue implemented as min heap
 make a queue-based mutex
 Use kassert often
 Clean up the types (i.e. use size_t for arch stuff used in kernel)
+Re-write assembly programs to use GNU as; this way, we can include
+ constants from a c program more easily
 
 misc tasks 
    use syscall/sysret instead of interrupt

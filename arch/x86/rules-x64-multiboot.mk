@@ -17,7 +17,9 @@ arch_c_srcs := 				\
 	arch/x86/drivers/vgacommon/vgacommon.c	\
 	arch/x86/drivers/vgacommon/vgafont.c	\
 	arch/x86/archx64.c		\
+	arch/x86/lmode/idt.c		\
 	arch/x86/lmode/gdt.c		\
+	arch/x86/lmode/isr.c		\
 	arch/x86/lmode/paging.c		\
 	arch/x86/drivers/lapic.c
 
@@ -26,7 +28,8 @@ arch_asm_srcs :=			\
 	arch/x86/lmode/cpuidasm.asm	\
 	arch/x86/lmode/pagingasm.asm	\
 	arch/x86/lmode/descriptors.asm	\
-	arch/x86/lmode/spinlock.asm
+	arch/x86/lmode/spinlock.asm	\
+	arch/x86/lmode/int.asm
 
 arch_header = arch/x86/lmode/mbheader.asm
 

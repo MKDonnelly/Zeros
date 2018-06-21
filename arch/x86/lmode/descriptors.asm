@@ -1,5 +1,10 @@
 ;assembly routines related to descriptors
 
+global idt_load
+idt_load:
+   lidt [rdi]
+   ret
+
 ; Why ljmp_to is needed:
 ; There are a few times where it would be really
 ; nice to do a long jump to a register. However,
@@ -14,6 +19,21 @@
 
 global gdt_load
 gdt_load:
-   ;No need to do a long jump if the CS does not change
-   lgdt [rax]
+   lgdt [rdi]
+
+   mov eax, 0x8
+   mov ds, ax
+   mov es, ax
+   mov fs, ax
+   mov gs, ax
+   mov ss, ax
+
+   mov rax, rsp
+   push qword 0x8
+   push rax
+   push 2
+   push qword 0x8
+   push .return_gdt
+
+.return_gdt:
    ret
