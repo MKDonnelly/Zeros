@@ -1,6 +1,5 @@
 #pragma once
 
-
 /*      Set of escape sequences that each mode must understand
     \c = Clear screen
     \m{<x>,<y>} move cursor to (<x>, <y>)

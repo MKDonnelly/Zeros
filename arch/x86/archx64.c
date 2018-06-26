@@ -3,6 +3,4 @@
 
 void arch_init_system(){
    vga_init( &vmode_vga3h );
-
-   
 }

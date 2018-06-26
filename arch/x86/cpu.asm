@@ -24,4 +24,3 @@ arch_disable_ints:
    cli
    ret
 
-

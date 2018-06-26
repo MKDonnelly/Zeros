@@ -49,8 +49,4 @@
 //Enable its IRQ and sets timer_callback
 //as its handler.
 void arch_timer_init( void (*timer_callback)() );
-
-//If the handler needs to be changed at a later time.
-void arch_timer_register_callback( void (*timer_callback)() );
-
 void set_timer_count(uint16_t);

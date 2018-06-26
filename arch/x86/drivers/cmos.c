@@ -6,7 +6,7 @@
 //needs to be converted to a binary number to
 //be of use.
 
-void initCMOS(){
+void init_cmos(){
    //We will access bit 2 in status register 2 to output
    //a binary representation of the dates instead of a BCD
    //value which would need to be converted. First, read in
@@ -19,7 +19,7 @@ void initCMOS(){
    portb_write( CMOS_IO_P, statusB | 0x4 );
 }
 
-uint16_t getCMOSReg(uint16_t reg){
+uint16_t get_cmos_reg(uint16_t reg){
    //Read a value from the cmos. See the header file
    //for definitions of registers.
   
@@ -30,7 +30,7 @@ uint16_t getCMOSReg(uint16_t reg){
    return portb_read(CMOS_IO_P); 
 }
 
-int8_t cmos_update(){
+char cmos_update(){
    portb_write( CMOS_COMMAND_P, 0xA);
    return portb_read( CMOS_IO_P & 0x80 );
 }

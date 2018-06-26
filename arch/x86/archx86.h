@@ -12,17 +12,16 @@
 #include <arch/x86/pmode/arch_task.h>
 #include <arch/x86/pmode/schedule.h>
 #include <arch/x86/pmode/spinlock.h>
-#include <arch/x86/cpu.h>
 
 #include <arch/x86/drivers/keyboard.h>
 #include <arch/x86/drivers/mouse.h>
 #include <arch/x86/drivers/timer.h>
 #include <arch/x86/drivers/serial/serial.h>
 #include <arch/x86/drivers/cmos.h>
-
 #include <arch/x86/drivers/vgacommon/modeset.h>
 #include <arch/x86/drivers/vgacommon/vgacommon.h>
 #include <arch/x86/drivers/vgacommon/vgafont.h>
 #include <arch/x86/drivers/vga3h/vga3h.h>
 
+#include <arch/x86/cpu.h>
 void arch_system_init();

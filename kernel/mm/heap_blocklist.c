@@ -6,7 +6,6 @@ heap_algs_t blocklist_heap = {
    .init_heap = blocklist_init_heap
 };
 
-
 void blocklist_init_heap(heap_t *heap_descriptor){
 
     heap_block_t* head = (heap_block_t*)heap_descriptor->start;
@@ -17,7 +16,7 @@ void blocklist_init_heap(heap_t *heap_descriptor){
     head->next_block = NULL; //No next node, this is the first 
     head->size = heap_descriptor->len - sizeof(heap_block_t);
     heap_descriptor->size_left -= sizeof(heap_block_t);
-    head->free_mem = ( (uint8_t*)head + sizeof(heap_block_t) );
+    head->free_mem = ( (char*)head + sizeof(heap_block_t) );
     head->allocated = 0;
 
     spinlock_init(&heap_descriptor->heap_lock);
@@ -27,7 +26,8 @@ void blocklist_init_heap(heap_t *heap_descriptor){
 //Allocate "size" piece of memory on the heap. If align is non-zero
 //align the memory to it's size. If phys is non-null, return the physical
 //address of the allocate memory (different when using paging)
-void *blocklist_malloc(heap_t *heap_descriptor, uint32_t size, uint32_t align){
+void *blocklist_malloc(heap_t *heap_descriptor, uint32_t size, 
+                       uint32_t align){
 
    //Lock the heap to prevent corruption
    spinlock_acquire( &heap_descriptor->heap_lock );
@@ -44,9 +44,8 @@ void *blocklist_malloc(heap_t *heap_descriptor, uint32_t size, uint32_t align){
 
    //Go through each block while the current block is allocated or
    //is not large enough
-   while( head->allocated || (head->size < alloc_size && head->next_block)){
+   while(head->allocated || (head->size < alloc_size && head->next_block))
         head = head->next_block;
-   }
 
    //Make sure we are dealing with a valid chunk of free memory
    if( ! (head->allocated || head->size < alloc_size ) ){
@@ -57,11 +56,13 @@ void *blocklist_malloc(heap_t *heap_descriptor, uint32_t size, uint32_t align){
       if( head->size - alloc_size - sizeof(heap_block_t) > MIN_SPLIT ){
 
          heap_block_t *current_node = head;
-         heap_block_t *next_item = (heap_block_t*)( (uint8_t*)head + sizeof(heap_block_t) + alloc_size);
+         heap_block_t *next_item = (heap_block_t*)( (char*)head + 
+                                    sizeof(heap_block_t) + alloc_size);
       
          next_item->next_block = current_node->next_block;
-         next_item->free_mem = (uint8_t*)next_item + sizeof(heap_block_t);
-         next_item->size = current_node->size - sizeof(heap_block_t) - alloc_size;
+         next_item->free_mem = (char*)next_item + sizeof(heap_block_t);
+         next_item->size = current_node->size - sizeof(heap_block_t) - 
+                           alloc_size;
          next_item->allocated = 0;
  
          current_node->next_block = next_item;

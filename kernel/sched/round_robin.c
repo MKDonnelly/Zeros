@@ -4,7 +4,6 @@
 #include <lib/generic_ll.h>
 #include <lib/timing.h>
 
-
 //Linked list of tasks to run
 static ktask_t *task_list = NULL;
 

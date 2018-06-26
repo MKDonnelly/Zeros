@@ -14,6 +14,8 @@ typedef struct blkdev{
    uint32_t block_size;
 
    //Common methods that all block devices should support 
+   //TODO standardize the argument order (i.e. buffer at end)
+   //     also make naming consistent (i.e. size should be len)
    void (*write_lba)(struct blkdev *blkdev, char *buffer,
                      uint32_t lba, uint32_t size);
    void (*read_lba)(struct blkdev *blkdev, char *buffer,

@@ -82,7 +82,7 @@ void rtl8139_init(uint8_t bus, uint8_t slot){
    //Wait for the reset to complete by checking the RST bit.
    //once clear, the device is ready.
    for(int i = 1000; i > 0; i--){
-      if( (portb_read( rtl8139_device.basereg + CMD) & RST_BIT) == 0) break;
+      if((portb_read( rtl8139_device.basereg + CMD) & RST_BIT) == 0) break;
       for(int i = 100; i > 0; i--);
    }
 //   while( portb_read(rtl8139_device.basereg + CMD) & RST_BIT );

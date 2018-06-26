@@ -7,13 +7,12 @@
 #define CONFIG_VENDOR	0
 #define CONFIG_DEVID	2
 
-
-uint16_t pci_config_read_word(uint8_t bus, uint8_t slot, uint8_t func, uint8_t offset){
-   uint32_t address;
+uint16_t pci_config_read_word(uint8_t bus, uint8_t slot, 
+                              uint8_t func, uint8_t offset){
+   uint32_t address, tmp;
    uint32_t lbus = (uint32_t)bus;
    uint32_t lslot = (uint32_t)slot;
    uint32_t lfunc = (uint32_t)func;
-   uint16_t tmp = 0;
 
    //Create configuration address
    address = (uint32_t)((lbus << 16) | (lslot << 11) | (lfunc << 8) | 
@@ -23,11 +22,13 @@ uint16_t pci_config_read_word(uint8_t bus, uint8_t slot, uint8_t func, uint8_t o
    portd_write(PCI_CONFIG_ADDRESS, address);
 
    //Read in data
-   tmp = (uint16_t)((portd_read(PCI_CONFIG_DATA) >> ((offset & 2) * 8)) & 0xffff);
+   tmp = (uint16_t)((portd_read(PCI_CONFIG_DATA) >> 
+                     ((offset & 2) * 8)) & 0xffff);
    return tmp;
 }
 
-void pci_config_write_word(uint8_t bus, uint8_t slot, uint8_t func, uint8_t offset, uint16_t new_val){
+void pci_config_write_word(uint8_t bus, uint8_t slot, uint8_t func, 
+                           uint8_t offset, uint16_t new_val){
    uint32_t address;
    uint32_t lbus = (uint32_t)bus;
    uint32_t lslot = (uint32_t)slot;
@@ -45,7 +46,8 @@ void pci_config_write_word(uint8_t bus, uint8_t slot, uint8_t func, uint8_t offs
 }
 
 
-uint32_t pci_config_read_dword(uint8_t bus, uint8_t slot, uint8_t func, uint8_t offset){
+uint32_t pci_config_read_dword(uint8_t bus, uint8_t slot, 
+                               uint8_t func, uint8_t offset){
    uint32_t address;
    uint32_t lbus = (uint32_t)bus;
    uint32_t lslot = (uint32_t)slot;
@@ -119,7 +121,6 @@ void pci_enumerate(){
                k_printf("Device Name: %s\n", dev_name);
             if( dev_init != NULL )
                dev_init(bus, slot);
-            
          }
       }
    }

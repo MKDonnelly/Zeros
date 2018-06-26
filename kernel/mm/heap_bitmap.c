@@ -35,7 +35,6 @@ uint8_t dibit_get(void *mem, int idx){
    return (bit_get( mem, idx * 2 ) << 1) | bit_get(mem, idx * 2 + 1);
 }
 
-
 heap_algs_t bitmap_heap = {
    .malloc = bitmap_malloc,
    .free   = bitmap_free,
@@ -51,7 +50,8 @@ void bitmap_init_heap(heap_t *heap){
    //Add 1 to round up. 
    int total_blocks = heap->len / DEFAULT_BLOCKSIZE + 1;
    head->dibitmap_len = (total_blocks * 2) / CHAR_BITS;
-   head->dibitmap = (char*)(heap->start + sizeof(heap_t) + sizeof(bitmap_heap_t));
+   head->dibitmap = (char*)(heap->start + sizeof(heap_t) + 
+                            sizeof(bitmap_heap_t));
    memset( head->dibitmap, head->dibitmap_len, 0);
 
    //Align the start of the heap on a block size for easier alignment
@@ -80,7 +80,8 @@ void bitmap_free(heap_t *heap, void *memblock){
 
    //Clear all blocks backwards
    i = 1;
-   while( (index - i >= 0) && dibit_get( head->dibitmap, index -i ) == color ){
+   while( (index - i >= 0) && 
+           dibit_get( head->dibitmap, index -i ) == color ){
       dibit_set( head->dibitmap, index - i, DIBIT_FREE );
       i++;
    }

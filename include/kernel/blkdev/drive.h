@@ -40,6 +40,4 @@ typedef struct drive{
    void *drive_data;
 }drive_t;
 
-
 void drive_register(drive_t *drive);
-

@@ -76,8 +76,8 @@ fs_srcs :=			\
 	fs/vfs/vnode.c		\
 	fs/mbr.c		\
 	fs/vfs/fsmanager.c	\
-	fs/zsfs/zsfs.c
-#	fs/initrd/initrd.c	\
+	fs/zsfs/zsfs.c		\
+	fs/initrd/initrd.c	
 
 fs_src_dirs := fs/initrd fs/zsfs fs/vfs
 

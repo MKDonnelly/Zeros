@@ -27,41 +27,38 @@ void sys_write(int fd, char *ubuf, int len){
 }
 
 
-uint32_t read_fs(fs_node_t *node, uint32_t offset, uint32_t size, int8_t *buffer){
+int read_fs(fs_node_t *node, int offset, int size, char *buffer){
    if( node->read != NULL )
       return node->read(node, offset, size, buffer);
-   else
-      return 0;
+   return -1;
 }
 
-uint32_t write_fs(fs_node_t *node, uint32_t offset, uint32_t size, int8_t *buffer){
+int write_fs(fs_node_t *node, int offset, int size, char *buffer){
    if( node->write != NULL )
       return node->write(node, offset, size, buffer);
-   else
-      return 0;
+   return -1;
 }
 
-void open_fs(fs_node_t *node, uint8_t read, uint8_t write){
+int open_fs(fs_node_t *node, int flags){
    if( node->open != NULL )
-      node->open(node);
+      return node->open(node, flags);
+   return -1;
 }
 
-void close_fs(fs_node_t *node){
+int close_fs(fs_node_t *node){
    if( node->close != NULL )
-      node->close(node);
+      return node->close(node);
+   return -1;
 }
 
-
-fs_node_t *readdir_fs(fs_node_t *node, uint32_t index){
+dirent_t *readdir_fs(fs_node_t *node, int index){
    if( node->readdir != NULL && (node->flags & FS_DIRECTORY))
       return node->readdir(node, index);
-   else
-      return NULL;
+   return NULL;
 }
 
 fs_node_t *finddir_fs(fs_node_t *node, char *name){
    if( node->finddir != NULL && (node->flags & FS_DIRECTORY))
       return node->finddir(node, name);
-   else
-      return NULL;
+   return NULL;
 }

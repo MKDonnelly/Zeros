@@ -38,7 +38,6 @@ register_mouse_handler(m);
 #define MOUSE_WRITE_OK_M 0x2
 #define MOUSE_READ_OK_M  0x1
 
-
 //Format of mouse packets
 // 1st byte: flags (see below)
 // 2nd byte: x movement (negative for left)
@@ -52,8 +51,6 @@ register_mouse_handler(m);
 #define MOUSE_RIGHT_BUTTON 0x2
 #define MOUSE_LEFT_BUTTON 0x1
 
-void mouse_init();
-
 //Used by higher level code
 typedef struct mouse_packet{
    int8_t delta_x;
@@ -63,5 +60,5 @@ typedef struct mouse_packet{
    int8_t right_button  : 1;
 } mouse_packet_t;
 
-void register_mouse_handler( void (*callback)(mouse_packet_t) );
-void unregister_mouse_handler();
+void arch_init_mouse();
+void arch_register_mouse_handler( void (*callback)(mouse_packet_t) );

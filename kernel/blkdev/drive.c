@@ -2,7 +2,6 @@
 #include <kernel/mm/heap.h>
 #include <kernel/blkdev/blkdev.h>
 
-
 //A registering system for devices on the system
 #define MAX_DRIVES	10
 static drive_t *drives[MAX_DRIVES];
@@ -30,8 +29,7 @@ void drive_register(drive_t *drive){
 drive_t *drive_search(int id){
    for(int i = 0; i < current_drive; i++){
       if( drives[i]->id == id )
-         return &drives[i];
+         return drives[i];
    }
    return NULL;
 }
-

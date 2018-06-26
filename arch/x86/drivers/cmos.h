@@ -18,19 +18,13 @@
 #define CMOS_YEAR_R     0x09
 
 //Initilize the cmos
-void initCMOS();
+void init_cmos();
 
 //Get the designated cmos register 
 //(see the #define's above)
-uint16_t getCMOSReg(uint16_t);
+uint16_t get_cmos_reg(uint16_t regnum);
 
 //We need to check to make sure a CMOS
 //time update is not running when we get
 //a value
-int8_t cmos_update();
-
-//Enable the RTC to generate a periodic
-//interrupt on IRQ 8. This can be used
-//just like the timer, but with less 
-//precision.
-
+char cmos_update();

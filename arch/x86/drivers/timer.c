@@ -4,7 +4,7 @@
 #include <arch/x86/pmode/isr.h>
 #include <arch/x86/drivers/pic.h>
 
-void arch_timer_init( void (*timer_callback)(context_t) ){
+void arch_timer_init(void (*timer_callback)(context_t)){
 
    //Set the timer to operate at 100HZ
    set_timer_count( I8253_10MS_COUNTER );

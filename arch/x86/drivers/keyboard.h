@@ -2,10 +2,8 @@
 
 #include <lib/types.h>
 
-//#define KEYBOARD_BUFFER_SIZE 128
 #define KEYBOARD_IRQ 1
 #define KEYBOARD_INTERRUPT 33
-
 
 //              Keyboard controller constants
 #define KEYBOARD_CONTROLLER_P 0x64
@@ -33,7 +31,6 @@
 
 
 //             Keyboard encoder constants
-
 #define KEYBOARD_ENCODER_P    0x60
 
 //Keyboard encoder commands
@@ -60,9 +57,6 @@
 #define KE_RESEND_C           0xFE
 #define KE_RESET_C            0xFF
 
-
-//End encoder constants
-
 #define INSERT_KEY      1
 #define SHIFT_LEFT_KEY  42 
 #define SHIFT_RIGHT_KEY 54
@@ -72,7 +66,8 @@ void arch_keyboard_register_callback(void (*keypress_callback)(char) );
 
 //Various routines that communicate
 //to the keyboard controller/encoder
-void kb_set_leds(uint8_t,uint8_t,uint8_t);
+//Takes KE_{SCROLL,NUMLOCK,CAPLOCK}_M
+void kb_set_leds(char flags);
 void kbd_ctrl_send_command(uint8_t);
 void kbd_enc_send_command(uint8_t);
 

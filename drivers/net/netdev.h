@@ -7,4 +7,3 @@ typedef struct{
    char *mac_addr;
    char *input_buf;
 }netdev_t;
-

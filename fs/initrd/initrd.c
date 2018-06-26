@@ -1,183 +1,121 @@
 #include <fs/initrd/initrd.h>
 
 #include <kernel/mm/heap.h>
+#include <kernel/blkdev/blkdev.h>
 #include <lib/types.h>
 #include <lib/string.h>
+#include <fs/vfs/fsmanager.h>
+#include <fs/vfs/vnode.h>
 
-//This does the job of reading a file from the initrd
-//*node should be a pointer to a fs_node_t FILE
-//Since we designed a file/dir in the initrd to have an
-//inode corresponding to its index, we can place the index
-//to get the initrd_object from the initrd header
+#define INITRD_MAGIC 0x12345678
 
-//initrd_close, initrd_readfile, and initrd_writefile
-//are used to implement close, read, and write for each
-//file node returned by either initrd_readdir or initrd_finddir
+//This represents the initrd superblock
+typedef struct initrd_sb{
+   uint32_t magic;
+   uint32_t entries_count;
+}initrd_sb_t;
 
-//initrd_close, initrd_readdir and initrd_finddir are used to implement
-//close, readdir, finddir for the initrd root node. initrd_close works
-//for both files and directories.
+//An initrd inode. Name is the name of
+//the entity, id is a unique number for this inode,
+//offset is the offset FROM THE START of the initrd
+//(NOT into memory). length is the length in bytes,
+//flags is used to distinguish among a file and directory.
+#define FILENAME_MAX_LEN 32
+typedef struct initrd_inode{
+   char name[FILENAME_MAX_LEN];
+   uint32_t id;
+   uint32_t offset;
+   uint32_t length;
+   uint32_t  flags;
+}initrd_inode_t;
 
-void initrd_close(fs_node_t *node){
-   k_free( node );
-   node = NULL;
+#define FS_INITRD 1
+//Represents an initrd filesystem exported to fsmanager
+static fstype_t initrd = {
+      .fs_type = FS_INITRD,
+      .fs_id = 0x11111111,
+      .parent = NULL,  //we use the parent as the location
+                       //of the initrd in memory.
+      .check_type = NULL,
+      .get_id = NULL,
+      .open_inodes = NULL,
+      .root_dir = {
+         .name = "/",
+         .flags = 0,
+         .fs = 0, //Points to containing structure
+         .inode = 0,
+
+         .read = NULL,
+         .write = NULL,
+         .open = NULL,
+         .close = NULL,
+         .readdir = initrd_readdir,
+         .finddir = initrd_finddir,
+         .len = initrd_len,
+      }, 
+   };
+
+#define FS_INITRD	1
+void initrd_init(size_t *start){
+   initrd_sb_t *head = (initrd_sb_t*)start;
+   initrd.parent = start;
+   initrd.root_dir.fs = start;
+
+   initrd_inode_t *root_inode = k_malloc(sizeof(initrd_inode_t));
+   strcmp(root_inode->name, "/");
+   root_inode->id = 0;
+   root_inode->offset = start;
+   root_inode->len = head->entries_count;
+   list_add( initrd.open_inodes, root_inode, 0 );
+
+   fsmanager_add_active_fs(&initrd);
 }
 
-//TODO: Make some meaningful error codes to be returned
-static uint32_t initrd_readfile(fs_node_t *node, uint32_t offset, uint32_t size, int8_t *buffer){
+int initrd_read(fs_node_t *file, int offset, int len, char *buffer){
 
-   struct initrd_object *obj = &current_initrd.initrdObjects[node->inode];
-
-   //To find the start of the file in memory, find the absolute 
-   //memory address of the initrd (from the initrdHeader) and add
-   //the offset from the header stored in the individual initrdObject
-   //Also add a provided offset within the file.
-   int32_t fileLocation = (uint32_t)current_initrd.initrdHeader + obj->offset + offset;
-   //We want an 8-bit pointer, since we will
-   //be reading 1 byte values
-   int8_t *ptr = (int8_t*)fileLocation;
-
-   //Now we can start reading
-   int i;
-   for(i = 0; i < size && i < node->length; i++){
-      buffer[i] = ptr[i];
-   }
-
-   return 0;
-}
-
-
-//Writes to a file in the initrd. One major limitation: it can
-//not expand a file; if we have a 100 byte file, we can only
-//write to those 100 bytes, period. Later on, we will design a
-//more complicated ramfs to allow expansion of files.
-static uint32_t initrd_writefile(fs_node_t *node, uint32_t offset, uint32_t size, int8_t *buffer){
-
-   struct initrd_object *obj = &current_initrd.initrdObjects[node->inode];
-
-   //To find the start of the file in memory, find the absolute 
-   //memory address of the initrd (from the initrdHeader) and add
-   //the offset from the header stored in the individual initrdObject
-   //Also add a provided offset within the file.
-   int32_t fileLocation = (uint32_t)current_initrd.initrdHeader + obj->offset + offset;
-   //We want an 8-bit pointer, since we will
-   //be reading 1 byte values
-   int8_t *ptr = (int8_t*)fileLocation;
-
-   //Now we can start writing!
-   int i;
-   for(i = 0; i < size && i < node->length; i++){
-      ptr[i] = buffer[i];
-   }
-   return 0;
-}
-
-//This function reads the given directory within the
-//initrd and returns a fs_node_t to whatever is at
-//the given index in the directory. Indexes start at 0!
-static fs_node_t *initrd_readdir(fs_node_t *node, uint32_t index){
-
-   //Check to make sure we did not 
-   //go over the end.
-   if( node->length <= index )
-      return NULL; 
-
-   fs_node_t *fsNode = (fs_node_t*)k_malloc( sizeof(fs_node_t), 0);
-   strcpy( fsNode->name, current_initrd.initrdObjects[index].name );
-   fsNode->mask = fsNode->uid = fsNode->gid = fsNode->impl = 0;
-   fsNode->flags = current_initrd.initrdObjects[index].flags;
-   fsNode->inode = current_initrd.initrdObjects[index].inode;
-   fsNode->length = current_initrd.initrdObjects[index].length;
-   
-   //We will need to setup the function pointers differently
-   //depending on if this is a file or directory.
-   if( fsNode->flags & FS_FILE ){
-      //This is a file, the only operations that make
-      //sense are read,write,close,and open. We currently
-      //do not implement open,close as that is a far
-      //higher abstraction that we need atm.
-      fsNode->read = initrd_readfile;
-      fsNode->write = initrd_writefile;
-      fsNode->open = NULL;
-      fsNode->close = initrd_close; 
-      fsNode->readdir = NULL;
-      fsNode->finddir = NULL;
-   }
-   return fsNode;
-}
-
-//This function searches the given node (MUST BE A DIRECTORY)
-//for the given file/directory name (currently only supports files.
-static fs_node_t *initrd_finddir(fs_node_t *node, char *name){
-
-   fs_node_t *fsNode;
-
-   for(int item = 0; item < current_initrd.numFiles; item++){
-      //We have found the file!
-      if( ! strcmp( name, current_initrd.initrdObjects[item].name) ){
-         fsNode = (fs_node_t*)k_malloc(sizeof(fs_node_t), 0);
-
-         strcpy( fsNode->name, current_initrd.initrdObjects[item].name );
-         fsNode->mask = fsNode->uid = fsNode->gid = fsNode->impl = 0;
-         fsNode->flags = current_initrd.initrdObjects[item].flags;
-         fsNode->inode = current_initrd.initrdObjects[item].inode;
-         fsNode->length = current_initrd.initrdObjects[item].length;
-
-         //The function pointers need to be setup differently
-         //depending if we are dealing with a file or directory.
-         if( fsNode->flags & FS_FILE ){
-            fsNode->read = initrd_readfile;
-            fsNode->write = initrd_writefile;
-            fsNode->open = NULL;
-            fsNode->close = initrd_close; 
-            fsNode->readdir = NULL;
-            fsNode->finddir = NULL;
-         }
-      }
-   }
-   return fsNode;
 }
 
 
-//This function will initilize the initrd for use.
-//It will create a single fs_node_t for use by
-//the caller. fs_node_t's representing each file/dir
-//in the initrd will be created on an as-needed basis
-//This is the only function that any outside code needs
-//to know about.
-fs_node_t *init_initrd(uint32_t *addr){
-   //Verify the initrd magic number
-   if( *addr != INITRD_MAGIC )
+int initrd_write(fs_node_t *file, int offset, int len, char *buffer){
+
+}
+
+int initrd_open(fs_node_t *node, int flags){
+
+}
+
+int initrd_close(fs_node_t *node){
+
+}
+
+dirent_t *initrd_readdir(fs_node_t *dir, int index){
+   if( strcmp(dir->name, "/") != 0 )
       return NULL;
-
-   //TODO do more error checking?
    
-   //Initilize the current_initrd strucute
-   current_initrd.initrdHeader = (struct initrd_header*)addr;
-   current_initrd.numFiles = current_initrd.initrdHeader->numFiles;
+   dirent_t *new_dirent = k_malloc(sizeof(dirent_t), 0);
+   k_printf("Got %x\n", dir->fs);
+   initrd_inode_t *inode = (initrd_inode_t*)((char*)dir->fs + 
+                           sizeof(initrd_sb_t) + index * sizeof(initrd_inode_t));
+   k_printf("Inode at %x\n", inode);
+   strcpy(new_dirent->name, inode->name);
+   new_dirent->inode = inode->id;
 
-   //We add 2 since initrd_header consists of two uint32_t members.
-   //If we had put sizeof( struct initrd_header ), it would have 
-   //resolved to 8 (2 * uint32_t), at which point the compiler
-   //would increment addr BY 8 * 4 = 32 BYTES, NOT THE 8 * 2 = 16 
-   //THAT WE NEED
-   current_initrd.initrdObjects = (struct initrd_object*)(addr + 2);
+   return new_dirent;
+}
 
-   fs_node_t *initrd = (fs_node_t*)k_malloc(sizeof(fs_node_t), 0);
-   strcpy( initrd->name, "initrd");
-   initrd->mask = initrd->uid = initrd->gid = initrd->inode = initrd->impl = 0;
-   initrd->flags = FS_DIRECTORY;
-   initrd->length = current_initrd.initrdHeader->numFiles;
+int initrd_len(fs_node_t *node){
 
-   //The initrd is treated as a directory, the only functions 
-   //applicable are readdir and finddir
-   initrd->read = NULL;
-   initrd->write = NULL;
-   initrd->open = NULL;
-   initrd->close = initrd_close;
-   initrd->readdir = initrd_readdir;
-   initrd->finddir = initrd_finddir;
-   initrd->ptr = NULL;
+}
 
-   return initrd;
+fs_node_t *initrd_finddir(fs_node_t *dir, char *name){
+/*   int i = 0;
+   initrd_inode_t *first_inode = (initrd_inode_t*)((char*)dir->fs +
+                                                   sizeof(initrd_sb_t))
+   while( i < dir->
+
+   fs_node_t *new_node = k_malloc(sizeof(fs_node_t), 0);
+   strcpy(new_node->name, name);
+   new_node->flags = 0;
+   new_node->fs = dir->fs;
+   new_node->inode = */
 }

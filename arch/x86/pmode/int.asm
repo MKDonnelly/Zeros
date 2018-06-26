@@ -75,6 +75,7 @@ interrupt_common:
    ;if needed.
    call arch_save_context
 
+   ;TODO explicitly pass in context_t as a pointer
    call main_interrupt_handler 
 
    ;Restore the context. This may be different than the

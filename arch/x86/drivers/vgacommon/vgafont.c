@@ -3,7 +3,6 @@
 #include <arch/x86/portio.h>
 #include <arch/x86/drivers/vgacommon/modeset.h>
 #include <lib/string.h>
-
  
 unsigned char g_8x16_font[4096] = {
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -268,48 +267,53 @@ unsigned char g_8x16_font[4096] = {
 
 
 void write_font(unsigned char *buf, unsigned font_height){
-	unsigned char seq2, seq4, gc4, gc5, gc6;
+   unsigned char seq2, seq4, gc4, gc5, gc6;
 
-// save registers
-//set_plane() modifies GC 4 and SEQ 2, so save them as well 
-	portb_write( VGA_SEQ_IDX_P, 2);
-	seq2 = portb_read(VGA_SEQ_DATA_P);
+   // save registers
+   //set_plane() modifies GC 4 and SEQ 2, so save them as well 
+   portb_write( VGA_SEQ_IDX_P, 2);
+   seq2 = portb_read(VGA_SEQ_DATA_P);
 
-	portb_write(VGA_SEQ_IDX_P, 4);
-	seq4 = portb_read(VGA_SEQ_DATA_P);
-// turn off even-odd addressing (set flat addressing)
-//assume: chain-4 addressing already off 
-	portb_write(VGA_SEQ_DATA_P, seq4 | 0x04);
+   portb_write(VGA_SEQ_IDX_P, 4);
+   seq4 = portb_read(VGA_SEQ_DATA_P);
+   
+   //turn off even-odd addressing (set flat addressing)
+   //assume: chain-4 addressing already off 
+   portb_write(VGA_SEQ_DATA_P, seq4 | 0x04);
 
-	portb_write(VGA_GRAPHICSC_IDX_P, 4);
-	gc4 = portb_read(VGA_GRAPHICSC_DATA_P);
+   portb_write(VGA_GRAPHICSC_IDX_P, 4);
+   gc4 = portb_read(VGA_GRAPHICSC_DATA_P);
 
-	portb_write(VGA_GRAPHICSC_IDX_P, 5);
-	gc5 = portb_read(VGA_GRAPHICSC_DATA_P);
-// turn off even-odd addressing 
-	portb_write(VGA_GRAPHICSC_DATA_P, gc5 & ~0x10);
+   portb_write(VGA_GRAPHICSC_IDX_P, 5);
+   gc5 = portb_read(VGA_GRAPHICSC_DATA_P);
 
-	portb_write(VGA_GRAPHICSC_IDX_P, 6);
-	gc6 = portb_read(VGA_GRAPHICSC_DATA_P);
-// turn off even-odd addressing 
-	portb_write(VGA_GRAPHICSC_DATA_P, gc6 & ~0x02);
-// write font to plane P4 
-	set_plane(2);
-// write font 0 
-	for(int i = 0; i < 256; i++)
-	{
-                memcpy( (void*)( 0xb8000 + (i * 32) ), buf, font_height );
-		buf += font_height;
-	}
-// restore registers 
-	portb_write(VGA_SEQ_IDX_P, 2);
-	portb_write(VGA_SEQ_DATA_P, seq2);
-	portb_write(VGA_SEQ_IDX_P, 4);
-	portb_write(VGA_SEQ_DATA_P, seq4);
-	portb_write(VGA_GRAPHICSC_IDX_P, 4);
-	portb_write(VGA_GRAPHICSC_DATA_P, gc4);
-	portb_write(VGA_GRAPHICSC_IDX_P, 5);
-	portb_write(VGA_GRAPHICSC_DATA_P, gc5);
-	portb_write(VGA_GRAPHICSC_IDX_P, 6);
-	portb_write(VGA_GRAPHICSC_DATA_P, gc6);
+   //turn off even-odd addressing 
+   portb_write(VGA_GRAPHICSC_DATA_P, gc5 & ~0x10);
+
+   portb_write(VGA_GRAPHICSC_IDX_P, 6);
+   gc6 = portb_read(VGA_GRAPHICSC_DATA_P);
+
+   //turn off even-odd addressing 
+   portb_write(VGA_GRAPHICSC_DATA_P, gc6 & ~0x02);
+
+   //write font to plane P4 
+   set_plane(2);
+
+   //write font 0 
+   for(int i = 0; i < 256; i++){
+      memcpy( (void*)( 0xb8000 + (i * 32) ), buf, font_height );
+      buf += font_height;
+   }
+
+   //restore registers 
+   portb_write(VGA_SEQ_IDX_P, 2);
+   portb_write(VGA_SEQ_DATA_P, seq2);
+   portb_write(VGA_SEQ_IDX_P, 4);
+   portb_write(VGA_SEQ_DATA_P, seq4);
+   portb_write(VGA_GRAPHICSC_IDX_P, 4);
+   portb_write(VGA_GRAPHICSC_DATA_P, gc4);
+   portb_write(VGA_GRAPHICSC_IDX_P, 5);
+   portb_write(VGA_GRAPHICSC_DATA_P, gc5);
+   portb_write(VGA_GRAPHICSC_IDX_P, 6);
+   portb_write(VGA_GRAPHICSC_DATA_P, gc6);
 }

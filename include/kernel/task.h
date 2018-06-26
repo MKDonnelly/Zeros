@@ -28,16 +28,17 @@ typedef struct ktask{
    //store scheduler-specific data.
 } ktask_t;
 
+//System call
 int sys_getpid();
 
 //When creating a task, we pass in the head of the stack.
 //k_malloc will return a pointer to the beginning of the memory
 //block, but the head of the stack is at the end of the memory block.
 //This converts from a pointer from k_malloc to a stack head pointer
-#define STACK_HEAD( ptr, stack_size ) (uint32_t*)( (uint8_t*)ptr + stack_size )
-ktask_t *ktask_create(void (*start)(), void *param, void (*exit)());
+#define STACK_HEAD( ptr, stack_size ) \
+        (uint32_t*)( (uint8_t*)ptr + stack_size )
 
+ktask_t *ktask_create(void (*start)(), void *param, void (*exit)());
 ktask_t *utask_create(void (*start)(), void *param,
                         void (*exit)(), uint32_t *stack);
-
 ktask_t *utask_from_elf(char *elf_data);

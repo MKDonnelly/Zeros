@@ -1,32 +1,40 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
+#include <stdlib.h>
 
+//TODO merge this with the in-kernel initrd code to have a single
+//     version of this.
 #define INITRD_MAGIC 0x12345678
 #define FILENAME_MAX_LEN 32
-#define NUM_INITRD_FILES 32
 
-//A header describing the initrd.
-struct initrd_header{
+//A superblock for the initrd
+typedef struct initrd_sb{
    uint32_t magic;
-   uint32_t numFiles;
-};
+   uint32_t entries_count;
+}initrd_sb_t;
 
-#define INITRD_FILE 0x01
-#define INITRD_DIR  0x02
+//Last bit in flags determines if this
+//is a file or directoty.
+#define INITRD_FILE 0x00
+#define INITRD_DIR  0x01
 
-
-//The file header describing a 
-//file within the initrd.
-struct file_header{
+//The initrd_inode describes an entity
+//within an initrd.
+typedef struct initrd_inode{
    char name[FILENAME_MAX_LEN];
    uint32_t inode;
    uint32_t offset;
    uint32_t length;
    uint32_t  flags; 
-};
+}initrd_inode_t;
+
 
 //./makeinitrd file1 file2 initrd
+//Args:
+// Last argument is name of initrd output.
+// All other arguments are for file to
+// store within the initrd.
 int main(char argc, char **argv){
 
    //Catch wrong number of files
@@ -35,71 +43,80 @@ int main(char argc, char **argv){
       return -1;
    }
 
-   //Write the initrd header
-   FILE *initrd = fopen( argv[argc - 1], "w" );
+   //Open the last argument on the command line.
+   //This is the output initrd.
+   FILE *initrd = fopen(argv[argc-1], "w");
 
-   struct initrd_header head = {
-          .magic = INITRD_MAGIC,
-          .numFiles = argc - 2
+   //Total number of files to place in the initrd. Subtact 2
+   //since one is "./makeinitrd" and the other is the output 
+   //initrd name
+   int total_files = argc - 2;
+
+   //Create an initrd superblock
+   initrd_sb_t superblock = {
+     .magic = INITRD_MAGIC,
+     .entries_count = total_files, 
    };
-   fwrite( &head, sizeof(struct initrd_header), 1, initrd );
+ 
+   //Write the superblock
+   fwrite(&superblock, sizeof(superblock), 1, initrd);
 
    //Create a default template for the fixed number
    //of file descriptors and write them to the initrd.
    //Later on, we come back and put valid data in these
    //to reflect valid files added.
-   struct file_header template = {
-          .name = 0,
-          .inode = 0,
-          .offset = 0,
-          .length = 0, 
-          .flags = 0
-   };
+   initrd_inode_t template;
+   memset(&template, sizeof(template), 0);
   
-   for(int i = 0; i < NUM_INITRD_FILES; i++){
-      fwrite( &template, sizeof(struct file_header), 1, initrd ); 
+   for(int i = 0; i < total_files; i++){
+      fwrite(&template, sizeof(template), 1, initrd);
    }
  
-   //Calculate the current offset in the file
-   int curOffset = sizeof(struct initrd_header) + 
-                   NUM_INITRD_FILES * sizeof(struct file_header);
+   //Now that we have wrote the headers, calculate where we
+   //currently are in the file.
+   int initrd_offset = sizeof(initrd_sb_t) + 
+                           total_files * sizeof(initrd_inode_t);
 
 
    //Now we will loop through each file passed to us on the 
    //command line, read it char-by-char into the initrd, calculate
    //its offset and length, and store that information into lengths 
    //and offsets.
-   int lengths[NUM_INITRD_FILES];
-   int offsets[NUM_INITRD_FILES];
-   for(int i = 1; i <= argc - 2; i++){
-      offsets[i-1] = curOffset;
-      //Open the file to put in the initrd
-      FILE *fileToPlace = fopen( argv[i], "r" );
-      int fileSize = 0;
+   int *lengths = malloc(sizeof(int) * total_files);
+   int *offsets = malloc(sizeof(int) * total_files);
+
+   for(int i = 0; i <= total_files; i++){
+      //Open the file to put in the initrd. Add 1 since index 0
+      //is the name of this program.
+      FILE *initrd_file = fopen(argv[i+1], "r");
+
+      offsets[i] = initrd_offset;      
+      //we can calculate the length of the file by feeking to the end
+      fseek(initrd_file, 0, SEEK_END);
+      lengths[i] = ftell(initrd_file);
+      fseek(initrd_file, 0, SEEK_SET);
+      initrd_offset += lengths[i];
+
+      //Write the file to the iniitrd 
       char temp;
-      while( (temp = getc( fileToPlace ) ) != EOF ){
-         fputc( temp, initrd );
-         fileSize++;
-      }
-      lengths[i-1] = fileSize;
-      curOffset += fileSize;
-      fclose( fileToPlace );
+      while( (temp = getc(initrd_file)) != EOF )
+         fputc(temp, initrd);
+      fclose( initrd_file);
    }
 
    //We now go back and update the file_header structures
    //at the beginning of the file using lengts and offsets above.
-   int headerOffset = sizeof( struct initrd_header );
-   struct file_header temp;
+   int headers_start = sizeof(initrd_sb_t);
+   fseek(initrd, headers_start, SEEK_SET);
+   initrd_inode_t temp;
 
-   for(int i = 0; i < argc - 2; i++){
-      strncpy( temp.name, argv[i+1], FILENAME_MAX_LEN);
+   for(int i = 0; i < total_files; i++){
+      strncpy(temp.name, argv[i+1], FILENAME_MAX_LEN);
       temp.offset = offsets[i];
       temp.length = lengths[i];
       temp.inode = i;
       temp.flags = INITRD_FILE;
-      fseek( initrd, headerOffset, SEEK_SET );
-      fwrite( &temp, sizeof(struct file_header), 1, initrd );
-      headerOffset += sizeof(struct file_header);
+      fwrite(&temp, sizeof(temp), 1, initrd );
    }
 
    fclose(initrd);

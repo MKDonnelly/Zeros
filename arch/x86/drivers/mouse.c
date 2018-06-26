@@ -5,7 +5,6 @@
 #include <arch/x86/drivers/vgacommon/vgacommon.h>
 #include <arch/x86/pmode/isr.h>
 
-
 //Temporarily holds packets as they come in.
 //When a full packet has been accuumulated, it
 //is converted to a mouse_packet_t to the registered
@@ -23,7 +22,7 @@ void (*mouse_handler)(mouse_packet_t) = NULL;
 
 //We must wait for the mouse to respond before
 //writing to port 0x60 or 0x64.
-void wait_for_write(){
+static void wait_for_write(){
    for(int i = 0; i < MOUSE_TIMEOUT; i++){
       if( (portb_read( MOUSE_CMD_P ) & MOUSE_WRITE_OK_M) == 0 )
          return;
@@ -32,7 +31,7 @@ void wait_for_write(){
 
 //We must wait for the mouse to respond before
 //reading from reading from port 0x60
-void wait_for_read(){
+static void wait_for_read(){
    for(int i = 0; i < MOUSE_TIMEOUT; i++){
       if( (portb_read( MOUSE_CMD_P ) & MOUSE_READ_OK_M) == 1 )
          return;
@@ -40,7 +39,7 @@ void wait_for_read(){
 }
 
 //Write a command to the 
-void mouse_write(int8_t command){
+static void mouse_write(int8_t command){
 
   //Wait to be able to send a command
   wait_for_write();
@@ -58,7 +57,7 @@ void mouse_write(int8_t command){
 
 //Used to conllect mouse packets and pass them
 //up to whatever handler has been defined.
-void mouse_interrupt_handler(){
+static void mouse_interrupt_handler(){
 
    int8_t status = portb_read( MOUSE_CMD_P );
 
@@ -86,9 +85,7 @@ void mouse_interrupt_handler(){
    }
 }
 
-
-void mouse_init(){ 
-
+void arch_init_mouse(){ 
    //Enable aux mouse
    wait_for_write();
    portb_write( MOUSE_CMD_P, MOUSE_AUX_MOUSE );
@@ -128,7 +125,6 @@ void mouse_init(){
 }
 
 //Pass null to unregister handler
-void register_mouse_handler( void (*new_handler)(mouse_packet_t) ){
+void arch_register_mouse_handler(void (*new_handler)(mouse_packet_t)){
    mouse_handler = new_handler;
 }
-

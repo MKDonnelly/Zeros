@@ -79,6 +79,10 @@ stop:
     jmp stop
 
 section .boot
+;TODO we waste a lot of space here due to alignment.
+;     add the early kernel stack here instead of having
+;     it go after the kernel image
+
 align 0x1000
 ;A fixed page table for the early boot environment. This identity
 ;maps the first 4M and maps 3G to the first 4M as well. This helps

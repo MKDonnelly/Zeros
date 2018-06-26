@@ -45,7 +45,6 @@ tasklet_t *workqueue_get(workqueue_t *workqueue){
 }
 
 void workqueue_worker(workqueue_t *workqueue){
-
    while(1){
       tasklet_t *tasklet = workqueue_get( workqueue );
 

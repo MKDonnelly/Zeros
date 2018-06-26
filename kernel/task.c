@@ -45,7 +45,6 @@ ktask_t *ktask_create( void (*start)(), void *param, void (*exit)()){
 
 ktask_t *utask_create( void (*start)(), void *param, 
                          void (*exit)(), uint32_t *stack){
-
    KASSERT( start != NULL );
    KASSERT( stack != NULL && (uint32_t)stack < KERNEL_VADDR );
    KASSERT( IS_ALIGNED_ON( (uint32_t)stack, ARCH_PAGE_SIZE ) );

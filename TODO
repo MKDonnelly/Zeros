@@ -21,6 +21,8 @@ make a modular kernel
 priority lock based on priority queue implemented as min heap
 make a queue-based mutex
 Use kassert often
+Database-fs: Within a file, create a key-value store to associate
+             a certain key with a block of data.
 
 misc tasks 
    use syscall/sysret instead of interrupt

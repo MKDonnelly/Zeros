@@ -30,7 +30,6 @@ typedef struct heap{
    mutex_t heap_lock;
 }heap_t;
 
-
 //Used throughout the kernel code and initilized in kmain
 heap_t global_kernel_heap;
 
@@ -41,4 +40,3 @@ heap_t global_kernel_heap;
 
 void heap_create(heap_t *heap, uint32_t start_addr, uint32_t len,
                  heap_algs_t *algs );
-

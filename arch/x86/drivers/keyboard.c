@@ -133,17 +133,8 @@ void kbd_enc_send_command(uint8_t command){
 
 
 //Sets the LEDs on the keyboard
-void kb_set_leds(uint8_t numLock, uint8_t capLock, uint8_t scroll){
-   uint8_t leds = 0;
-   if( numLock )
-      leds |= KE_NUMLOCK_M;
-   if( capLock )
-      leds |= KE_CAPLOCK_M;
-   if( scroll )
-      leds |= KE_SCROLL_M;
-
+void kb_set_leds(char flags){
    //Send the command to the encoder
-   kbd_enc_send_command( KE_SET_LEDS_C );
-   kbd_enc_send_command( leds );
+   kbd_enc_send_command(KE_SET_LEDS_C);
+   kbd_enc_send_command(flags);
 }
-

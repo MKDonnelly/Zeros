@@ -10,8 +10,9 @@ void blkdev_write_lba(blkdev_t *dev, char *buf,
    int drive_len = dev->max_lba - dev->min_lba;
    if( (lba + len) > drive_len || (lba + len) < 0 ){
       //Asked to write outside of drive.
+      return;
    }else{
-       dev->parent->write_lba(dev->parent, buf, dev->min_lba + lba, len);
+      dev->parent->write_lba(dev->parent, buf, dev->min_lba + lba, len);
    }
 }
 
@@ -20,6 +21,7 @@ void blkdev_read_lba(blkdev_t *dev, char *buf,
    int drive_len = dev->max_lba - dev->min_lba;
    if( (lba + len) > drive_len || (lba + len) < 0 ){
       //Asked to write outside of drive.
+      return;
    }else{
        dev->parent->read_lba(dev->parent, buf, dev->min_lba + lba, len);
    }

@@ -12,7 +12,6 @@ void memset( void *dest, int amount, int val){
       ((char*)dest)[i] = val;
 }
 
-
 //Find length of string
 int strlen(char inputarray[]){
    int i = 0;

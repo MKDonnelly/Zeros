@@ -1,6 +1,7 @@
 #pragma once
 
 #include <lib/types.h>
+typedef uint32_t size_t;
 
 //Masks for fs_node.flags
 #define FS_FILE         0x01
@@ -11,69 +12,89 @@
 #define FS_SYMLINK      0x06
 #define FS_MOUNTPOINT   0x08
 
-struct fs_node;
+typedef struct fs_node fs_node_t;
 //These are function types used in fs_node_t.  They are used to specify
 //the type of function that can be used within fs_node_t. The functions 
 //inside of fs_node_t will change with the storage type.
-typedef uint32_t (*read_type_t)(struct fs_node*,uint32_t,uint32_t,int8_t*);
-typedef uint32_t (*write_type_t)(struct fs_node*,uint32_t,uint32_t,int8_t*);
-typedef void (*open_type_t)(struct fs_node*);
-typedef void (*close_type_t)(struct fs_node*);
+typedef int (*vnode_read_t)(fs_node_t *self, int offset, 
+                            int len, char *buffer);
+typedef int (*vnode_write_t)(fs_node_t *self, int offset, 
+                            int len, char *buffer);
+typedef int (*vnode_open_t)(fs_node_t *self, int flags);
+typedef int (*vnode_close_t)(fs_node_t *self);
+typedef int (*vnode_len_t)(fs_node_t *self);
+
+typedef struct dirent{
+   char name[128];
+   uint32_t inode;
+}dirent_t;
 
 //TODO We should have a lookup by inode as well
-typedef struct fs_node * (*readdir_type_t)(struct fs_node*,uint32_t);
-typedef struct fs_node * (*finddir_type_t)(struct fs_node*,char *name);
+typedef dirent_t *(*vnode_readdir_t)(fs_node_t *self, int index);
+typedef fs_node_t *(*vnode_finddir_t)(fs_node_t *self, char *name);
+
 
 #define FS_NODE_NAME_MAXLEN 32
 
-//This structure represents a
-//file system as a whole.
+//Most of the actual data is stored in the inode. The inode is
+//filesystem specific, and this provides a generic interface to it.
+//This basically associates a name and operations with an inode.
+typedef struct fstype fstype_t; //defined in fsmanager.h
 typedef struct fs_node{
+   char name[FS_NODE_NAME_MAXLEN];
+   uint32_t flags;
+   fstype_t *fs;
+   size_t inode;
+
+   //These point to specific file system functions.
+   vnode_read_t read;
+   vnode_write_t write;
+   vnode_open_t open;
+   vnode_close_t close;
+   vnode_readdir_t readdir;
+   vnode_finddir_t finddir;
+   vnode_len_t len;
+
+} fs_node_t;
+
+/*typedef struct fs_node{
    char name[FS_NODE_NAME_MAXLEN];
    uint32_t mask;
    uint32_t uid;
    uint32_t gid;
    uint32_t flags;
-   uint32_t inode;
+   uint32_t dev_id; //Uniquely identifies the drive that the file lies on
+   uint32_t inode;  //Uniquely idientifies the file within the file system
    uint32_t length;
    uint32_t impl;
 
-   //These functions are indirectly
-   //called by read_fs, write_fs...
-   //They should not be called by 
-   //anything outside of filesystem
-   //code as fs_node->read
-   read_type_t read;
-   write_type_t write;
-   open_type_t open;
-   close_type_t close;
-   readdir_type_t readdir;
-   finddir_type_t finddir;
-   struct fs_node *ptr;
-} fs_node_t;
+   //These point to specific file system functions.
+   vnode_read_t read;
+   vnode_write_t write;
+   vnode_open_t open;
+   vnode_close_t close;
+   vnode_readdir_t readdir;
+   vnode_finddir_t finddir;
+} fs_node_t;*/
+
 
 //The root file system
 extern fs_node_t *fs_root;
 
-//These are the generic fs_node_t operators. These will perform error
-//checking before calling the specific function inside of the
-//provided fs_node_t. These can be called outside of fs code.
+//These are used as a wrapper around a fs_node_t. They perform minimal
+//error checking (i.e. make sure the read member is not null before
+//calling it) and then call the actual function pointers.
+int read_fs(fs_node_t *node, int offset, int len, char *buffer);
+int write_fs(fs_node_t *node, int offset, int size, char *buffer);
+#define OPEN_R	0x1
+#define OPEN_W	0x2
+int open_fs(fs_node_t *node, int flags);
+int close_fs(fs_node_t *node);
 
-//This function reads from the given file (the fs_node_t*) at the given
-//offset and size, and places it in *buffer. THIS SHOULD REFERENCE A FILE!
-//This function will do error checking to make sure that we do not read
-//off the end of the file.
-uint32_t read_fs(fs_node_t *node, uint32_t offset, uint32_t size, int8_t *buffer);
-uint32_t write_fs(fs_node_t *node, uint32_t offset, uint32_t size, int8_t *buffer);
-void open_fs(fs_node_t *node, uint8_t read, uint8_t write);
-void close_fs(fs_node_t *node);
-
-//This function will return information about a file/directory
-//at the index of the directory. For example, if a directory
-//has three files (file1,file2,file3), a call of readdir_fs(...,0)
-//will return info about file1, readdir_fs(...,1) will return info
-//about file2, and so on.
-fs_node_t *readdir_fs(fs_node_t *node, uint32_t index);
+//Returns a dirent_t structures corresponding to the file at the given
+//index. We can get the actual fs_node_t corresponding to the file
+//by passing dirent->name to the finddir_fs functin.
+dirent_t *readdir_fs(fs_node_t *node, int index);
 
 //Given the name of a file, try to locate it in the directory.
 fs_node_t *finddir_fs(fs_node_t *node, char *name);

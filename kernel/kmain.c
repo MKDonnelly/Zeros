@@ -92,14 +92,22 @@ void kmain(struct multiboot_info *multiboot_info){
    syscalls_init();
 
    zsfs_init();
+   initrd_init(&ldscript_initrd_start);
+   k_printf("Initrd at %x\n", &ldscript_initrd_start);
    ata_enumerate();
 
-   fstype_t *z = fsmanager_find_id(0x1234ABCD);
+   fstype_t *initrd = fsmanager_find_id(0x11111111);
+   if( initrd != NULL ){
+      k_printf("Found!\n");
+      dirent_t *first = initrd->root_dir.readdir(&initrd->root_dir, 0);
+      k_printf("First file's name: %s\n", first->name);
+   }
+/*   fstype_t *z = fsmanager_find_id(0x1234ABCD);
    if( z != NULL ){
       k_printf("YES!\n");
       zsfs_sb_t *sb = z->get_superblock(z);
       k_printf("From superblock: %x, %d, %d\n", sb->fs_id, sb->freeblock_block, sb->fsentry_block);
-   }
+   }*/
 
 //   blkdev_t *blkdev = blkdev_find(0);
 //   zsfs_create(blkdev);   

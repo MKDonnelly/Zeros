@@ -4,6 +4,7 @@
 #include <arch/x86/drivers/pic.h>
 
 void arch_system_init(int video_mode){
+   arch_disable_ints();
 
    //Initilize descriptors
    gdt_init();
@@ -14,7 +15,5 @@ void arch_system_init(int video_mode){
 
    //Setup the function points to use
    //the screen
-   vga_init( &vmode_vga3h );   
-
-   arch_disable_ints();
+   vga_init( &vmode_vga3h );
 }
