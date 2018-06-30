@@ -1,4 +1,5 @@
 #pragma once
+#include <lib/genericll.h>
 
 typedef struct{
    int milliseconds;
@@ -15,7 +16,7 @@ typedef struct{
 //the node definition and is used with
 //the abstract linked list.
 typedef struct alarm{
-   struct alarm *next;
+   list_head_t timer_list; //Link for use in double linked list
 
    //The function to call every...
    void (*callback)();

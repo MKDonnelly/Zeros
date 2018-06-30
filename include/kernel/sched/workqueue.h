@@ -13,9 +13,10 @@
 */
 
 #include <arch/current_arch>
+#include <lib/genericll.h>
 
 typedef struct tasklet{
-   struct tasklet *next;
+   list_head_t tasklet_list;
    void (*function)();
    void *data;
 }tasklet_t;
@@ -24,10 +25,8 @@ typedef struct tasklet{
 tasklet_t *tasklet_create( void (*function)(), void *data);
 
 typedef struct{
-   unsigned int total_tasks;
-
    //Linked list of tasklets
-   tasklet_t *tasks;
+   list_t *tasklet_list;
    mutex_t workqueue_lock;   
 }workqueue_t;
 

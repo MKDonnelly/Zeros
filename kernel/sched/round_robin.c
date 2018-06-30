@@ -1,18 +1,14 @@
 #include <kernel/sched/round_robin.h>
 
 #include <kernel/task.h>
-#include <lib/generic_ll.h>
+#include <lib/genericll.h>
 #include <lib/timing.h>
 
 //Linked list of tasks to run
-static ktask_t *task_list = NULL;
+static list_t task_list = LIST_SINIT(__builtin_offsetof(ktask_t, ktask_list));
 
 //Pointer to current task
 static ktask_t *current_task = NULL;
-
-//Number of tasks in the task list
-static int task_count = 0;
-int current_task_index = 0;
 
 //Returns the current ktask.
 ktask_t *rr_current_ktask(){
@@ -22,8 +18,9 @@ ktask_t *rr_current_ktask(){
 //The main scheduler. Routinely called to manage tasks
 void rr_schedule(){
    do{
-      current_task_index = (current_task_index + 1) % task_count;
-      current_task = list_get_node( task_list, current_task_index);
+      current_task = list_next_node(&task_list, current_task, ktask_t);
+      if( current_task == NULL )
+         current_task = list_getfront(&task_list, ktask_t);
    }while( current_task->state != TASK_READY );
 
    arch_run_next( &(current_task->task_info) );
@@ -36,10 +33,6 @@ static void idle_task(){
 }
 
 void rr_setup(){
-   //Add idle task
-   ktask_t *idle = ktask_create(idle_task, NULL, NULL);
-   list_add( task_list, idle, 0 );
-   task_count++;
 }   
 
 void rr_start(){
@@ -50,15 +43,18 @@ void rr_start(){
    //scheduler interrupt
    arch_register_scheduler( rr_schedule );
 
-   //Index 0 is for the idle thread
-   current_task = list_get_node( task_list, 0 );
+   //Add idle task
+   ktask_t *idle = ktask_create(idle_task, NULL, NULL);
+   list_pushfront(&task_list, idle);
+
+   current_task = idle;
    arch_run_next( &current_task->task_info );
    idle_task();
 }
 
 
 void rr_add_task( ktask_t *new_task){
-   list_add( task_list, new_task, task_count++);
+   list_pushfront(&task_list, new_task);
 }
 
 

@@ -5,7 +5,7 @@
 #include <lib/types.h>
 #include <lib/bitwise.h>
 #include <lib/timing.h>
-#include <lib/generic_ll.h>
+#include <lib/genericll.h>
 #include <lib/elf32.h>
 
 #include <drivers/ata/ata_pio.h>
@@ -98,9 +98,17 @@ void kmain(struct multiboot_info *multiboot_info){
 
    fstype_t *initrd = fsmanager_find_id(0x11111111);
    if( initrd != NULL ){
-      k_printf("Found!\n");
-      dirent_t *first = initrd->root_dir.readdir(&initrd->root_dir, 0);
-      k_printf("First file's name: %s\n", first->name);
+      fs_node_t *root = &initrd->root_dir;
+      dirent_t *first = root->readdir(root, 0);
+      k_printf("Name is %s, %d\n", first->name, first->inode);
+
+      fs_node_t *file = root->finddir(root, first->name); 
+      char buf[100];
+      file->read( file, 0, 20, buf );
+      for(int i = 0; i < 10; i++){
+         k_printf("%c", buf[i]);
+      }      
+
    }
 /*   fstype_t *z = fsmanager_find_id(0x1234ABCD);
    if( z != NULL ){

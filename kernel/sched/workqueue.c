@@ -1,7 +1,6 @@
 #include <kernel/sched/workqueue.h>
 
 #include <arch/x86/pmode/spinlock.h>
-#include <lib/generic_ll.h>
 #include <kernel/sched/sched.h>
 #include <kernel/task.h>
 #include <kernel/mm/heap.h>
@@ -16,8 +15,7 @@ tasklet_t *tasklet_create( void (*function)(), void *data){
 
 workqueue_t *workqueue_create(){
    workqueue_t *workqueue = k_malloc( sizeof(workqueue_t), 0);
-   workqueue->tasks = NULL;
-   workqueue->total_tasks = 0;
+   workqueue->tasklet_list = list_create(tasklet_t, tasklet_list);
    spinlock_init(&workqueue->workqueue_lock);
    return workqueue;
 }
@@ -25,19 +23,17 @@ workqueue_t *workqueue_create(){
 void workqueue_add(workqueue_t *workqueue, tasklet_t *new_task){
    spinlock_acquire( &workqueue->workqueue_lock );
 
-   workqueue->total_tasks++;
-   list_add( workqueue->tasks, new_task, 0 );
+   list_pushfront(workqueue->tasklet_list, new_task);
 
-   spinlock_release( &workqueue->workqueue_lock );
+   spinlock_release(&workqueue->workqueue_lock);
 }
 
 tasklet_t *workqueue_get(workqueue_t *workqueue){
    spinlock_acquire( &workqueue->workqueue_lock );
    
    tasklet_t *return_tasklet = NULL;
-   if( workqueue->total_tasks > 0 ){
-      return_tasklet = list_rm_index( workqueue->tasks, 0 );
-      workqueue->total_tasks--;
+   if( list_len(workqueue->tasklet_list) > 0 ){
+      return_tasklet = list_rmfront(workqueue->tasklet_list, tasklet_t);
    }
 
    spinlock_release( &workqueue->workqueue_lock );

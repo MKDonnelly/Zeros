@@ -3,38 +3,55 @@
 #include <string.h>
 #include <stdlib.h>
 
-//TODO merge this with the in-kernel initrd code to have a single
-//     version of this.
 #define INITRD_MAGIC 0x12345678
 #define FILENAME_MAX_LEN 32
 
-//A superblock for the initrd
-typedef struct initrd_sb{
-   uint32_t magic;
-   uint32_t entries_count;
-}initrd_sb_t;
 
-//Last bit in flags determines if this
-//is a file or directoty.
-#define INITRD_FILE 0x00
-#define INITRD_DIR  0x01
+#define INITRD_FILE 0
+#define INITRD_DIR  1
 
 //The initrd_inode describes an entity
-//within an initrd.
+//within an initrd. Note that a name is not stored here:
+//the whole idea of having a directory is to associate 
+//a name with an inode. Later on, this will be useful
+//if links are supported.
+
+//For a file, this describes it byte offset from the start of the
+//initrd as well as its length in bytes. For a directory, this describes
+//the byte offset of it contents (basicall, a name->inode# table), as well
+//as the length AS THE NUMBER OF ENTRIES within the directory.
 typedef struct initrd_inode{
-   char name[FILENAME_MAX_LEN];
+   //My OS is 32 bit, so the two pointers here *should*
+   //be 8 bytes total. However, the system compiler is 
+   //64 bits, so this will end up being 16 bytes.
+   //Just reserve 8 bytes here for the linked list node.
+   char RESERVED[8];
    uint32_t inode;
    uint32_t offset;
    uint32_t length;
-   uint32_t  flags; 
+   uint32_t type; //currently, only directory or file
 }initrd_inode_t;
 
+//This is what a directory entry points to. The number of these
+//structures is determined by the length
+typedef struct initrd_dirent{
+   char name[128];
+   uint32_t inode;
+}initrd_dirent_t;
 
-//./makeinitrd file1 file2 initrd
-//Args:
-// Last argument is name of initrd output.
-// All other arguments are for file to
-// store within the initrd.
+//The initrd superblock. Just a regular inode describing the root,
+//as well as a magic number to ensure that is is an initrd.
+typedef struct initrd_sb{
+   uint32_t magic;
+   initrd_inode_t root_inode;
+   //All inodes (except for root_inode) are kept in their own
+   //contigeous section. This is the byte offset from the start
+   //of the initrd.
+   uint32_t inodes_offset; 
+   uint32_t inodes_len;
+}initrd_sb_t;
+
+
 int main(char argc, char **argv){
 
    //Catch wrong number of files
@@ -52,31 +69,40 @@ int main(char argc, char **argv){
    //initrd name
    int total_files = argc - 2;
 
-   //Create an initrd superblock
-   initrd_sb_t superblock = {
-     .magic = INITRD_MAGIC,
-     .entries_count = total_files, 
-   };
- 
    //Write the superblock
-   fwrite(&superblock, sizeof(superblock), 1, initrd);
+   initrd_sb_t initrd_sb = {
+      .magic = INITRD_MAGIC,
+      .root_inode = {
+         .inode = 0,
+         .offset = sizeof(initrd_sb_t)+ sizeof(initrd_inode_t)*total_files, 
+         .length = total_files, //length here is the number of entries
+         .type = INITRD_DIR,
+      }, 
+      .inodes_offset = sizeof(initrd_sb), //inodes begin after sb
+      //1 inode for each file
+      .inodes_len = total_files,
+   };
 
-   //Create a default template for the fixed number
-   //of file descriptors and write them to the initrd.
-   //Later on, we come back and put valid data in these
-   //to reflect valid files added.
-   initrd_inode_t template;
-   memset(&template, sizeof(template), 0);
-  
-   for(int i = 0; i < total_files; i++){
-      fwrite(&template, sizeof(template), 1, initrd);
-   }
+   fwrite(&initrd_sb, sizeof(initrd_sb), 1, initrd);
  
-   //Now that we have wrote the headers, calculate where we
-   //currently are in the file.
-   int initrd_offset = sizeof(initrd_sb_t) + 
-                           total_files * sizeof(initrd_inode_t);
+   //At this point, create temporary inodes for each file. These
+   //are updated later
+   initrd_inode_t template;
+   fwrite(&template, sizeof(initrd_inode_t), total_files, initrd);
 
+   //Now create the root directory contents, which will associate
+   //a name to an inode
+   for(int i = 0; i < total_files; i++){
+      initrd_dirent_t new_file;
+      strcpy(new_file.name, argv[i+1]);
+      new_file.inode = i + 1;
+      fwrite(&new_file, sizeof(new_file), 1, initrd);
+   }
+
+
+   //Now that we have wrote the inodes, calculate where we
+   //currently are in the file.
+   int initrd_offset = ftell(initrd); 
 
    //Now we will loop through each file passed to us on the 
    //command line, read it char-by-char into the initrd, calculate
@@ -106,16 +132,15 @@ int main(char argc, char **argv){
 
    //We now go back and update the file_header structures
    //at the beginning of the file using lengts and offsets above.
-   int headers_start = sizeof(initrd_sb_t);
-   fseek(initrd, headers_start, SEEK_SET);
+   int inodes_start = sizeof(initrd_sb_t);
+   fseek(initrd, inodes_start, SEEK_SET);
    initrd_inode_t temp;
 
    for(int i = 0; i < total_files; i++){
-      strncpy(temp.name, argv[i+1], FILENAME_MAX_LEN);
       temp.offset = offsets[i];
       temp.length = lengths[i];
-      temp.inode = i;
-      temp.flags = INITRD_FILE;
+      temp.inode = i + 1; //0 is reserved for the root inode. start @ 1
+      temp.type = INITRD_FILE;
       fwrite(&temp, sizeof(temp), 1, initrd );
    }
 

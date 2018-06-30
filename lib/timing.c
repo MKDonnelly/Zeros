@@ -1,15 +1,13 @@
 #include <lib/timing.h>
 
 #include <kernel/mm/heap.h>
-#include <lib/generic_ll.h>
 #include <arch/x86/archx86.h>
 #include <lib/types.h>
 
 //Holds the system time
-system_time_t global_time = {0};
+static system_time_t global_time = {0};
 
-alarm_t *alarm_list = NULL;
-int total_alarms = 0;
+static list_t alarm_list = LIST_SINIT(__builtin_offsetof(alarm_t, timer_list));
 
 void timing_set_alarm(void (*alarm_function)(), int ms_period){
 
@@ -17,8 +15,7 @@ void timing_set_alarm(void (*alarm_function)(), int ms_period){
    new_alarm->callback = alarm_function;
    new_alarm->callback_period = new_alarm->time_left = ms_period;
 
-   list_add( alarm_list, new_alarm, 0);
-   total_alarms++;
+   list_pushfront(&alarm_list, new_alarm);
 }
 
 
@@ -29,9 +26,9 @@ void timing_main_handler(){
    //      10ms should have elapsed.
    global_time.seconds++;
 
-   if( total_alarms ){
+   if( alarm_list.len > 0 ){
       //This runs down the list of alarms and handles each
-      list_foreach( alarm_list, alarm_iter ){
+      list_foreach( &alarm_list, alarm_iter, alarm_t ){
          alarm_iter->time_left -= ARCH_TIMER_MS_PERIOD;
          
          //Handle any alarms that go off
@@ -39,6 +36,6 @@ void timing_main_handler(){
             alarm_iter->time_left = alarm_iter->callback_period;
             alarm_iter->callback();
          }
-      }      
+      }
    }
 }

@@ -23,6 +23,7 @@ void blocklist_init_heap(heap_t *heap_descriptor){
 }
 
 
+//TODO make sure all returned addresses are aligned on a 4 byte boundary
 //Allocate "size" piece of memory on the heap. If align is non-zero
 //align the memory to it's size. If phys is non-null, return the physical
 //address of the allocate memory (different when using paging)

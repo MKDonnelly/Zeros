@@ -109,7 +109,7 @@ kernel_objs := $(kernel_srcs:%.c=$(objdir)/%.o)
 #Lib stuff
 lib_srcs := 			\
 	lib/bitwise.c		\
-	lib/generic_ll.c	\
+	lib/genericll.c		\
 	lib/keyboard.c		\
 	lib/print.c		\
 	lib/random.c		\

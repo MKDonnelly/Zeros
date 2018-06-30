@@ -24,6 +24,15 @@ Use kassert often
 Database-fs: Within a file, create a key-value store to associate
              a certain key with a block of data.
 
+printing/screen manipulation:
+  Double buffering, frame buffer
+  VGA 13h mode driver (shapes, graphics)
+  Get a dump of the vga font and create custom font 
+  Add more vga register modes (get higher res dumps using qemu)
+  use hwinfo --framebuffer to see and program video modes
+    also use grub gfx directive to boot into a higher video mode
+  make routines for 1024x768 graphics mode (set by multiboot header)
+
 misc tasks 
    use syscall/sysret instead of interrupt
    port zeros to xen
@@ -42,15 +51,4 @@ low-priority
    use timer channel 2 to play sound on pc speaker
    work on arm arch code with qemu-arm
 
-printing/screen manipulation:
-  Double buffering, frame buffer
-  VGA 13h mode driver (shapes, graphics)
-  Get a dump of the vga font and create custom font 
-  Add more vga register modes (get higher res dumps using qemu)
-  use hwinfo --framebuffer to see and program video modes
-    also use grub gfx directive to boot into a higher video mode
-  make routines for 1024x768 graphics mode (set by multiboot header)
 
-initrd
-   Add in cpio or tar support
-   Add directory support to initrd

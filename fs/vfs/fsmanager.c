@@ -28,6 +28,8 @@ void fsmanager_check(blkdev_t *blockdev){
    blockdev->read_lba( blockdev, temp_buf, 0, 1 );
 
    for(int i = 0; i < template_fses_count; i++){
+      //TODO let the filesystems themselves do the I/O and return
+      //     a fstype_t.
       if( template_fses[i]->check_type(temp_buf) != 0 ){
          fstype_t *new_active_fs = k_malloc(sizeof(fstype_t), 0);
          memcpy(new_active_fs, template_fses[i], sizeof(fstype_t));

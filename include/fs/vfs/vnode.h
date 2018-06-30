@@ -33,7 +33,6 @@ typedef struct dirent{
 typedef dirent_t *(*vnode_readdir_t)(fs_node_t *self, int index);
 typedef fs_node_t *(*vnode_finddir_t)(fs_node_t *self, char *name);
 
-
 #define FS_NODE_NAME_MAXLEN 32
 
 //Most of the actual data is stored in the inode. The inode is
@@ -42,8 +41,12 @@ typedef fs_node_t *(*vnode_finddir_t)(fs_node_t *self, char *name);
 typedef struct fstype fstype_t; //defined in fsmanager.h
 typedef struct fs_node{
    char name[FS_NODE_NAME_MAXLEN];
-   uint32_t flags;
+   uint32_t flags; 
+   uint8_t type;
    fstype_t *fs;
+
+   //TODO think about making this a void* to a fs-specific inode.
+   //perhaps that would simplify things
    size_t inode;
 
    //These point to specific file system functions.
@@ -54,29 +57,7 @@ typedef struct fs_node{
    vnode_readdir_t readdir;
    vnode_finddir_t finddir;
    vnode_len_t len;
-
 } fs_node_t;
-
-/*typedef struct fs_node{
-   char name[FS_NODE_NAME_MAXLEN];
-   uint32_t mask;
-   uint32_t uid;
-   uint32_t gid;
-   uint32_t flags;
-   uint32_t dev_id; //Uniquely identifies the drive that the file lies on
-   uint32_t inode;  //Uniquely idientifies the file within the file system
-   uint32_t length;
-   uint32_t impl;
-
-   //These point to specific file system functions.
-   vnode_read_t read;
-   vnode_write_t write;
-   vnode_open_t open;
-   vnode_close_t close;
-   vnode_readdir_t readdir;
-   vnode_finddir_t finddir;
-} fs_node_t;*/
-
 
 //The root file system
 extern fs_node_t *fs_root;

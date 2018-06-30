@@ -2,6 +2,7 @@
 
 #include <arch/current_arch>
 #include <lib/types.h>
+#include <lib/genericll.h>
 
 enum TASK_STATE { TASK_RUNNING, TASK_READY, TASK_EXIT, TASK_BLOCKED };
 
@@ -9,7 +10,9 @@ enum TASK_STATE { TASK_RUNNING, TASK_READY, TASK_EXIT, TASK_BLOCKED };
 //to be used by an abstract linked list
 //in the scheduler code.
 typedef struct ktask{
-   struct ktask *next;
+   //ktask's are chained together into an
+   //intrusive double linked list.
+   list_head_t ktask_list;
 
    //Generic, arch-abstracted structure describing
    //the task's state.
