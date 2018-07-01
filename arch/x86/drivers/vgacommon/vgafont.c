@@ -265,7 +265,7 @@ unsigned char g_8x16_font[4096] = {
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-
+//TODO re-write this
 void write_font(unsigned char *buf, unsigned font_height){
    unsigned char seq2, seq4, gc4, gc5, gc6;
 
@@ -316,4 +316,5 @@ void write_font(unsigned char *buf, unsigned font_height){
    portb_write(VGA_GRAPHICSC_DATA_P, gc5);
    portb_write(VGA_GRAPHICSC_IDX_P, 6);
    portb_write(VGA_GRAPHICSC_DATA_P, gc6);
+
 }

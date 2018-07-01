@@ -21,7 +21,7 @@ pd_t *kernel_page_dir;
 //pte corresponding to it. If create_pt is set, create any
 //page tables needed. If create_pt is not set and the pt
 //is not allocated, return null
-static pte_t *get_page( uint32_t vaddr, bool create_pt, pd_t *page_directory){
+static pte_t *get_page( uint32_t vaddr, uint8_t create_pt, pd_t *page_directory){
 
    //Get the page table
    pde_t *page_dir_entry = &page_directory->pd_entries[ PD_INDEX( vaddr ) ];
@@ -60,6 +60,7 @@ uint32_t virt_to_phys( uint32_t uaddr, pd_t *page_directory ){
      return 0; //Address not mapped
 }
 
+//TODO combine rw and user_access using flags
 void vm_pmap(uint32_t vaddr, uint32_t paddr, pd_t *page_directory, 
              uint8_t rw, uint8_t user_access){
 
@@ -151,7 +152,7 @@ static void clone_table(pde_t *dest_pde, pde_t *source_pde){
 
    //For every page descriptor in the source table, make a new page
    //descriptor in the destination and copy the data
-   for(int i = 0; i < PTE_IN_PT; i++){
+   for(int i = 0; i < ENTRIES_IN_LEVEL; i++){
 
       //Only create a new page in the copy if the source has one
       if( source_pt->pt_entries[i].frame_addr != 0 ){
@@ -179,7 +180,7 @@ pd_t *vm_pdir_clone(pd_t *clone_dir){
    pd_t *new_dir = k_malloc( sizeof(pd_t), ARCH_PAGE_SIZE );
    memset( new_dir, sizeof(pd_t), 0 );
 
-   for(int i = 0; i < PDE_IN_PD; i++){
+   for(int i = 0; i < ENTRIES_IN_LEVEL; i++){
 
       //Map in the kernel virtual addresses to the cloned page directory.
       //We unconditionally map the kernel in since, when switching tasks,
@@ -209,15 +210,15 @@ void vm_init(){
    memset( kernel_page_dir, sizeof(pd_t), 0 );
 
    //Create the kernel page table mapping. Map 5M of the kernel starting
-   //at KERNEL_VADDR to the first 5M of physical memory
-   vm_pmap_range( KERNEL_VADDR, 0, kernel_page_dir, PAGE_RW, 
+   //at KERNEL_VBASE to the first 5M of physical memory
+   vm_pmap_range( KERNEL_VBASE, 0, kernel_page_dir, PAGE_RW, 
                  PAGE_KERNEL_ACCESS, 0x500000 );
 
    //Setup a frame pool
    framepool_create( 0x600000, 100 );
 
    //Setup the interrupt handler for paging BEFORE enabling paging
-   arch_register_interrupt( PAGE_INTERRUPT, page_int_handler);
+   //arch_register_interrupt( PAGE_INTERRUPT, page_int_handler);
 
    //Let the processor know where our page table is
    //and enable paging.
@@ -226,9 +227,7 @@ void vm_init(){
 
 //TODO have a page fault callback instead of this.
 void page_int_handler(context_t r){
-   int fault_addr;
-   //TODO convert to assembly
-   asm volatile("mov %%cr2, %0" : "=r" (fault_addr));
+   int fault_addr = get_pfault_addr();
 
    uint8_t present = !(r.error & PAGE_PRESENT_M);
    uint8_t rw = r.error & PAGE_RW_M;

@@ -5,3 +5,4 @@
 *.img
 *.so
 *.efi
+tools/*

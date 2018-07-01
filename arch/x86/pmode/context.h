@@ -28,6 +28,6 @@ typedef struct{
 
 //Create an intial context for a new kernel task
 context_t *arch_kcontext_create( void (*start)(void*), void *param,
-                                 void (*exit)(), uint32_t *stack_addr );
+                                 void (*exit)(), size_t stack_addr );
 context_t *arch_ucontext_create( void (*start)(void*), void *param,
-                                 void (*exit)(), uint32_t *stack_addr );
+                                 void (*exit)(), size_t stack_addr );

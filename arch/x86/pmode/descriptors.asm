@@ -15,12 +15,8 @@ tss_load:
 ; IDT as an argument. 
 global idt_load
 idt_load:
-   push eax
-
-   mov eax, [esp+8]
+   mov eax, [esp+4]
    lidt [eax]
-
-   pop eax
    ret
 
 ; Load the gdt and update the segment registers

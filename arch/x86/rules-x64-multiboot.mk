@@ -1,6 +1,7 @@
 #Compiler is gcc
-CC := gcc
-LD := ld
+TOOL_DIR := $(HOME)/bin/bos/tools64/bin/
+CC := $(TOOL_DIR)x86_64-elf-gcc
+LD := $(TOOL_DIR)x86_64-elf-ld
 ASM := nasm
 
 #Build artifacts
@@ -15,13 +16,22 @@ arch_c_srcs := 				\
 	arch/x86/drivers/vgacommon/modeset.c	\
 	arch/x86/drivers/vgacommon/vgacommon.c	\
 	arch/x86/drivers/vgacommon/vgafont.c	\
-	arch/x86/archx64.c
+	arch/x86/archx64.c		\
+	arch/x86/lmode/idt.c		\
+	arch/x86/lmode/gdt.c		\
+	arch/x86/lmode/isr.c		\
+	arch/x86/lmode/paging.c		\
+	arch/x86/drivers/lapic.c
 
 arch_asm_srcs :=			\
 	arch/x86/cpu.asm		\
-	arch/x86/lmode/cpuidasm.asm
+	arch/x86/lmode/cpuidasm.asm	\
+	arch/x86/lmode/pagingasm.asm	\
+	arch/x86/lmode/descriptors.asm	\
+	arch/x86/lmode/spinlock.asm	\
+	arch/x86/lmode/int.asm
 
-arch_header = arch/x86/lmode/kernelheader.asm
+arch_header = arch/x86/lmode/mbheader.asm
 
 arch_src_dirs :=		\
 	arch/			\
@@ -57,9 +67,12 @@ driver_objs = $(driver_srcs:%.c=$(objdir)/%.o)
 
 #kernel stuff
 kernel_srcs :=				\
-	kernel/kmain64.c
+	kernel/kmain64.c		\
+	kernel/mm/heap.c		\
+	kernel/mm/bitmap_heap.c		\
+	kernel/mm/blocklist_heap.c
 
-kernel_src_dirs := kernel/
+kernel_src_dirs := kernel/ kernel/mm/
 
 kernel_objs = $(kernel_srcs:%.c=$(objdir)/%.o)
 
@@ -82,11 +95,10 @@ lib_objs = $(lib_srcs:%.c=$(objdir)/%.o)
 ROOTDIR := .
 
 CFLAGS := -mcmodel=large -mno-red-zone -mno-mmx -mno-sse -mno-sse2 
-CFLAGS += -fno-pie -m64 -ffreestanding -fno-stack-protector -nostdlib 
-CFLAGS += -nostdinc -fno-builtin -Wall -g
+CFLAGS += -ffreestanding -Wall -g
 CFLAGS += -I$(ROOTDIR)/include -I. -I$(ROOTDIR)
 
-LDFLAGS = -m elf_x86_64 -z max-page-size=0x1000 -T arch/x86/x64_link.ld
+LDFLAGS = -z max-page-size=0x1000 -T arch/x86/x64_link.ld
 
 ASMFLAGS := -f elf64 -g 
 
@@ -99,6 +111,8 @@ all: pre-build $(kernel) post-build
 pre-build:
 	@mkdir -p $(objdir)
 	@$(call make-build)
+	@\rm ./arch/current_arch
+	@ln -s x86/archx64.h ./arch/current_arch
 
 $(kernel): $(arch_header_obj) $(arch_objs) $(drivers_objs) \
 	$(fs_objs) $(kernel_objs) $(lib_objs)
@@ -112,6 +126,10 @@ post-build:
 
 run: all
 	@qemu-system-x86_64 os.iso
+
+debug: all
+	@qemu-system-x86_64 os.iso -S -s &
+	@gdb -q -x .gdbdebug64
 
 clean:
 	@\rm -Rf ./build

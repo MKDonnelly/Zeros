@@ -6,6 +6,7 @@ heap_algs_t blocklist_heap = {
    .init_heap = blocklist_init_heap
 };
 
+
 void blocklist_init_heap(heap_t *heap_descriptor){
 
     heap_block_t* head = (heap_block_t*)heap_descriptor->start;
@@ -18,17 +19,13 @@ void blocklist_init_heap(heap_t *heap_descriptor){
     heap_descriptor->size_left -= sizeof(heap_block_t);
     head->free_mem = ( (char*)head + sizeof(heap_block_t) );
     head->allocated = 0;
-
-    spinlock_init(&heap_descriptor->heap_lock);
 }
 
 
-//TODO make sure all returned addresses are aligned on a 4 byte boundary
 //Allocate "size" piece of memory on the heap. If align is non-zero
 //align the memory to it's size. If phys is non-null, return the physical
 //address of the allocate memory (different when using paging)
-void *blocklist_malloc(heap_t *heap_descriptor, uint32_t size, 
-                       uint32_t align){
+void *blocklist_malloc(heap_t *heap_descriptor, int size, int align){
 
    //Lock the heap to prevent corruption
    spinlock_acquire( &heap_descriptor->heap_lock );
@@ -40,13 +37,13 @@ void *blocklist_malloc(heap_t *heap_descriptor, uint32_t size,
    //the pointer returned within this block. Since we allocated the size
    //plus the alignment in bytes, we can be assured that the alignment
    //will not cause problems.
-   uint32_t alloc_size = align ? size + align : size;
-
+   size_t alloc_size = align ? size + align : size;
 
    //Go through each block while the current block is allocated or
    //is not large enough
-   while(head->allocated || (head->size < alloc_size && head->next_block))
+   while(head->allocated || (head->size < alloc_size && head->next_block)){
         head = head->next_block;
+   }
 
    //Make sure we are dealing with a valid chunk of free memory
    if( ! (head->allocated || head->size < alloc_size ) ){
@@ -58,12 +55,12 @@ void *blocklist_malloc(heap_t *heap_descriptor, uint32_t size,
 
          heap_block_t *current_node = head;
          heap_block_t *next_item = (heap_block_t*)( (char*)head + 
-                                    sizeof(heap_block_t) + alloc_size);
+                                        sizeof(heap_block_t) + alloc_size);
       
          next_item->next_block = current_node->next_block;
          next_item->free_mem = (char*)next_item + sizeof(heap_block_t);
-         next_item->size = current_node->size - sizeof(heap_block_t) - 
-                           alloc_size;
+         next_item->size = current_node->size - sizeof(heap_block_t) 
+                                 - alloc_size;
          next_item->allocated = 0;
  
          current_node->next_block = next_item;
@@ -71,13 +68,15 @@ void *blocklist_malloc(heap_t *heap_descriptor, uint32_t size,
 
          if( align ){
             //We overestimate the amount of memory we need when aligning
-            uint32_t *start_addr = (uint32_t*)((int8_t*)current_node + sizeof(heap_block_t) + align);
+            size_t *start_addr = (size_t*)((char*)current_node 
+                                           + sizeof(heap_block_t) + align);
 
             //Mask the address by taking the 1's complement of the
             //alignment which forms a mask
-            current_node->free_mem = (uint32_t*)((uint32_t)start_addr & -align);
+            current_node->free_mem =(size_t*)((size_t)start_addr & -align);
          }else{
-            current_node->free_mem = ( (int8_t*)current_node + sizeof(heap_block_t) );
+            current_node->free_mem = ((char*)current_node + 
+                                        sizeof(heap_block_t) );
          }
 
          current_node->allocated = 1;
@@ -92,13 +91,14 @@ void *blocklist_malloc(heap_t *heap_descriptor, uint32_t size,
 
          if( align ){
             //We overestimate the amount of memory we need when aligning
-            uint32_t *start_addr = (uint32_t*)((int8_t*)head + sizeof(heap_block_t) + align);
+            size_t *start_addr = (size_t*)((char*)head + 
+                                            sizeof(heap_block_t) + align);
 
             //Mask the address by taking the 1's complement of the
             //alignment which forms a mask
-            head->free_mem = (uint32_t*)((uint32_t)start_addr & -align);
+            head->free_mem = (size_t*)((size_t)start_addr & -align);
          }else{
-            head->free_mem = ( (int8_t*)head + sizeof(heap_block_t) );
+            head->free_mem = ((char*)head + sizeof(heap_block_t));
          }
 
          head->allocated = 1;
@@ -146,23 +146,25 @@ static void blocklist_unify_heap(heap_t *heap_descriptor){
 //used to free that block. This is primarily done since alignment
 //on a certain boundary using kmalloc will return a pointer that may
 //not be the first free memory location
-void blocklist_free(heap_t *heap_descriptor, void *memChunk){
+void blocklist_free(heap_t *heap_descriptor, void *mem_chunk){
 
    //Lock the heap to prevent corruption
    spinlock_acquire( &heap_descriptor->heap_lock );
 
    heap_block_t *head = (heap_block_t*)heap_descriptor->start;
-   char found_mem = 0;
+   int found_mem = 0;
 
    while( head->next_block && ! found_mem){
 
-      //See if the memChunk address falls in the free 
+      //See if the mem_chunk address falls in the free 
       //space of the current chunk. If it does, we deallocate
       //it and break out of the loop by setting foundMem.
-      uint32_t chunkStart = (uint32_t)((uint8_t*)head + sizeof(heap_block_t));
-      uint32_t chunkEnd = (uint32_t)((uint8_t*)head + sizeof(heap_block_t) + head->size);
+      size_t chunk_start = (size_t)((char*)head + sizeof(heap_block_t));
+      size_t chunk_end = (size_t)((char*)head + sizeof(heap_block_t) + 
+                                  head->size);
 
-      if( (int)memChunk <= chunkEnd && (int)memChunk >= chunkStart){
+      if( (size_t)mem_chunk <= chunk_end && 
+          (size_t)mem_chunk >= chunk_start){
          //If we found the chunk, all we need to do it
          //set the allocated flag to 0.
          head->allocated = 0;
