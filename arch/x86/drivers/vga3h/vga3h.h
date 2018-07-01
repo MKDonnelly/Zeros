@@ -28,3 +28,4 @@ enum VGA3H_COLORS {
 
 void vga3h_putstr(char *str);
 void vga3h_putstr_at(char *str, int x, int y);
+void vga3h_init(vmode_t *vmode_current);

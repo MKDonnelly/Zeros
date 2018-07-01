@@ -28,6 +28,7 @@ multiboot_header:
 global arch_start
 
 [extern kmain]
+[extern ldscript_kernel_end]
 arch_start:
 
     ;Setup a temporary page directory so that 
@@ -55,21 +56,20 @@ arch_start:
     or eax, 0x80000000
     mov cr0, eax
 
-    ;Set the kernel stack. Have it start 4K after the 
-    ;end of the kernel .text, .data, and .bss section.
-    ;The heap will start just after that.
-    mov eax, 0xC0010000 
-    add eax, 0x1000
-    mov ebp, eax
+    ;Have the kernel stack start 4K after the end
+    ;of the kernel. Note that the heap will also start
+    ;at this same address, so 1 byte is subtracted to 
+    ;ensure that they do not overlap.
+    mov ebp, ldscript_kernel_end
+    sub ebp, 1
+    ;align the stack on a 4 byte boundary
+    and ebp, 0xFFFFFFFC
     mov esp, ebp
 
-    ;Make sure to pass the multiboot header
-    ;AFTER setting the stack
+    ;Pass the pointer to the multiboot header
+    ;GRUB automatically puts it into ebx
     push ebx 
-    lea ecx, [kmain]
-    ;TODO Why does this break when using jmp?
-    ;     Maybe multiboot header access?
-    call ecx
+    call kmain
 
     ;We should never get here, but in the case that kmain
     ;exits, at least we do not crash

@@ -4,12 +4,10 @@
 #include <lib/types.h>
 #include <lib/string.h>
 
-//TODO Fails when we print two chars in a row
-//     i.e. k_printf("%c %c", 'Z', 'Z');
-//     Only the first char is printed
 void k_printf(char *str, ...){
 
-   va_arg args = va_start( str );
+   va_list valist;
+   va_start( valist, str );
 
    int i = 0;
    while( str[i] != 0 ){
@@ -19,20 +17,20 @@ void k_printf(char *str, ...){
       if( str[i] == '%' ){
 
          if( str[i+1] == 'd' ){
-            int arg = va_get( args, int );
+            int arg = va_arg( valist, size_t );
             itoa( arg, buf );
          }else if( str[i+1] == 'x' ){
-            int arg = va_get( args, int );
+            int arg = va_arg( valist, size_t );
             itoh( arg, buf );
          }else if( str[i+1] == 's' ){
-            char *s = va_get( args, char* );
+            char *s = va_arg( valist, char* );
             strncpy( buf, s, 20 ); 
          }else if( str[i+1] == 'c' ){
             //NOTE: Even though a char is 1 byte,
             //pushing it onto the stack makes it 4 bytes
             //due to stack alignment. va_get must then
             //advance 4 bytes to get the next char.
-            char c = va_get(args, uint32_t);
+            char c = va_arg( valist, size_t );
             buf[0] = c;
             buf[1] = 0;
          } 

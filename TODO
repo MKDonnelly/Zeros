@@ -7,11 +7,18 @@ Multitasking
          Links to the same address w/ the default address
          do as well, but other address work fine.
    create systemcall interface 
-   Symmetric Multi Processing (SMP)
+   Symmetric Multi Processing (SMP) (see intel multiprocessor spec)
    Work on scheduler
    Create message passing interface and shared memory for IPC
    Add name to task_t
    Utilize page faults better (kill task that makes a page fault,etc)
+   create a task pool for fast task creation
+   In userland, extend the idea of interrupts to that of signals;
+      have userland programs register various events that should trigger
+      and interrupt and have handler functions to catch it.
+
+filesystem
+   use inodes as the interface between the VFS and the file system
 
 drivers
    APIC, HPET, ATA non-PIO mode, PCI, network card
@@ -35,11 +42,22 @@ printing/screen manipulation:
 
 misc tasks 
    use syscall/sysret instead of interrupt
+Clean up the types (i.e. use size_t for arch stuff used in kernel)
+Re-write assembly programs to use GNU as; this way, we can include
+ constants from a c program more easily
+
+misc tasks 
+   use syscall/sysret instead of interrupt
+   Create /dev virtual directory
    port zeros to xen
    port over a c library (newlib, uClib, musl)
    Add a how-to to explain how each subsystem works
    Add examples for each subsystem for reference
       and list the dependencies
+   Create a slab allocator to be placed over the generic
+      heap. e.g. paging stuff requires a lot of 4K pages
+      aligned on 4K; have a slab allocator catch those and
+      have the generic slab as a backup
 
 advanced os examples:
    dragonfly bsd, minix, plan9, genode, haiku, helenos, redox
@@ -50,5 +68,3 @@ low-priority
    Get proper release/press code working with keyboard
    use timer channel 2 to play sound on pc speaker
    work on arm arch code with qemu-arm
-
-

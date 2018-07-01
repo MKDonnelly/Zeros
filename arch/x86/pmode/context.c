@@ -5,13 +5,14 @@
 //Sets up a context for a kernel-level task and returns a pointer
 //to the head of the stack (a context_t* type)
 context_t *arch_kcontext_create( void (*start)(void *), void *param, 
-                                 void (*exit)(), uint32_t *stack_addr ){
+                                 void (*exit)(), size_t stack ){
 
    /*    Kernel context layout 
       stack_addr+0x0: 1st parameter
       stack_addr+0x4: exit function
       stack_addr+   : context_t struct
    */
+   uint32_t *stack_addr = (uint32_t*)stack;
 
    //The first item on the stack is the first parameter
    stack_addr--;
@@ -28,7 +29,8 @@ context_t *arch_kcontext_create( void (*start)(void *), void *param,
    //the same privilege level (in this case, ring 0), the esp_pushed and
    //ss fields of the context_t ARE NOT USED. We skip over them by adding 8
    //(2 X 4 byte members=8) and not setting either esp_pushed or ss below.
-   context_t *context = (context_t*)((char*)stack_addr - sizeof(context_t) + 8);
+   context_t *context = (context_t*)((char*)stack_addr 
+                                     - sizeof(context_t) + 8);
    context->eip = (uint32_t)start;
    context->eflags = INITIAL_EFLAGS;
 
@@ -46,13 +48,15 @@ context_t *arch_kcontext_create( void (*start)(void *), void *param,
 
 
 context_t *arch_ucontext_create( void (*start)(void*), void *param, 
-                                void (*exit)(), uint32_t *stack_addr ){
+                                void (*exit)(), size_t stack ){
 
    /*    User context layout 
       stack_addr+0x0: 1st parameter
       stack_addr+0x4: exit function
       stack_addr+   : context_t struct
    */
+
+   uint32_t *stack_addr = (uint32_t*)stack;
 
    //Put the first parameter on the stack
    stack_addr--;
@@ -63,11 +67,11 @@ context_t *arch_ucontext_create( void (*start)(void*), void *param,
    *stack_addr = (uint32_t)exit;
 
    //Put the context_t on the stack
-   context_t *context = (context_t*)((uint8_t*)stack_addr - sizeof(context_t));
+   context_t *context = (context_t*)((char*)stack_addr- sizeof(context_t));
 
    context->eip = (uint32_t)start;
    //The gdt selectors for userland code/data, with 
-   //the requested privilege level (0b11 = ring 3) ored
+   //the requestor's privilege level (0b11 = ring 3) ored
    //onto the end.
    context->cs = gdt_userland_code_rpl;
    context->ss = gdt_userland_data_rpl;

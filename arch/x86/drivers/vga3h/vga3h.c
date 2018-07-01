@@ -21,16 +21,19 @@
 vmode_t vmode_vga3h = {
    .vmode_putstr = vga3h_putstr,
    .vmode_putstr_at = vga3h_putstr_at,
+   .vmode_init      = vga3h_init,
 };
 
-//TODO fix this somehow. x86 kernel is higher-half, so it needs
-//to add 0xC0000000, while x64 is not.
-static char *vidmem = (char*)(0xB8000 + 0xC0000000);
+static char *vidmem = (char*)0xB8000;
 
 static int screen_offset = 0;
 static int cursor_offset = 0;
 static int fg_color = COLOR_WHITE;
 static int bg_color = COLOR_BLACK;
+
+void vga3h_init(vmode_t *mode){
+   vidmem += mode->kernel_vbase;
+}
 
 static inline int vga3h_xy_to_linear(int x, int y){
    return y * VGA3H_COLCELLS + x;

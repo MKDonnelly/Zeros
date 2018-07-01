@@ -11,7 +11,7 @@ kernel := $(objdir)/kernel.elf
 
 
 #UEFI header stuff
-uefi_header := arch/x86/lmode/main.c
+uefi_header := arch/x86/lmode/uefiheader.c
 uefi_header_obj := $(uefi_header:%.c=$(objdir)/%.o)
 uefi_header_so := $(uefi_header:%.c=$(objdir)/%.so)
 uefi_header_efi := $(uefi_header:%.c=$(objdir)/%.efi)

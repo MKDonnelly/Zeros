@@ -12,14 +12,14 @@ typedef struct{
 
 typedef struct heap{
    //Start address of heap
-   uint32_t start;
+   size_t start;
 
    //Lenght of heap, in bytes
-   uint32_t len;
+   size_t len;
 
    //Approximate number of bytes of
    //free space remaining.
-   uint32_t size_left;
+   size_t size_left;
 
    //Specific heap allocation algorithms will
    //put their functions inside of this.
@@ -38,5 +38,5 @@ heap_t global_kernel_heap;
 #define k_free( memblock ) \
     global_kernel_heap.actions.free(&global_kernel_heap, memblock)
 
-void heap_create(heap_t *heap, uint32_t start_addr, uint32_t len,
+void heap_create(heap_t *heap, size_t start_addr, size_t len,
                  heap_algs_t *algs );
