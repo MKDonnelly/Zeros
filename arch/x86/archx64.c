@@ -2,5 +2,5 @@
 #include <arch/x86/drivers/vga3h/vga3h.h>
 
 void arch_init_system(){
-   vga_init( &vmode_vga3h );
+   vga_init( &vmode_vga3h, 0 );
 }

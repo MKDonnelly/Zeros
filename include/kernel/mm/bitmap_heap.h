@@ -13,9 +13,9 @@
 #define DIBIT_GREEN 0x3
 
 typedef struct{
-   uint32_t blocksize;
+   size_t blocksize;
 
-   uint32_t dibitmap_len;
+   size_t dibitmap_len;
    char *dibitmap;
    
    //Another convenience field.
@@ -30,7 +30,7 @@ extern heap_algs_t bitmap_heap;
 void bitmap_init_heap(heap_t *heap);
 
 //Allocates memory on the heap
-void *bitmap_malloc(heap_t *heap, uint32_t size, uint32_t align);
+void *bitmap_malloc(heap_t *heap, size_t size, size_t align);
 
 //Frees dynamic memory
 void bitmap_free(heap_t *heap, void *memblock);

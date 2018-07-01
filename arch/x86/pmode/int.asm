@@ -25,7 +25,7 @@ get_current_context:
 
 global set_current_context
 set_current_context:
-   mov eax, [esp+8]
+   mov eax, [esp+4]
    mov [current_context], eax
    ret
 
@@ -134,7 +134,7 @@ isr%1:
 ; interrupt #x to point to 
 ; isr#x. Without this, we would
 ; have to go
-;    add_idt_entry(#x, isr#x)
+;    idt_add_entry(#x, isr#x)
 ; 256 times in c!
 global idt_setup_isrs
 idt_setup_isrs:

@@ -13,8 +13,8 @@
 #include <kernel/multiboot.h>
 #include <kernel/task.h>
 
-#include <kernel/mm/heap_blocklist.h>
-#include <kernel/mm/heap_bitmap.h>
+#include <kernel/mm/blocklist_heap.h>
+#include <kernel/mm/bitmap_heap.h>
 #include <kernel/mm/heap.h>
 
 #include <kernel/sched/sched.h>

@@ -1,0 +1,6 @@
+target remote localhost:1234
+symbol-file build/kernel.elf
+set arch i386:x86-64:intel
+b kmain64
+c
+

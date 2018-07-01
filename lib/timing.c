@@ -9,7 +9,7 @@ static system_time_t global_time = {0};
 
 static list_t alarm_list = LIST_SINIT(__builtin_offsetof(alarm_t, timer_list));
 
-void timing_set_alarm(void (*alarm_function)(), int ms_period){
+void timing_set_alarm(void (*alarm_function)(), unsigned int ms_period){
 
    alarm_t *new_alarm = (alarm_t*)k_malloc( sizeof(alarm_t), 0);
    new_alarm->callback = alarm_function;

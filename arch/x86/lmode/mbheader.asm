@@ -25,18 +25,21 @@ multiboot_header:
 ;    dd 0 ;0 = set graphics mode
 ;    dd 1024, 768, 16 ;Width, height, and depth for display
 
-KERNEL_STACK_START equ 0x300000
-
+[extern ldscript_kernel_end]
 arch_start:
-    ; setup the kernel stack
-    mov ebp, KERNEL_STACK_START
+    ;Setup the heap to start 4K after the end of the kernel.
+    ;Subtract 1 byte since the heap also starts at the same
+    ;address to prevent the two from overlapping.
+    mov ebp, ldscript_kernel_end
+    sub ebp, 1
+    ;align the address on a 16 byte boundary
+    and ebp, 0xFFFFFFF0
     mov esp, ebp
-
+    
     ;jump to long mode
     call long_mode_jump
 
     ;we should never get here
-
 
 global long_mode_jump
 long_mode_jump:
@@ -46,6 +49,7 @@ long_mode_jump:
    lgdt [gdt64.pointer]
    jmp gdt64.code:lmode_entry
    ;never returns
+
 
 enable_paging:
    ;Load p4 to cr3 register for use
@@ -88,7 +92,7 @@ setup_page_tables:
    mov [p2_table + ecx * 8], eax
 
    inc ecx
-   cmp ecx, 3 ;Map only 3 2MB pages
+   cmp ecx, 2 ;Map only 2 2MB pages
    jne .map_p2_table
 
    ret
@@ -123,6 +127,7 @@ p2_table:
    resb 4096
 
 section .rodata
+global gdt64
 gdt64:
    dq 0
 .code: equ $ - gdt64
