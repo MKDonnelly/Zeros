@@ -19,6 +19,11 @@ static void disable_pic(){
    portb_write(0xa1, 0xff);
 }
 
+void apic_eoi(){
+   uint32_t *apic_eoi = (uint32_t*)APIC_EOI;
+   *apic_eoi = 0;
+}
+
 void apic_enable(){
    asm("cli");
    disable_pic();
@@ -30,16 +35,19 @@ void apic_enable(){
    *((uint32_t*)APIC_SPURIOUS) |= (1<<8);
  
    uint32_t *timer_reg = (uint32_t*)APIC_TIMER;
-   uint32_t *timer_init_cnt = (uint32_t*)APIC_TIMER_COUNT;
-   *timer_init_cnt = 0x100;
+   *timer_reg |= (1 << 17);
+   k_printf("%x\n", *timer_reg);
+
+   uint32_t *timer_init_cnt = (uint32_t*)APIC_TIMER_ICOUNT;
+   *timer_init_cnt = 0xfffff;
+   //*timer_init_cnt = 0xffffffff;
   
-   uint32_t *divide = (uint32_t*)(APIC_BASE + 0x3E0);
+   uint32_t *divide = (uint32_t*)APIC_TIMER_DIV;
    *divide = 0xA;
 
-   uint32_t *timer = (uint32_t*)(APIC_BASE + 0x320);
+   uint32_t *timer = (uint32_t*)APIC_TIMER;
    *timer = (1<<17) | 32;
 
    k_printf("%x\n", *((uint32_t*)APIC_VERSION));
 
-//   asm("sti");
 }

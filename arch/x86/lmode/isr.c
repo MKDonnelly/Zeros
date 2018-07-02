@@ -2,5 +2,5 @@
 
 void main_interrupt_handler(context_t r){
    k_printf("Got interrupt %d\n", r.number);
-   arch_stop_cpu();
+   apic_eoi();
 }

@@ -12,13 +12,9 @@ Multitasking
    Create message passing interface and shared memory for IPC
    Add name to task_t
    Utilize page faults better (kill task that makes a page fault,etc)
-   create a task pool for fast task creation
    In userland, extend the idea of interrupts to that of signals;
       have userland programs register various events that should trigger
       and interrupt and have handler functions to catch it.
-
-filesystem
-   use inodes as the interface between the VFS and the file system
 
 drivers
    APIC, HPET, ATA non-PIO mode, PCI, network card
@@ -42,11 +38,7 @@ printing/screen manipulation:
 
 misc tasks 
    use syscall/sysret instead of interrupt
-Clean up the types (i.e. use size_t for arch stuff used in kernel)
-Re-write assembly programs to use GNU as; this way, we can include
- constants from a c program more easily
-
-misc tasks 
+   Clean up the types (i.e. use size_t for arch stuff used in kernel)
    use syscall/sysret instead of interrupt
    Create /dev virtual directory
    port zeros to xen

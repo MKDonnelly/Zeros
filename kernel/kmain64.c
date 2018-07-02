@@ -16,8 +16,8 @@ void kmain64(struct multiboot_header *mbh){
    heap_create( &global_kernel_heap,(size_t)&ldscript_kernel_end, 0x100000,
                 &blocklist_heap);
    vm_init();
-   apic_enable();
    idt_init();
+   apic_enable();
    arch_enable_ints();
    k_puts("Working..."); 
 
