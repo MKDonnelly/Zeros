@@ -62,15 +62,10 @@ void kmain(struct multiboot_info *multiboot_info){
    arch_timer_init( timing_main_handler );
    arch_keyboard_init( keyboard_main_handler );
    k_puts("\\c"); //clear screen
-   
-   //Have the heap start just after the text segment on an aligned boundary
-   //Add 0x2000 since the kernel stack starts there.
-   uint32_t heap_start = ALIGN_ON((int)&ldscript_kernel_end, 
-                                  ARCH_PAGE_SIZE);
-   //Keep in mind that only the first 4M of memory at the start of the
-   //kernel is mapped in. If the size is changed to be larger, this 
-   //may cause a page fault.
-   heap_create( &global_kernel_heap, heap_start, 0x200000, 
+ 
+   //Setup the heap on an aligned address after the end of the kernel
+   //image. the ldscript already aligned the address.
+   heap_create(&global_kernel_heap,(size_t)&ldscript_kernel_end, 0x200000, 
                 &bitmap_heap);
    
    //Copy the multiboot header since we will not be able to access

@@ -13,6 +13,9 @@ MULTIBOOT_HEADER_FLAGS equ PAGE_ALIGN | MEMORY_INFO ;| VIDEO_INFO
 KERNEL_VIRT_ADDR equ 0xC0000000
 KERNEL_PAGE equ (KERNEL_VIRT_ADDR >> 22)
 
+;Early kernel stack length
+EARLY_KERNEL_SLEN equ 3000
+
 [bits 32]
 
 section .boot
@@ -22,13 +25,12 @@ multiboot_header:
     dd MULTIBOOT_HEADER_FLAGS
     dd -(MULTIBOOT_HEADER_MAGIC + MULTIBOOT_HEADER_FLAGS)
 ;    dd 0, 0, 0, 0, 0 ;Zero out the bytes for AOUT_KLUDGE
-;    dd 0 ;0 = set graphics mode
+;    dd 0 ; 0 = set graphics mode
 ;    dd 1024, 768, 16 ;Width, height, and depth for display
 
 global arch_start
 
 [extern kmain]
-[extern ldscript_kernel_end]
 arch_start:
 
     ;Setup a temporary page directory so that 
@@ -60,8 +62,14 @@ arch_start:
     ;of the kernel. Note that the heap will also start
     ;at this same address, so 1 byte is subtracted to 
     ;ensure that they do not overlap.
-    mov ebp, ldscript_kernel_end
-    sub ebp, 1
+    mov ebp, early_kernel_stack
+    add ebp, EARLY_KERNEL_SLEN
+ 
+    ;Higher-half kernel is mapped to 0xC0000000.
+    ;Since paging is enabled, it is alright to push
+    ;to this address, since it will loop back to
+    ;the real address of early_kernel_stack
+    add ebp, KERNEL_VIRT_ADDR 
     ;align the stack on a 4 byte boundary
     and ebp, 0xFFFFFFFC
     mov esp, ebp
@@ -79,9 +87,17 @@ stop:
     jmp stop
 
 section .boot
-;TODO we waste a lot of space here due to alignment.
-;     add the early kernel stack here instead of having
-;     it go after the kernel image
+;We waste a lot of space here due to alignment.
+; In an attempt to get it back, place the early
+; kernel stack here instead of having it go 
+; after the kernel image.
+;This is a rough estimate: the code above is 
+; somewhere 50-100 bytes. To be safe, only
+; 3000 bytes is allocated after that for the early
+; kernel stack. This could get bigger, if needed.
+
+early_kernel_stack:
+times EARLY_KERNEL_SLEN db 0
 
 align 0x1000
 ;A fixed page table for the early boot environment. This identity

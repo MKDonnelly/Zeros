@@ -21,13 +21,13 @@ SECTIONS{
 
    ldscript_data_start = .;
    .data ALIGN (0x1000) : AT(ADDR(.data) - 0xC0000000) {
-       *(.data)
+      *(.data)
    }
    ldscript_data_end = .;
 
    ldscript_bss_start = .;
    .bss : AT(ADDR(.bss) - 0xC0000000) {
-       *(.bss)
+      *(.bss)
    }
    ldscript_bss_end = .;
 
@@ -36,12 +36,13 @@ SECTIONS{
      and then trying to map it in*/
    ldscript_initrd_start = .;
    .initrd : AT(ADDR(.initrd) - 0xC0000000) { 
-       *(.initrd)
+      *(.initrd)
    }
    ldscript_initrd_end = .;
 
-   /*Add 0x1000 for the kernel stack*/
-   . += 0x1000;
+   /*The heap will start after the kernel image. 
+     Align on 4K to make it easier to setup.*/
+   . = ALIGN(0x1000);
 
    ldscript_kernel_end = .;
 }
