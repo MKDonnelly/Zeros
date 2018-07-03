@@ -125,10 +125,10 @@ post-build:
 	@grub-mkrescue isofiles -o os.iso 2> /dev/null
 
 run: all
-	@qemu-system-x86_64 os.iso
+	@qemu-system-x86_64 -smp cpus=2 os.iso
 
 debug: all
-	@qemu-system-x86_64 os.iso -S -s &
+	@qemu-system-x86_64 os.iso -smp cpus=2 -S -s &
 	@gdb -q -x .gdbdebug64
 
 clean:
