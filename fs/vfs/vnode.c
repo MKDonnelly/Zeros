@@ -17,7 +17,7 @@ void sys_open(int fd, char *addr){
    k_printf("%c%c%c%c%c\n", buf[0], buf[1], buf[2], buf[3], buf[4]); 
 }
 
-void sys_write(int fd, char *ubuf, int len){
+void sys_write(int fd, char *ubuf, size_t len){
    ktask_t *ctask = current_scheduler->scheduler_current_ktask();
 
    char kbuf[30];
@@ -27,15 +27,15 @@ void sys_write(int fd, char *ubuf, int len){
 }
 
 
-int read_fs(fs_node_t *node, int offset, int size, char *buffer){
+int read_fs(fs_node_t *node, size_t offset, size_t len, char *buffer){
    if( node->read != NULL )
-      return node->read(node, offset, size, buffer);
+      return node->read(node, offset, len, buffer);
    return -1;
 }
 
-int write_fs(fs_node_t *node, int offset, int size, char *buffer){
+int write_fs(fs_node_t *node, size_t offset, size_t len, char *buffer){
    if( node->write != NULL )
-      return node->write(node, offset, size, buffer);
+      return node->write(node, offset, len, buffer);
    return -1;
 }
 

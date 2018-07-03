@@ -49,5 +49,5 @@
 #define APIC_EXT_REGS_START	(APIC_BASE + 0x500)
 #define APIC_EXT_REGS_END	(APIC_BASE + 0x530)
 
-#define APIC_TIMER		(APIC_BASE + 0x320)
-#define APIC_TIMER_COUNT	(APIC_BASE + 0x380)
+void apic_eoi();
+void apic_enable();

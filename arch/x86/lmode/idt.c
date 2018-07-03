@@ -1,4 +1,6 @@
 #include <arch/x86/lmode/idt.h>
+#include <lib/string.h>
+#include <arch/x86/cpu.h>
 
 static idt_entry_t idt_table[TOTAL_INTERRUPTS];
 static idt_descriptor_t idt_descriptor;
@@ -15,6 +17,10 @@ void idt_add_entry(uint64_t int_number, uint64_t handle_function){
                                  
    idt_table[int_number].seg_sel = 0x08; //GDT kernel code
 }
+
+//In int.asm
+extern void idt_setup_isrs(void);
+extern void idt_load(idt_descriptor_t*);
 
 void idt_init(){
    memset(idt_table, TOTAL_INTERRUPTS * sizeof(idt_entry_t), 0);

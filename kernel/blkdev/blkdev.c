@@ -6,7 +6,7 @@
 //drive that the blockdev can access. These do that. Write/reads
 //are intended to start from the start of the blkdev.
 void blkdev_write_lba(blkdev_t *dev, char *buf, 
-                      uint32_t lba, uint32_t len){
+                      size_t lba, size_t len){
    int drive_len = dev->max_lba - dev->min_lba;
    if( (lba + len) > drive_len || (lba + len) < 0 ){
       //Asked to write outside of drive.
@@ -17,7 +17,7 @@ void blkdev_write_lba(blkdev_t *dev, char *buf,
 }
 
 void blkdev_read_lba(blkdev_t *dev, char *buf,
-                     uint32_t lba, uint32_t len){
+                     size_t lba, size_t len){
    int drive_len = dev->max_lba - dev->min_lba;
    if( (lba + len) > drive_len || (lba + len) < 0 ){
       //Asked to write outside of drive.

@@ -7,6 +7,7 @@
 #include <kernel/mm/bitmap_heap.h>
 #include <kernel/mm/blocklist_heap.h>
 #include <arch/x86/drivers/lapic.h>
+#include <arch/x86/lmode/idt.h>
 
 extern size_t ldscript_kernel_end;
 

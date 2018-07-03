@@ -12,9 +12,9 @@ typedef struct part{
 
    //Used for finding out information about
    //parititions.
-   uint32_t (*part_start)(struct drive *drive, 
+   size_t (*part_start)(struct drive *drive, 
                           int part_num);
-   uint32_t (*part_len)(struct drive *drive,
+   size_t (*part_len)(struct drive *drive,
                         int part_num);
 }part_t;
 
@@ -27,9 +27,9 @@ typedef struct drive{
    
    //Common methods that all drives should support 
    void (*write_lba)(struct drive *drive, char *buffer,
-                     uint32_t lba, uint32_t size);
+                     size_t lba, size_t len);
    void (*read_lba)(struct drive *drive, char *buffer,
-                    uint32_t lba, uint32_t size);
+                    size_t lba, size_t len);
    void (*reset)();
 
    //This will store data specific to a drive.

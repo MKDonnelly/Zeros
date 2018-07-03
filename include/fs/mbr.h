@@ -45,7 +45,7 @@ typedef struct{
 } __attribute__((packed)) mbr_part_t;
 
 
-static inline uint32_t mbr_part_number(uint8_t num){
+static inline int mbr_part_number(int num){
    switch(num){
        case 1:
           return MBR_PART_1;
@@ -60,5 +60,5 @@ static inline uint32_t mbr_part_number(uint8_t num){
 }
 
 void mbr_setup_parttable(drive_t *drive);
-uint32_t mbr_get_partstart_lba(drive_t *drive, int part_number);
-uint32_t mbr_get_partsize(drive_t *drive, int part_number);
+size_t mbr_get_partstart_lba(drive_t *drive, int part_number);
+size_t mbr_get_partsize(drive_t *drive, int part_number);

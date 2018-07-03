@@ -1,7 +1,6 @@
 #pragma once
 
 #include <lib/types.h>
-typedef uint32_t size_t;
 
 //Masks for fs_node.flags
 #define FS_FILE         0x01
@@ -16,10 +15,10 @@ typedef struct fs_node fs_node_t;
 //These are function types used in fs_node_t.  They are used to specify
 //the type of function that can be used within fs_node_t. The functions 
 //inside of fs_node_t will change with the storage type.
-typedef int (*vnode_read_t)(fs_node_t *self, int offset, 
-                            int len, char *buffer);
-typedef int (*vnode_write_t)(fs_node_t *self, int offset, 
-                            int len, char *buffer);
+typedef int (*vnode_read_t)(fs_node_t *self, size_t offset, 
+                            size_t len, char *buffer);
+typedef int (*vnode_write_t)(fs_node_t *self, size_t offset, 
+                            size_t len, char *buffer);
 typedef int (*vnode_open_t)(fs_node_t *self, int flags);
 typedef int (*vnode_close_t)(fs_node_t *self);
 typedef int (*vnode_len_t)(fs_node_t *self);
@@ -41,8 +40,8 @@ typedef fs_node_t *(*vnode_finddir_t)(fs_node_t *self, char *name);
 typedef struct fstype fstype_t; //defined in fsmanager.h
 typedef struct fs_node{
    char name[FS_NODE_NAME_MAXLEN];
-   uint32_t flags; 
-   uint8_t type;
+   int flags; 
+   char type;
    fstype_t *fs;
 
    //TODO think about making this a void* to a fs-specific inode.
@@ -59,14 +58,11 @@ typedef struct fs_node{
    vnode_len_t len;
 } fs_node_t;
 
-//The root file system
-extern fs_node_t *fs_root;
-
 //These are used as a wrapper around a fs_node_t. They perform minimal
 //error checking (i.e. make sure the read member is not null before
 //calling it) and then call the actual function pointers.
-int read_fs(fs_node_t *node, int offset, int len, char *buffer);
-int write_fs(fs_node_t *node, int offset, int size, char *buffer);
+int read_fs(fs_node_t *node, size_t offset, size_t len, char *buffer);
+int write_fs(fs_node_t *node, size_t offset, size_t len, char *buffer);
 #define OPEN_R	0x1
 #define OPEN_W	0x2
 int open_fs(fs_node_t *node, int flags);
@@ -81,5 +77,5 @@ dirent_t *readdir_fs(fs_node_t *node, int index);
 fs_node_t *finddir_fs(fs_node_t *node, char *name);
 
 //system calls
-void sys_open(int a, char *addr);
-void sys_write(int fd, char *buf, int len);
+void sys_open(int fd, char *addr);
+void sys_write(int fd, char *buf, size_t len);

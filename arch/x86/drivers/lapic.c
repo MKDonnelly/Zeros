@@ -1,6 +1,7 @@
 #include <arch/x86/drivers/lapic.h>
 #include <lib/types.h>
 #include <arch/x86/lmode/paging.h>
+#include <arch/x86/portio.h>
 
 static void disable_pic(){
    portb_write(0x20, 0x11);

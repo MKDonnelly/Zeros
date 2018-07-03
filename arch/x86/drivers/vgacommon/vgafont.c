@@ -301,7 +301,8 @@ void write_font(unsigned char *buf, unsigned font_height){
 
    //write font 0 
    for(int i = 0; i < 256; i++){
-      memcpy( (void*)( 0xb8000 + (i * 32) ), buf, font_height );
+      size_t *addr = (size_t*)((char*)0xB8000 + (i*32));
+      memcpy( addr, buf, font_height );
       buf += font_height;
    }
 
