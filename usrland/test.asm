@@ -1,10 +1,4 @@
-section .data
-str: db 'Hello', 0
-str_len: equ $-str
-my_pid: db 1
-
 section .text
-
 global _start
 _start:
    mov eax, 2
@@ -13,24 +7,34 @@ _start:
    mov edx, str_len
    int 0x31
 
-   mov eax, 3
+   ;open file
+   mov eax, 0
+   mov ebx, fname
+   int 0x31
+ 
+   ;read from file
+   mov eax, 4
+   mov ebx, 1
+   mov ecx, filebuf
+   mov edx, 9
    int 0x31
 
-   add eax, '0'
-   mov byte [my_pid], al
-   
+   ;write to stdout
    mov eax, 2
    mov ebx, 0
-   mov ecx, my_pid
-   mov edx, 1
+   mov ecx, filebuf
+   mov edx, 9
    int 0x31
 
-;   mov ecx, str
-;   call write_str
-
-.end:
    mov eax, 1
    int 0x31
+
+fname: db 'data.txt', 0
+str: db 'Hello', 0
+str_len: equ $-str
+tmp: db ' '
+filebuf: db '          '
+
 
 ;ecx has address of string
 global write_str

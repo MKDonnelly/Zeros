@@ -56,6 +56,30 @@ extern unsigned int ldscript_kernel_end;
 extern unsigned int ldscript_initrd_start;
 
 
+int stdout_test(fs_node_t *self, int offset, int len, char *buffer){
+   //self and offset are ignored
+   for(int i = 0; i < len; i++){
+      k_printf("%c", buffer[i]);
+   }
+}
+
+fs_node_t stdout_fs = {
+   .name = "stdout",
+   .flags = 0,
+   .type = 0,
+   .fs = NULL,
+   .inode = 0,
+   .write = stdout_test,
+};
+
+void init_usrland_fds(ktask_t *usr_task){
+   usr_task->open_fs[0] = &stdout_fs;
+   usr_task->next_free_node = 1;
+}
+
+
+fs_node_t *root_fs = NULL;
+
 void kmain(struct multiboot_info *multiboot_info){
 
    arch_system_init();
@@ -93,43 +117,27 @@ void kmain(struct multiboot_info *multiboot_info){
 
    fstype_t *initrd = fsmanager_find_id(0x11111111);
    if( initrd != NULL ){
-      fs_node_t *root = &initrd->root_dir;
-      dirent_t *first = root->readdir(root, 0);
+      root_fs = &initrd->root_dir;
+      dirent_t *first = root_fs->readdir(root_fs, 0);
       k_printf("Name is %s, %d\n", first->name, first->inode);
 
-      fs_node_t *file = root->finddir(root, first->name); 
-      char buf[100];
-      file->read( file, 0, 20, buf );
-      for(int i = 0; i < 10; i++){
-         k_printf("%c", buf[i]);
-      }      
+      fs_node_t *file = root_fs->finddir(root_fs, first->name); 
+      k_free(first);
+      char *buf = k_malloc(1000, 0);
+      file->read( file, 0, file->len(file), buf );
 
+      k_printf("Test read of data.txt\n");
+      char buf2[20];
+      memset(buf2, 20, 0);
+      fs_node_t *data = root_fs->finddir(root_fs, "data.txt");
+      data->read(data, 0, 10, buf2);
+      k_printf("Read %s\n", buf2);
+
+      ktask_t *new_task = utask_from_elf(buf);
+      init_usrland_fds(new_task);
+      current_scheduler->scheduler_add_task(new_task);
+      current_scheduler->scheduler_start();
    }
-/*   fstype_t *z = fsmanager_find_id(0x1234ABCD);
-   if( z != NULL ){
-      k_printf("YES!\n");
-      zsfs_sb_t *sb = z->get_superblock(z);
-      k_printf("From superblock: %x, %d, %d\n", sb->fs_id, sb->freeblock_block, sb->fsentry_block);
-   }*/
-
-//   blkdev_t *blkdev = blkdev_find(0);
-//   zsfs_create(blkdev);   
-
-//   pci_enumerate();
-//   rtl8139_test_send();
-
-/*
-//Read in first file from initrd (it will contain a test binary)
-   char *program_buf = k_malloc( 5000, 0);
-   fs_root = init_initrd( &ldscript_initrd_start );
-   fs_node_t *first = fs_root->readdir( fs_root, 0 );
-   first->read( first, 0, first->length, program_buf);
-
-   ktask_t *new_task = utask_from_elf(program_buf);
-   
-   current_scheduler->scheduler_add_task(new_task);
-
-   current_scheduler->scheduler_start();*/
 
    while(1) arch_halt_cpu();
 }

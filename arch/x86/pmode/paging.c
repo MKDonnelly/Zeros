@@ -88,11 +88,11 @@ void vm_pmap_range( uint32_t vaddr, uint32_t paddr, pd_t *page_directory,
 
 //Used for pages that frequently change (like when used by copy_to_physiscal)
 void vm_pmap_temp( uint32_t vaddr, uint32_t paddr, pd_t *page_directory){
-   vm_pmap( vaddr, paddr, page_directory, PAGE_RW, PAGE_KERNEL_ACCESS );
-
    //We expect the mapping to change frequently, so this ensure that when
    //we return, there is no cached reference to the page we mapped.
    inval_page( vaddr );
+
+   vm_pmap( vaddr, paddr, page_directory, PAGE_RW, PAGE_KERNEL_ACCESS );
 }
 
 //Copies len bytes of memory at the virtual address vbuf to the physical
@@ -106,7 +106,8 @@ void vm_copy_to_physical(char *vbuf, uint32_t paddr, uint32_t len){
    //Align page frame on 4K boundary
    vm_pmap_temp( 0x0, ALIGN_4K(paddr), kernel_page_dir );
 
-   //FIXME len is assumed to be less than the page size
+   //FIXME len is assumed to be less than the page size and
+   //      does not cross a page boundary.
    memcpy( (char*)0x0, vbuf, len );
 }
 
@@ -115,18 +116,46 @@ void vm_copy_to_physical(char *vbuf, uint32_t paddr, uint32_t len){
 void vm_copy_from_pdir(uint32_t vaddr, pd_t *page_directory, 
                        char *to, uint32_t len){
 
-   uint32_t physical_page_addr = virt_to_phys( vaddr, page_directory );
+   uint32_t physical_page_addr = virt_to_phys(ALIGN_4K(vaddr), page_directory);
 
    //physical_page_addr will only give us the addres of the page, not
    //the actual offset within that page.
    uint32_t offset_into_page = vaddr & 0xFFF;
 
-   //Map it into the kernel address space
+   //Map it into the current page directory. We should
+   //be operating under the page directory passed to us.
    vm_pmap_temp( 0x0, physical_page_addr, page_directory );
 
    //Note: currently we assume that the data remains within a page
    KASSERT( len < ARCH_PAGE_SIZE );
    memcpy( to, (char*)offset_into_page, len );
+}
+
+//Copies a string from a page directory to the buffer, with a param
+//specifying the max length.
+void vm_copy_str(uint32_t vaddr, pd_t *page_directory,
+                 char *to, uint32_t max){
+   uint32_t physical_page_addr = virt_to_phys(ALIGN_4K(vaddr), page_directory);
+
+   //physical_page_addr will only give us the addres of the page, not
+   //the actual offset within that page.
+   uint32_t offset_into_page = vaddr & 0xFFF;
+
+   //Map it into the current page directory. We should
+   //be operating under the page directory passed to us.
+   vm_pmap_temp( 0x0, physical_page_addr, page_directory );
+
+   //Note: currently we assume that the data remains within a page
+   KASSERT( max < ARCH_PAGE_SIZE );
+   int i = 0;
+   char *user_string = (char*)offset_into_page;
+   while( i < max && user_string[i] != 0 ){
+      to[i] = user_string[i];
+      i++;
+   }
+
+   //set that null byte
+   to[i] = 0;
 }
 
 //Copies the page at one physical address to another 

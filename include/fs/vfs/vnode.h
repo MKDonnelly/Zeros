@@ -81,5 +81,6 @@ dirent_t *readdir_fs(fs_node_t *node, int index);
 fs_node_t *finddir_fs(fs_node_t *node, char *name);
 
 //system calls
-void sys_open(int a, char *addr);
-void sys_write(int fd, char *buf, int len);
+int sys_open(char *name);
+int sys_write(int fd, char *buf, int len);
+int sys_read(int fd, char *ubuf, int len);

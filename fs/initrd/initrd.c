@@ -212,6 +212,7 @@ fs_node_t *initrd_finddir(fs_node_t *dir, char *name){
          new_file->fs = dir->fs; //file must be on same drive as directory
          new_file->inode = dir_entries[i].inode;
          new_file->read = initrd_read;
+         new_file->len = initrd_len;
 
          return new_file;
       }

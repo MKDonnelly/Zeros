@@ -15,4 +15,5 @@ void syscalls_init(){
    arch_register_syscall( current_scheduler->scheduler_exit_task, 1 );
    arch_register_syscall( sys_write, 2 );
    arch_register_syscall( sys_getpid, 3 );
+   arch_register_syscall( sys_read, 4);
 }
