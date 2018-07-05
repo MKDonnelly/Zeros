@@ -30,7 +30,7 @@ int sys_open(char *name){
 }
 
 int sys_write(int fd, char *ubuf, int len){
-   k_printf("Write called!\n");
+   k_printf("Write called w/ %d bytes!\n", len);
    ktask_t *ctask = current_scheduler->scheduler_current_ktask();
    
    char *kbuf = k_malloc(len, 0);
@@ -47,11 +47,12 @@ int sys_read(int fd, char *ubuf, int len){
    char *kbuf = k_malloc(len, 0);
    ctask->open_fs[fd]->read( ctask->open_fs[fd], 0, len, kbuf);
 
-   k_printf("You read ");
+   k_printf("You read %d bytes ", len);
    for(int i = 0; i < len; i++)
       k_printf("%c", kbuf[i]);
+   k_printf("\n");
 
-   vm_copy_to_physical(kbuf, ubuf, len);
+   vm_copy_to_physical(kbuf, virt_to_phys(ALIGN_4K((uint32_t)ubuf), ctask->task_info.task_pd) + (uint32_t)ubuf & 0xfff, len);
    return 0; 
 }
 

@@ -126,13 +126,6 @@ void kmain(struct multiboot_info *multiboot_info){
       char *buf = k_malloc(1000, 0);
       file->read( file, 0, file->len(file), buf );
 
-      k_printf("Test read of data.txt\n");
-      char buf2[20];
-      memset(buf2, 20, 0);
-      fs_node_t *data = root_fs->finddir(root_fs, "data.txt");
-      data->read(data, 0, 10, buf2);
-      k_printf("Read %s\n", buf2);
-
       ktask_t *new_task = utask_from_elf(buf);
       init_usrland_fds(new_task);
       current_scheduler->scheduler_add_task(new_task);

@@ -13,6 +13,10 @@
 #include <lib/print.h>
 #include <lib/assert.h>
 
+//TODO unify paging and task stuff
+//     virt_to_phys and vm_copy_to_physical should
+//     work on ktasks
+
 //Points to current page directory in use as well
 //as the page directory used by the kernel.
 pd_t *kernel_page_dir;
@@ -108,7 +112,7 @@ void vm_copy_to_physical(char *vbuf, uint32_t paddr, uint32_t len){
 
    //FIXME len is assumed to be less than the page size and
    //      does not cross a page boundary.
-   memcpy( (char*)0x0, vbuf, len );
+   memcpy( (char*)0x0 + (uint32_t)(paddr & 0xfff), vbuf, len );
 }
 
 //Copies data from a virtual address in a page directory to the given
