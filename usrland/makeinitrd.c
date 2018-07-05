@@ -35,7 +35,7 @@ typedef struct initrd_inode{
 //This is what a directory entry points to. The number of these
 //structures is determined by the length
 typedef struct initrd_dirent{
-   char name[128];
+   char name[32];
    uint32_t inode;
 }initrd_dirent_t;
 
@@ -111,7 +111,7 @@ int main(char argc, char **argv){
    int *lengths = malloc(sizeof(int) * total_files);
    int *offsets = malloc(sizeof(int) * total_files);
 
-   for(int i = 0; i <= total_files; i++){
+   for(int i = 0; i < total_files; i++){
       //Open the file to put in the initrd. Add 1 since index 0
       //is the name of this program.
       FILE *initrd_file = fopen(argv[i+1], "r");
@@ -124,10 +124,14 @@ int main(char argc, char **argv){
       initrd_offset += lengths[i];
 
       //Write the file to the iniitrd 
-      char temp;
-      while( (temp = getc(initrd_file)) != EOF )
+      int temp;
+      int i = 0;
+      while( (temp = getc(initrd_file)) != EOF ){
          fputc(temp, initrd);
-      fclose( initrd_file);
+         i++;
+      }
+      fflush(initrd_file);
+      fclose(initrd_file);
    }
 
    //We now go back and update the file_header structures

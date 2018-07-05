@@ -27,7 +27,7 @@ typedef struct initrd_inode{
 }initrd_inode_t;
 
 typedef struct initrd_dirent{
-   char name[128];
+   char name[FILENAME_MAX_LEN];
    uint32_t inode;
 }initrd_dirent_t;
 
