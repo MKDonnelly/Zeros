@@ -21,7 +21,8 @@ arch_c_srcs := 				\
 	arch/x86/lmode/gdt.c		\
 	arch/x86/lmode/isr.c		\
 	arch/x86/lmode/paging.c		\
-	arch/x86/drivers/lapic.c
+	arch/x86/drivers/lapic.c	\
+	arch/x86/drivers/ioapic.c
 
 arch_asm_srcs :=			\
 	arch/x86/cpu.asm		\
