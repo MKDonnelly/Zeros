@@ -29,13 +29,6 @@ _start:
    mov eax, 1
    int 0x31
 
-fname: db 'data.txt', 0
-str: db 'Hello', 0
-str_len: equ $-str
-tmp: db ' '
-filebuf: db '          '
-
-
 ;ecx has address of string
 global write_str
 write_str:
@@ -49,4 +42,13 @@ write_str:
    jmp .loop
 .end:
    ret
+
+section .data
+fname: db 'data.txt', 0
+str: db 'Hello', 0
+str_len: equ $-str
+tmp: db ' '
+filebuf: db '          '
+
+
 

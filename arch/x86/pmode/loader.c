@@ -25,16 +25,20 @@ uint32_t arch_create_from_elf(Elf32_Ehdr *elf_data, pd_t *task_pd){
    if( !elf_verify_magic(elf_data) || !elf_can_exec(elf_data) )
       return 0;
 
-   Elf32_Phdr *elf_pheader = (Elf32_Phdr*)( (char*)elf_data + elf_data->e_phoff);
+   Elf32_Phdr *elf_pheader = (Elf32_Phdr*)( (char*)elf_data  
+                                            + elf_data->e_phoff);
 
    for(int i = 0; i < elf_data->e_phnum; i++){
       elf_pheader = (Elf32_Phdr*)( (char*)elf_data + elf_data->e_phoff +
                                     i * elf_data->e_phentsize);
+      k_printf("Header offset: %d\n", elf_pheader->p_offset);
+      k_printf("Loading to vaddr %x, size %d\n", elf_pheader->p_vaddr, elf_pheader->p_filesize);
       if( elf_pheader->p_type == PT_LOAD ){
          uint32_t frame = framepool_first_free(); 
-         vm_pmap( elf_pheader->p_vaddr, frame, task_pd, 1, 1);
+         vm_pmap( ALIGN_DOWN(elf_pheader->p_vaddr, 0x1000), frame, task_pd, 1, 1);
+         k_printf("%x is mapped to %x\n", elf_pheader->p_vaddr, virt_to_phys(elf_pheader->p_vaddr, task_pd));
          vm_copy_to_physical( (char*)elf_data + elf_pheader->p_offset, 
-                           frame, elf_pheader->p_filesize);
+                           frame + ((uint32_t)elf_pheader->p_vaddr & 0xfff), elf_pheader->p_filesize);
       }
    }
    return elf_data->e_entry;

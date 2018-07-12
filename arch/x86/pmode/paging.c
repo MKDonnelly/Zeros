@@ -65,6 +65,7 @@ uint32_t virt_to_phys( uint32_t uaddr, pd_t *page_directory ){
 }
 
 //TODO combine rw and user_access using flags
+//TODO have this automatically align vaddr
 void vm_pmap(uint32_t vaddr, uint32_t paddr, pd_t *page_directory, 
              uint8_t rw, uint8_t user_access){
 
@@ -94,9 +95,12 @@ void vm_pmap_range( uint32_t vaddr, uint32_t paddr, pd_t *page_directory,
 void vm_pmap_temp( uint32_t vaddr, uint32_t paddr, pd_t *page_directory){
    //We expect the mapping to change frequently, so this ensure that when
    //we return, there is no cached reference to the page we mapped.
-   inval_page( vaddr );
 
    vm_pmap( vaddr, paddr, page_directory, PAGE_RW, PAGE_KERNEL_ACCESS );
+
+   //TODO fix inval_page. it does not work
+   //inval_page( vaddr );
+   asm volatile("invlpg %0" : : "m"(*(int*)vaddr));
 }
 
 //Copies len bytes of memory at the virtual address vbuf to the physical
@@ -110,6 +114,7 @@ void vm_copy_to_physical(char *vbuf, uint32_t paddr, uint32_t len){
    //Align page frame on 4K boundary
    vm_pmap_temp( 0x0, ALIGN_4K(paddr), kernel_page_dir );
 
+   k_printf("%x is mapped to %x\n", 0x0, virt_to_phys(0x0, kernel_page_dir));
    //FIXME len is assumed to be less than the page size and
    //      does not cross a page boundary.
    memcpy( (char*)0x0 + (uint32_t)(paddr & 0xfff), vbuf, len );

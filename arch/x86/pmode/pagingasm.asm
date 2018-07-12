@@ -21,7 +21,7 @@ arch_enable_paging:
 ;the page mapping without switching out CR3
 global inval_page
 inval_page:
-   invlpg [esp+0x8]
+   invlpg [esp+0x4]
    ret
 
 ;Returns the address of the page fault

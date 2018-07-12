@@ -2,10 +2,6 @@ Multitasking
    program execution
       work on elf linking and loading
       READ MAN ELF!
-      For some reason, the program header offset is 0
-         when doing a default link with no linker script
-         Links to the same address w/ the default address
-         do as well, but other address work fine.
    create systemcall interface 
    Symmetric Multi Processing (SMP) (see intel multiprocessor spec)
    Work on scheduler

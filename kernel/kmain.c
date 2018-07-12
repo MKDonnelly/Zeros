@@ -105,7 +105,7 @@ void kmain(struct multiboot_info *multiboot_info){
    //Initilize vm subsystem. This requires the heap, so we cannot
    //have arch_system_init do this.
    vm_init();
-   
+  
    current_scheduler = &rr_scheduler;
    current_scheduler->scheduler_setup();
    syscalls_init();
