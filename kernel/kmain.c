@@ -123,7 +123,7 @@ void kmain(struct multiboot_info *multiboot_info){
 
       fs_node_t *file = root_fs->finddir(root_fs, first->name); 
       k_free(first);
-      char *buf = k_malloc(1000, 0);
+      char *buf = k_malloc(2000, 0);
       file->read( file, 0, file->len(file), buf );
 
       ktask_t *new_task = utask_from_elf(buf);

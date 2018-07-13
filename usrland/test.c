@@ -1,7 +1,11 @@
+#include "stdlib.h"
 
 void main(){
-   asm volatile("movl $0, %%eax" :);
-   asm volatile("movl $0x5A, %%ebx" :);
-   asm volatile("int $0x31" :);
-   while(1);
+   char name[] = "data.txt";
+   char msg[] = "Usrland: opening data.txt";
+   syscall_write(0, msg, sizeof(msg));
+   syscall_open(name);
+
+   syscall_exit(0);   
 }
+

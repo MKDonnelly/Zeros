@@ -23,15 +23,6 @@ static void syscall_handler(){
                                   current_context->edi);
 }
 
-/*static void syscall_handler(context_t regs){
-
-   if( regs.eax < 0 || regs.eax > TOTAL_SYSCALLS )
-      return;
-
-   uint32_t (*syscall)() = syscall_table[regs.eax];
-   regs.eax = syscall(regs.ebx, regs.ecx, regs.edx, regs.esi, regs.edi);
-}*/
-
 
 //Initilizes the system call interrupt
 void arch_syscalls_init(){

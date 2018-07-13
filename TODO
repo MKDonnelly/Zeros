@@ -8,13 +8,9 @@ Multitasking
    Create message passing interface and shared memory for IPC
    Add name to task_t
    Utilize page faults better (kill task that makes a page fault,etc)
-   create a task pool for fast task creation
    In userland, extend the idea of interrupts to that of signals;
       have userland programs register various events that should trigger
       and interrupt and have handler functions to catch it.
-
-filesystem
-   use inodes as the interface between the VFS and the file system
 
 drivers
    APIC, HPET, ATA non-PIO mode, PCI, network card
@@ -54,6 +50,8 @@ misc tasks
       heap. e.g. paging stuff requires a lot of 4K pages
       aligned on 4K; have a slab allocator catch those and
       have the generic slab as a backup
+   Let heap code accept hints. i.e. this memory will be allocated
+      for a long/short time, expands/does not expand, etc
 
 advanced os examples:
    dragonfly bsd, minix, plan9, genode, haiku, helenos, redox

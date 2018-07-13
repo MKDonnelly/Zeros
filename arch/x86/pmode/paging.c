@@ -114,7 +114,6 @@ void vm_copy_to_physical(char *vbuf, uint32_t paddr, uint32_t len){
    //Align page frame on 4K boundary
    vm_pmap_temp( 0x0, ALIGN_4K(paddr), kernel_page_dir );
 
-   k_printf("%x is mapped to %x\n", 0x0, virt_to_phys(0x0, kernel_page_dir));
    //FIXME len is assumed to be less than the page size and
    //      does not cross a page boundary.
    memcpy( (char*)0x0 + (uint32_t)(paddr & 0xfff), vbuf, len );

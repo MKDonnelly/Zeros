@@ -1,5 +1,8 @@
 #include <include/lib/keyboard.h>
 
+//TODO make callback on any key
+//     add getchar system call and make this 
+//      part of usrland stdio
 char keyboard_buffer[KEYBOARD_BUFFER_MAX];
 int keyboard_number_chars = 0;
 
