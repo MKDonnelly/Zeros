@@ -16,6 +16,8 @@ typedef struct fs_node fs_node_t;
 //These are function types used in fs_node_t.  They are used to specify
 //the type of function that can be used within fs_node_t. The functions 
 //inside of fs_node_t will change with the storage type.
+//TODO incorporate a current position for the vnode since 
+//     offset is ignored
 typedef int (*vnode_read_t)(fs_node_t *self, int offset, 
                             int len, char *buffer);
 typedef int (*vnode_write_t)(fs_node_t *self, int offset, 

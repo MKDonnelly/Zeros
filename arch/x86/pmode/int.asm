@@ -51,6 +51,7 @@ set_current_context:
 [extern arch_save_context]
 [extern arch_set_context]
 interrupt_common:
+   cli
    pushad
 
    ;Save segment registers for userland interrupt

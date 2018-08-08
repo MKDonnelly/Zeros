@@ -25,7 +25,7 @@ void fsmanager_check(blkdev_t *blockdev){
    //Read the first block of the block device. Iterate
    //over each template filesystem and find one that matches.
    char *temp_buf = k_malloc(blockdev->block_size, 0);
-   blockdev->read_lba( blockdev, temp_buf, 0, 1 );
+   blockdev->read_lba( blockdev, 0, 1, temp_buf );
 
    for(int i = 0; i < template_fses_count; i++){
       //TODO let the filesystems themselves do the I/O and return

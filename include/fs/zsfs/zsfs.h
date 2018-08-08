@@ -35,7 +35,7 @@ int zsfs_write(fs_node_t *file, int offset, int len, char *buffer);
 
 //ZSFS implements lazy opening. A call to finddir_fs will return a 
 //fs_node_t, but this will not result in an inode being allocated for
-//the file. Instead. the node must call open in order for an inode
+//the file. Instead, the node must call open in order for an inode
 //to be allocated.
 int zsfs_open(fs_node_t *fsnode, int flags);
 int zsfs_close(fs_node_t *fsnode);

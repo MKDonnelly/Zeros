@@ -2,6 +2,7 @@ Multitasking
    program execution
       work on elf linking and loading
       READ MAN ELF!
+   Look into what vDSO is (man vdso)
    create systemcall interface 
    Symmetric Multi Processing (SMP) (see intel multiprocessor spec)
    Work on scheduler
@@ -32,16 +33,14 @@ printing/screen manipulation:
     also use grub gfx directive to boot into a higher video mode
   make routines for 1024x768 graphics mode (set by multiboot header)
 
-misc tasks 
-   use syscall/sysret instead of interrupt
-Clean up the types (i.e. use size_t for arch stuff used in kernel)
-Re-write assembly programs to use GNU as; this way, we can include
- constants from a c program more easily
 
 misc tasks 
    use syscall/sysret instead of interrupt
    Create /dev virtual directory
    port zeros to xen
+   Re-write assembly programs to use GNU as; this way, we can include
+     constants from a c program more easily
+   Clean up the types (i.e. use size_t for arch stuff used in kernel)
    port over a c library (newlib, uClib, musl)
    Add a how-to to explain how each subsystem works
    Add examples for each subsystem for reference

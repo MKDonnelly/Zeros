@@ -3,6 +3,8 @@
 #include <lib/string.h>
 #include <arch/x86/pmode/frame.h>
 
+//TODO move elf stuff into generic lib file
+
 uint8_t elf_verify_magic(Elf32_Ehdr *elf_header){
    return strncmp( (char*)elf_header, ELF_MAGIC, ELF_MAGIC_LEN ) == 0;
 }
@@ -17,7 +19,6 @@ int8_t elf_can_exec(Elf32_Ehdr *elf_header){
    return 1;
 }
 
-//TODO Not working properly without userland_link.ld
 //Returns starting address of program.
 uint32_t arch_create_from_elf(Elf32_Ehdr *elf_data, pd_t *task_pd){
 

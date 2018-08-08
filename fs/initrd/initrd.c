@@ -80,13 +80,8 @@ void initrd_init(size_t *start){
    initrd.open_inodes = (void*)list_create(initrd_inode_t, inodes_list);
 
    //Put in the inode for the root filesystem. Copy it from the initrd.
-//   initrd_inode_t *root_inode = k_malloc(sizeof(initrd_inode_t), 0);
-//   memcpy(root_inode, &(((initrd_sb_t*)initrd.superblock)->root_inode), 
-//           sizeof(initrd_inode_t));
-
    list_pushfront((list_t*)initrd.open_inodes, 
                   &(((initrd_sb_t*)initrd.superblock)->root_inode));
-   //list_pushfront((list_t*)initrd.open_inodes, root_inode);
 
    fsmanager_add_active_fs(&initrd);
 }
@@ -178,11 +173,7 @@ int initrd_len(fs_node_t *node){
    if( found != NULL ){
       return found->length;
    }
-/*   list_foreach( (list_t*)node->fs->open_inodes, 
-                                 iter_node, initrd_inode_t ){
-      if( iter_node->inode == node->inode )
-         return iter_node->length;
-   }*/
+
    //Node is not opened or does not exist
    return -1;
 }

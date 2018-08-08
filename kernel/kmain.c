@@ -63,6 +63,28 @@ int stdout_test(fs_node_t *self, int offset, int len, char *buffer){
    }
 }
 
+int stdin_test(fs_node_t *self, int offset, int len, char *buffer){
+   //offset is ignored right now
+   for(int i = 0; i < len; i++){
+      int key = keyboard_getchar();
+      while( key == -1 ){
+         current_scheduler->scheduler_yield_task();
+         key = keyboard_getchar();
+      }
+      buffer[i] = (char)key;
+   }
+   k_printf("Returning with %c%c\n", buffer[0], buffer[1]);
+}
+
+fs_node_t stdin_fs = {
+   .name = "stdin",
+   .flags = 0,
+   .type = 0,
+   .fs = NULL,
+   .inode = 0,
+   .read = stdin_test,
+};
+
 fs_node_t stdout_fs = {
    .name = "stdout",
    .flags = 0,
@@ -73,8 +95,12 @@ fs_node_t stdout_fs = {
 };
 
 void init_usrland_fds(ktask_t *usr_task){
-   usr_task->open_fs[0] = &stdout_fs;
-   usr_task->next_free_node = 1;
+   usr_task->open_fs[0] = &stdin_fs;
+   usr_task->open_fs[1] = &stdout_fs;
+
+   //0 for stdin, 1 for stdout, 2 for stderr, 
+   //3 is the next free
+   usr_task->next_free_node = 3;
 }
 
 
@@ -94,8 +120,8 @@ void kmain(struct multiboot_info *multiboot_info){
    
    //Copy the multiboot header since we will not be able to access
    //it once paging is setup
-   struct multiboot_info *mb_copy = k_malloc(sizeof(struct multiboot_info), 0);
-   memcpy( mb_copy, multiboot_info, sizeof(struct multiboot_info));
+   multiboot_info_t *mb_copy = k_malloc(sizeof(multiboot_info_t), 0);
+   memcpy( mb_copy, multiboot_info, sizeof(multiboot_info));
 
    //Also copy over the command line arguments
    char *cmdline = k_malloc(strlen((char*)multiboot_info->cmdline), 0);

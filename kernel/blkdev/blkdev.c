@@ -5,25 +5,25 @@
 //on a drive. To do that, we need to limit the range of the 
 //drive that the blockdev can access. These do that. Write/reads
 //are intended to start from the start of the blkdev.
-void blkdev_write_lba(blkdev_t *dev, char *buf, 
-                      uint32_t lba, uint32_t len){
+void blkdev_write_lba(blkdev_t *dev, size_t lba, 
+                      size_t len, char *buf){
    int drive_len = dev->max_lba - dev->min_lba;
    if( (lba + len) > drive_len || (lba + len) < 0 ){
       //Asked to write outside of drive.
       return;
    }else{
-      dev->parent->write_lba(dev->parent, buf, dev->min_lba + lba, len);
+      dev->parent->write_lba(dev->parent, dev->min_lba + lba, len, buf);
    }
 }
 
-void blkdev_read_lba(blkdev_t *dev, char *buf,
-                     uint32_t lba, uint32_t len){
+void blkdev_read_lba(blkdev_t *dev, size_t lba, 
+                     size_t len, char *buf){
    int drive_len = dev->max_lba - dev->min_lba;
    if( (lba + len) > drive_len || (lba + len) < 0 ){
       //Asked to write outside of drive.
       return;
    }else{
-       dev->parent->read_lba(dev->parent, buf, dev->min_lba + lba, len);
+       dev->parent->read_lba(dev->parent, dev->min_lba + lba, len, buf);
    }
 }
 

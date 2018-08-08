@@ -21,15 +21,15 @@ typedef struct part{
 //Represents a storage drive attached
 
 typedef struct drive{
-   int id, type, blksize, maxlba;
+   int id, blksize, maxlba;
    
    part_t partitions;
    
    //Common methods that all drives should support 
-   void (*write_lba)(struct drive *drive, char *buffer,
-                     uint32_t lba, uint32_t size);
-   void (*read_lba)(struct drive *drive, char *buffer,
-                    uint32_t lba, uint32_t size);
+   void (*write_lba)(struct drive *drive, size_t lba, 
+                        size_t len, char *buffer);
+   void (*read_lba)(struct drive *drive, size_t lba, 
+                       size_t len, char *buffer);
    void (*reset)();
 
    //This will store data specific to a drive.

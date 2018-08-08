@@ -6,14 +6,14 @@
 char keyboard_buffer[KEYBOARD_BUFFER_MAX];
 int keyboard_number_chars = 0;
 
-char callback_key;
-void (*char_callback)(char);
+//char callback_key;
+//void (*char_callback)(char);
 
 void keyboard_main_handler(char key_entered){
 
-   if( key_entered == callback_key ){
-      char_callback(key_entered);
-   }
+//   if( key_entered == callback_key ){
+//      char_callback(key_entered);
+//   }
 
    //We have space in the buffer.
    if( keyboard_number_chars < KEYBOARD_BUFFER_MAX ){
@@ -28,7 +28,13 @@ void keyboard_main_handler(char key_entered){
    }
 }
 
-void keyboard_register_key_callback( void (*key_callback)(char), char key){
-   callback_key = key;
-   char_callback = key_callback;
+int keyboard_getchar(){
+   //ran out of input
+   if( keyboard_number_chars <= 0 )
+      return -1;
+
+   keyboard_number_chars--;
+   char c = keyboard_buffer[keyboard_number_chars];
+   return c;
 }
+

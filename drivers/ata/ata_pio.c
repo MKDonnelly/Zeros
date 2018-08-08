@@ -260,11 +260,11 @@ void ata_pio_identify_drive( drive_t *drive ){
 }
 
 
-void ata_pio_read( drive_t *drive, char *b, 
-                    uint32_t lba, uint32_t blocks){
+void ata_pio_read( drive_t *drive,  size_t lba, 
+                   size_t blocks, char *buf){
    //THIS IS CRUCIAL! We read 16 bits at a time, so our array
    //MUST be an array of 16 bit members!
-   uint16_t *buffer = (uint16_t*)b;
+   uint16_t *buffer = (uint16_t*)buf;
 
    ata_pio_drive_t *ata_pio = (ata_pio_drive_t*)drive->drive_data;   
 
@@ -307,11 +307,11 @@ void ata_pio_read( drive_t *drive, char *b,
 }
 
 
-void ata_pio_write(drive_t *drive, char *b, 
-                     uint32_t lba, uint32_t blocks){ 
+void ata_pio_write(drive_t *drive, size_t lba, 
+                   size_t blocks, char *buf){ 
    //THIS IS CRUCIAL! We write 16 bits at a time, so our array
    //MUST be an array of 16 bit members!
-   uint16_t *buffer = (uint16_t*)b;
+   uint16_t *buffer = (uint16_t*)buf;
 
    ata_pio_drive_t *ata_pio = (ata_pio_drive_t*)drive->drive_data;
 

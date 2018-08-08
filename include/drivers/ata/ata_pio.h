@@ -17,9 +17,9 @@ void ata_enumerate();
 drive_t *ata_pio_create_drive(int bus, int drive);
 
 void ata_pio_identify_drive(drive_t *drive);
-void ata_pio_read(drive_t *drive, char *buffer, 
-                   uint32_t lba, uint32_t blocks);
-void ata_pio_write(drive_t *drive, char *buffer, 
-                   uint32_t lba, uint32_t blocks);
+void ata_pio_read(drive_t *drive, size_t lba, 
+                  size_t blocks, char *buf);
+void ata_pio_write(drive_t *drive, size_t lba, 
+                   size_t blocks, char *buf);
 void ata_pio_reset(drive_t *drive);
 void ata_pio_select(drive_t *drive);

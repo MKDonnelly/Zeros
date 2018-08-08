@@ -6,7 +6,7 @@
 //documentation at https://www.gnu.org/software/grub/manual/multiboot/
 
 //This is what is ready by grub
-struct multiboot_header{
+typedef struct multiboot_header{
    uint32_t magic;
    uint32_t flags;
    uint32_t checksum;
@@ -25,7 +25,7 @@ struct multiboot_header{
    uint32_t width;
    uint32_t height;
    uint32_t depth;
-};
+}multiboot_header_t;
 
 //Symbol table for an a.out format
 typedef struct mb_aout_symbol_table{
@@ -46,12 +46,12 @@ typedef struct mb_elf_table{
 
 //A structure describing a module
 //passed by grub
-struct module{
+typedef struct mb_module{
    void *start;
    void *end;
    char *args;
    uint32_t not_used;
-};
+}mb_module_t;
 
 //Masks for the flags member below
 //so our kernel can tell what there is.
@@ -97,7 +97,7 @@ struct module{
 //provided in the grub manual
 
 //This is what is passed to kmain
-struct multiboot_info{
+typedef struct multiboot_info{
 
    //Used to test what we were passed
    uint32_t flags;
@@ -175,7 +175,7 @@ struct multiboot_info{
          uint8_t fb_blue_mask_size;
       };
    };
-};
+}multiboot_info_t;
 
 typedef struct mb_mmap_entry{
    uint32_t size;
@@ -205,7 +205,7 @@ typedef struct multiboot_mod_list{
 }multiboot_mod_list_t;
 
 //apm bios info
-struct mb_apm_info{
+typedef struct mb_apm_info{
    uint16_t version;
    uint16_t cseg;
    uint32_t offset;
@@ -215,4 +215,4 @@ struct mb_apm_info{
    uint16_t cseg_len;
    uint16_t cseg_16_len;
    uint16_t dseg_len;
-};
+}mb_apm_info_t;

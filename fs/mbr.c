@@ -11,7 +11,7 @@ typedef struct mbr_info{
 void mbr_setup_parttable(drive_t *drive){
    //Read in the first sector
    char *buffer = k_malloc( drive->blksize, 0 );
-   drive->read_lba( drive, buffer, 0, 1 );
+   drive->read_lba( drive, 0, 1, buffer );
 
    mbr_info_t *mbr_info = k_malloc(sizeof(mbr_info_t), 0);
    memcpy(mbr_info, buffer + MBR_PARTINFO_START, sizeof(mbr_part_t)*4);

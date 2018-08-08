@@ -1,5 +1,9 @@
 #pragma once
 
+#define stdin 0
+#define stdout 1
+#define stderr 2
+
 extern int do_syscall1(int syscall, ...);
 extern int do_syscall2(int syscall, ...);
 extern int do_syscall3(int syscall, ...);

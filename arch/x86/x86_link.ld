@@ -6,7 +6,7 @@ SECTIONS{
    /*Grub jumps to the virtual address of the ENTRY,
      so we must have it reflect the physical location*/
    . = 0x100000;
-   .boot : { *(.boot) }
+   .boot :  { *(.boot) }
    boot_end = .;
 
    /*This sets the linker's Virtual Memory address*/

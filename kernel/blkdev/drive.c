@@ -26,10 +26,3 @@ void drive_register(drive_t *drive){
    }
 }
 
-drive_t *drive_search(int id){
-   for(int i = 0; i < current_drive; i++){
-      if( drives[i]->id == id )
-         return drives[i];
-   }
-   return NULL;
-}
