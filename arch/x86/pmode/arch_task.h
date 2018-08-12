@@ -3,13 +3,22 @@
 #include <arch/x86/pmode/context.h>
 #include <arch/x86/pmode/paging.h>
 
+//When we are doing blocking system calls, we end up
+//with both the context of the interrupted userland task
+//and the context of the kernel land sleeping task on the 
+//stack. When returning, we need to pop them back off and
+//restore the esp pointers.
+typedef struct{
+   context_t *stacks[2];
+   int current_stack;
+}callstack_t;
+
 //Arch-specific structure describing task
 //state. This is meant to be part of a larger
 //ktask_t structure that is abstracted away from
 //the architecture
 typedef struct{
-   //Pointer to the thread stack (contains context_t)
-   context_t *task_context;   
+   callstack_t callstack;
 
    //Pointer to the task's kernel-level interrupt stack.
    //Switched in the TSS 

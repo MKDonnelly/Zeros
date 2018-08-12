@@ -16,18 +16,18 @@ extern gdt_kernel_code
 ;The scheduler may request this using get_current_context
 ;and set this using set_current_context. This is the basic
 ;method for task switching.
-current_context dq 0
+;current_context dq 0
 
-global get_current_context
-get_current_context:
-   mov eax, [current_context]
-   ret
+;global get_current_context
+;get_current_context:
+;   mov eax, [current_context]
+;   ret
 
-global set_current_context
-set_current_context:
-   mov eax, [esp+4]
-   mov [current_context], eax
-   ret
+;global set_current_context
+;set_current_context:
+;   mov eax, [esp+4]
+;   mov [current_context], eax
+;   ret
 
 
 ; This is common to all interrupts.
@@ -48,10 +48,13 @@ set_current_context:
 ;     <pushad stuff>
 ;        32 bits e[a,c,d,b]x, edi, esi, esp, ebp
 
+;TODO try to have a sleeping kernel thread do its own
+;     context save, instead of triggering an interrupt
+
 [extern arch_save_context]
 [extern arch_set_context]
 interrupt_common:
-   cli
+;   cli
    pushad
 
    ;Save segment registers for userland interrupt
@@ -67,24 +70,26 @@ interrupt_common:
    mov fs, ax
    mov gs, ax
 
+   ;TODO maybe we can push the current context onto the stack.
+   ;     That may solve the problem I have with blocking system
+   ;     calls, where a double interrupt does not save the state
+   ;     correctly.
    ;Store the current context into "current_context"
    ;for use by the scheduler.
-   mov [current_context], esp
+   push esp ;Push a pointer to the context_t on the stack. 
 
    ;Save the current context of the stopped task.
    ;This is done so that the scheduler can swap out tasks
-   ;if needed.
+   ;if needed. Accepts a context_t* we pushed earlier.
    call arch_save_context
 
-   ;TODO explicitly pass in context_t as a pointer
    call main_interrupt_handler 
 
    ;Restore the context. This may be different than the
    ;context we saved if the scheduler switched tasks.
+   ;Returns a context_t* to start.
    call arch_set_context
-
-   ;Restore context after scheduler call
-   mov esp, [current_context]
+   mov esp, eax
 
    ;Restore userland segment registers
    pop gs

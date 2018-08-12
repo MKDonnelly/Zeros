@@ -1,17 +1,35 @@
+Model for Design:
+   Everything is a file. Processes are files. Data is stored in files.
+   All processes communicate using messages. System calls are simply
+   a specific type of message. IPC between processes is simple another
+   specific type of message. Signals are specific type of messages.
+
+message example:
+   typedef struct message
+      enum MTYPE type;
+      msg_dest_t dest;
+      size_t content_len;
+      void *content;
+   }message_t;
+   ...
+   sysread_content request = {CHANNEL_TO_READ, SIZE, BUFFER, SYNCRONOUS};
+   message_t syscall_read = {MSG_SYSREAD, MSG_KERNEL, sizeof(request), &request};
+   send(syscall_read);
+
 Multitasking
    program execution
       work on elf linking and loading
       READ MAN ELF!
    Look into what vDSO is (man vdso)
    create systemcall interface 
+      for blocking system calls, we need to push the kernel-mode state
+      onto the stack and then switch to another thread.
    Symmetric Multi Processing (SMP) (see intel multiprocessor spec)
    Work on scheduler
-   Create message passing interface and shared memory for IPC
+   Create message passing interface and shared memory for IPC, signals
    Add name to task_t
    Utilize page faults better (kill task that makes a page fault,etc)
-   In userland, extend the idea of interrupts to that of signals;
-      have userland programs register various events that should trigger
-      and interrupt and have handler functions to catch it.
+   Unify message passing and signals: signals are just special messages
 
 drivers
    APIC, HPET, ATA non-PIO mode, PCI, network card
@@ -38,9 +56,6 @@ misc tasks
    use syscall/sysret instead of interrupt
    Create /dev virtual directory
    port zeros to xen
-   Re-write assembly programs to use GNU as; this way, we can include
-     constants from a c program more easily
-   Clean up the types (i.e. use size_t for arch stuff used in kernel)
    port over a c library (newlib, uClib, musl)
    Add a how-to to explain how each subsystem works
    Add examples for each subsystem for reference
@@ -56,8 +71,7 @@ advanced os examples:
    dragonfly bsd, minix, plan9, genode, haiku, helenos, redox
 
 low-priority
-   add random number generator, md5 sum function
-   add in arch-specific bitwise operators, optimizations (AVX, SIMD, etc)
+   add random number generator
    Get proper release/press code working with keyboard
    use timer channel 2 to play sound on pc speaker
    work on arm arch code with qemu-arm

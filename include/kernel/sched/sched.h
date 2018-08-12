@@ -21,7 +21,7 @@ typedef struct{
    //Removes a task from the scheduler
    void (*scheduler_rm_task)();
 
-   //Used on blocking calls
+   //Used to stop the current thread
    void (*scheduler_yield_task)();
 
    //Used to cleanly exit a task

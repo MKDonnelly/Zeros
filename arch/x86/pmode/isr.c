@@ -15,7 +15,7 @@
 static uint8_t int_present[ TOTAL_INTERRUPTS / 8 ];
 
 //This holds an array of handlers for the interrupts
-static void (*int_handlers[TOTAL_INTERRUPTS])(context_t);
+static void (*int_handlers[TOTAL_INTERRUPTS])();
 
 //This function initilizes the
 //whole interrupt system. It creates
@@ -35,7 +35,7 @@ void interrupts_init(){
 
 //Places the handler function into the interrupt handler array 
 //This is exported to general kernel code.
-void arch_register_interrupt( uint8_t int_number, void (*handler)(context_t)){
+void arch_register_interrupt( uint8_t int_number, void (*handler)()){
   //Mark the interrupt as present
   bit_set( &int_present, int_number );
   int_handlers[int_number] = handler;
@@ -52,29 +52,29 @@ void arch_unregister_interrupt( uint8_t int_number ){
 
 //Every interrupt is directed towards this function and is 
 //then routed to the correct handler.
-void main_interrupt_handler(context_t r){
+void main_interrupt_handler(context_t *r){
 
    //Check to see if this interrupt came from a PIC.
    //If it did, send the appropriate EOI
-   if( r.int_number >= PIC_MASTER_START 
-		   && r.int_number <= PIC_MASTER_END ){
+   if( r->int_number >= PIC_MASTER_START 
+		   && r->int_number <= PIC_MASTER_END ){
       //Interrupt came from master pic
       portb_write( MASTER_PIC_CTRL_P, PIC_EOI_C );
-   }else if( r.int_number >= PIC_SLAVE_START 
-		   && r.int_number <= PIC_SLAVE_END ){
+   }else if( r->int_number >= PIC_SLAVE_START 
+		   && r->int_number <= PIC_SLAVE_END ){
       portb_write( MASTER_PIC_CTRL_P, PIC_EOI_C );
       portb_write( SLAVE_PIC_CTRL_P, PIC_EOI_C );
    }
 
    //check to see if there is a registered interrupt
-   if( bit_get( &int_present, r.int_number ) ){ 
+   if( bit_get( &int_present, r->int_number ) ){ 
       //If there is, call the function handler
-      int_handlers[ r.int_number ]( r );
+      int_handlers[ r->int_number ]();
    }else{
-      k_printf("Caught unregistered interrupt %d\n", r.int_number);
+      k_printf("Caught unregistered interrupt %d\n", r->int_number);
 
       //So far, we cannot recover from exceptions
-      if( r.int_number < 33 )
+      if( r->int_number < 33 )
          arch_stop_cpu();
    }
 }

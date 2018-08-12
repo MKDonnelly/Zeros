@@ -64,7 +64,10 @@ int stdout_test(fs_node_t *self, int offset, int len, char *buffer){
 }
 
 int stdin_test(fs_node_t *self, int offset, int len, char *buffer){
-   //offset is ignored right now
+   keyboard_request(len, buffer);
+//   buffer[0] = 'a';
+   k_printf("Returning with %c\n", buffer[0]);
+/*   //offset is ignored right now
    for(int i = 0; i < len; i++){
       int key = keyboard_getchar();
       while( key == -1 ){
@@ -73,7 +76,7 @@ int stdin_test(fs_node_t *self, int offset, int len, char *buffer){
       }
       buffer[i] = (char)key;
    }
-   k_printf("Returning with %c%c\n", buffer[0], buffer[1]);
+   k_printf("Returning with %c%c\n", buffer[0], buffer[1]);*/
 }
 
 fs_node_t stdin_fs = {
@@ -158,5 +161,6 @@ void kmain(struct multiboot_info *multiboot_info){
       current_scheduler->scheduler_start();
    }
 
+//   arch_enable_ints();
    while(1) arch_halt_cpu();
 }

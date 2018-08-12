@@ -15,10 +15,12 @@ arch_task_t arch_ktask_create(void (*start)(), void *param,
    KASSERT( stack_addr != 0 );
 
    arch_task_t kernel_task;
+   kernel_task.callstack.current_stack = 0;
 
    //Create the context
-   kernel_task.task_context = 
+   kernel_task.callstack.stacks[0] = 
                 arch_kcontext_create(start, param, exit, stack_addr);
+   kernel_task.callstack.stacks[1] = NULL;
    
    //Kernel tasks will always inherit from kernel_page_dir
    kernel_task.task_pd = kernel_page_dir;
@@ -38,10 +40,12 @@ arch_task_t arch_utask_create(void (*start)(), void *param,
    KASSERT( stack_addr != 0 );
 
    arch_task_t user_task;
+   user_task.callstack.current_stack = 0;
 
    //Create context
-   user_task.task_context = arch_ucontext_create(start, param, 
-                                                 exit, stack_addr);
+   user_task.callstack.stacks[0] = arch_ucontext_create(start, param, 
+                                                        exit, stack_addr);
+   user_task.callstack.stacks[1] = NULL;
 
    //Userland tasks will clone the page directory of kernel_page_dir
    user_task.task_pd = vm_pdir_clone( kernel_page_dir );
@@ -57,6 +61,7 @@ arch_task_t arch_utask_from_elf( char *elf_file_buffer ){
    KASSERT(elf_file_buffer != NULL);
 
    arch_task_t user_task;
+   
 
    //Userland task will inherit the pd from kernel_page_dir
    user_task.task_pd = vm_pdir_clone( kernel_page_dir );
@@ -75,8 +80,9 @@ arch_task_t arch_utask_from_elf( char *elf_file_buffer ){
    //Create context. In this case, we do not need to subtract 
    //ARCH_PAGE_SIZE since arch_create_ucontext assumes that is is
    //passed the head of the stack.
-   user_task.task_context = arch_ucontext_create((void*)start_addr, 
-                               NULL, NULL, USERLAND_STACK );
+   user_task.callstack.stacks[0] = arch_ucontext_create((void*)start_addr, 
+                                              NULL, NULL, USERLAND_STACK );
+   user_task.callstack.stacks[1] = NULL;
 
    //Setup a syscall stack of 4K aligned on page boundary
    user_task.interrupt_stack = k_malloc( 1024, 0x1000 );

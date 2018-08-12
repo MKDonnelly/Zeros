@@ -1,5 +1,5 @@
 #Compiler is gcc
-TOOL_DIR := $(HOME)/bin/bos/tools/bin/
+TOOL_DIR := $(HOME)/bin/os/tools/bin/
 CC := $(TOOL_DIR)i686-elf-gcc
 LD := $(TOOL_DIR)i686-elf-ld
 ASM := nasm
