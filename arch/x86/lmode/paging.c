@@ -2,6 +2,7 @@
 #include <kernel/mm/heap.h>
 #include <arch/x86/lmode/pagingasm.h>
 #include <lib/assert.h>
+#include <lib/string.h>
 
 static inline uint64_t virt_to_phys(uint64_t addr){
    return addr;

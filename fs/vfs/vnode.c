@@ -60,15 +60,15 @@ int sys_read(int fd, char *ubuf, int len){
 
 
 
-int read_fs(fs_node_t *node, int offset, int size, char *buffer){
+int read_fs(fs_node_t *node, size_t offset, size_t len, char *buffer){
    if( node->read != NULL )
-      return node->read(node, offset, size, buffer);
+      return node->read(node, offset, len, buffer);
    return -1;
 }
 
-int write_fs(fs_node_t *node, int offset, int size, char *buffer){
+int write_fs(fs_node_t *node, size_t offset, size_t len, char *buffer){
    if( node->write != NULL )
-      return node->write(node, offset, size, buffer);
+      return node->write(node, offset, len, buffer);
    return -1;
 }
 

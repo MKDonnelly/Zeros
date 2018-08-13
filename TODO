@@ -4,19 +4,44 @@ Model for Design:
    a specific type of message. IPC between processes is simple another
    specific type of message. Signals are specific type of messages.
    Network communication is simply a specific type of message. All
-   communication is just a message. 
+   communication is just a message. Every entity has a complete URL.
+   i.e. /usr/bin/ls would end up as file:/usr/bin/ls, a process could
+   be addressed as process:myprocess, a thread could be addressed as
+   thread:myprocess/thread1, a process on a remote machine could be
+   represented as network:192.168.1.254/process:remote_process, etc.
 
 message example:
    typedef struct message
-      enum MTYPE type;
-      msg_dest_t dest;
-      size_t content_len;
+      int type;
+      int channel;
+      int len;
       void *content;
    }message_t;
    ...
    sysread_content request = {CHANNEL_TO_READ, SIZE, BUFFER, SYNCRONOUS};
    message_t syscall_read = {MSG_SYSREAD, MSG_KERNEL, sizeof(request), &request};
    send(syscall_read);
+   
+   With this abstraction, there would only be three things on the system:
+   files, entities, and a small set of system calls to manage messages. 
+   There will be a series of channels that messages can be sent/received
+   from. There will be four default channels: channel 0 will be for input,
+   channel 1 will be for output, channel 2 will be for error, and channel
+   4 will be for kernel communication. We can also register functions to
+   be called when a message is received on a channel. This is much like
+   how signals work on linux.
+
+Idea: Have a shared-memory interface between the kernel and userland
+      to reduce cost of message passing. Make a message-passing heap
+      that can be used.
+System calls:
+   msg_send(...)
+   msg_recv(...)
+   channel_setup(...)
+   channel_destroy(...)
+   channel_handle(...)
+   channel_unhandle(...)
+   
 
 Multitasking
    program execution
@@ -43,6 +68,10 @@ make a queue-based mutex
 Use kassert often
 Database-fs: Within a file, create a key-value store to associate
              a certain key with a block of data.
+Heap ideas
+   - Add in hints (i.e. this memory will be temp, or long term)
+   - Add in allocator pre-allocs (i.e. we will need to allocate 100 4k
+                                       frames in the future, prepare)
 
 printing/screen manipulation:
   Double buffering, frame buffer
@@ -52,7 +81,6 @@ printing/screen manipulation:
   use hwinfo --framebuffer to see and program video modes
     also use grub gfx directive to boot into a higher video mode
   make routines for 1024x768 graphics mode (set by multiboot header)
-
 
 misc tasks 
    use syscall/sysret instead of interrupt
@@ -67,7 +95,9 @@ misc tasks
       aligned on 4K; have a slab allocator catch those and
       have the generic slab as a backup
    Let heap code accept hints. i.e. this memory will be allocated
-      for a long/short time, expands/does not expand, etc
+      for a long/short time, expands/does not expand, etc. Have long
+      term allocations start at head of memory, and short term allocations
+      start at the end of memory. They then grow towards one another.
 
 advanced os examples:
    dragonfly bsd, minix, plan9, genode, haiku, helenos, redox

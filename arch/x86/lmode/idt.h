@@ -21,3 +21,5 @@ typedef struct{
    uint16_t limit;
    uint64_t base_addr;   
 }__attribute__((packed)) idt_descriptor_t;
+
+void idt_init();

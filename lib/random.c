@@ -7,11 +7,11 @@ uint16_t lfsr = 0xACF1;
 uint16_t bit;
 int period = 0;
 
-void srand(uint32_t seed){
+void srand(int seed){
    start_state = seed;
 }
 
-uint32_t random(){
+int random(){
    bit = ((lfsr >> 0) ^ (lfsr >> 2) ^ (lfsr >> 3) ^ (lfsr >> 5)) & 1;
    lfsr = (lfsr >> 1) | (bit << 15);
    ++period;

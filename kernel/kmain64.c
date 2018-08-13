@@ -7,6 +7,7 @@
 #include <kernel/mm/bitmap_heap.h>
 #include <kernel/mm/blocklist_heap.h>
 #include <arch/x86/drivers/lapic.h>
+#include <arch/x86/lmode/idt.h>
 
 extern size_t ldscript_kernel_end;
 
@@ -16,8 +17,8 @@ void kmain64(struct multiboot_header *mbh){
    heap_create( &global_kernel_heap,(size_t)&ldscript_kernel_end, 0x100000,
                 &blocklist_heap);
    vm_init();
-   apic_enable();
    idt_init();
+   apic_enable();
    arch_enable_ints();
    k_puts("Working..."); 
 
