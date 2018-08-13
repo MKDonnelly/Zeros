@@ -12,9 +12,9 @@ typedef struct part{
 
    //Used for finding out information about
    //parititions.
-   uint32_t (*part_start)(struct drive *drive, 
+   size_t (*part_start)(struct drive *drive, 
                           int part_num);
-   uint32_t (*part_len)(struct drive *drive,
+   size_t (*part_len)(struct drive *drive,
                         int part_num);
 }part_t;
 

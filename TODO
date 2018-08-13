@@ -43,6 +43,10 @@ make a queue-based mutex
 Use kassert often
 Database-fs: Within a file, create a key-value store to associate
              a certain key with a block of data.
+Heap ideas
+   - Add in hints (i.e. this memory will be temp, or long term)
+   - Add in allocator pre-allocs (i.e. we will need to allocate 100 4k
+                                       frames in the future, prepare)
 
 printing/screen manipulation:
   Double buffering, frame buffer
@@ -52,7 +56,6 @@ printing/screen manipulation:
   use hwinfo --framebuffer to see and program video modes
     also use grub gfx directive to boot into a higher video mode
   make routines for 1024x768 graphics mode (set by multiboot header)
-
 
 misc tasks 
    use syscall/sysret instead of interrupt

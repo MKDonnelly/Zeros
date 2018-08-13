@@ -1,3 +1,4 @@
+; Assembly routines to deal with interrupts
 
 %macro push_regs 0
    push rax
@@ -44,7 +45,12 @@ interrupt_common:
    call main_interrupt_handler
 
    pop_regs
+
+   ;Remove error code and interrupt number
+   add esp, 0x10
+
    iretq
+
 
 %macro DEFINE_INTERRUPT 1
 global isr%1

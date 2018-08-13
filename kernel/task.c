@@ -4,6 +4,10 @@
 #include <lib/assert.h>
 #include <kernel/sched/sched.h>
 
+//TODO make clone() that accepts a ktask and returns
+//     a new task depending on the flags it is passed.
+//     This will transcend scheduler and arch specifics.
+
 //Internally used by k_create_task to assign
 //a unique id to every task
 static int next_task_id = 0;
