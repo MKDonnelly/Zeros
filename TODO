@@ -3,6 +3,8 @@ Model for Design:
    All processes communicate using messages. System calls are simply
    a specific type of message. IPC between processes is simple another
    specific type of message. Signals are specific type of messages.
+   Network communication is simply a specific type of message. All
+   communication is just a message. 
 
 message example:
    typedef struct message

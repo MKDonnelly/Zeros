@@ -7,6 +7,7 @@
 #include <arch/x86/pmode/context.h>
 #include <arch/x86/portio.h>
 #include <arch/x86/pmode/descriptors.h>
+#include <lib/print.h>
 #include <lib/bitwise.h>
 #include <lib/string.h>
 

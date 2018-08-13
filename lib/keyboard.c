@@ -1,12 +1,12 @@
 #include <include/lib/keyboard.h>
 #include <kernel/task.h>
 #include <kernel/sched/sched.h>
+#include <lib/print.h>
 
-//TODO make callback on any key
-//     add getchar system call and make this 
-//      part of usrland stdio
-char keyboard_buffer[KEYBOARD_BUFFER_MAX];
-int keyboard_number_chars = 0;
+//TODO turn this into a darray
+#define KEYBOARD_BUFFER_MAX 128
+static char keyboard_buffer[KEYBOARD_BUFFER_MAX];
+static int keyboard_number_chars = 0;
 
 //When a userland process requests a read, we need
 //to block the thread and move onto another one.
@@ -17,16 +17,19 @@ typedef struct urequest{
    ktask_t *blocked_process;
 }urequest_t;
 
+//TODO turn this into a queue
 static urequest_t request = {0, NULL, NULL};
 
-//char callback_key;
-//void (*char_callback)(char);
+static void keyboard_process_request(){
+   if( request.buf != NULL ){
+      if( keyboard_number_chars >= request.total ){
+         request.buf[0] = keyboard_buffer[--keyboard_number_chars];
+         request.blocked_process->state = TASK_READY;
+      }
+   }
+}
 
 void keyboard_main_handler(char key_entered){
-
-//   if( key_entered == callback_key ){
-//      char_callback(key_entered);
-//   }
 
    //We have space in the buffer.
    if( keyboard_number_chars < KEYBOARD_BUFFER_MAX ){
@@ -43,16 +46,6 @@ void keyboard_main_handler(char key_entered){
    keyboard_process_request();
 }
 
-int keyboard_getchar(){
-   //ran out of input
-   if( keyboard_number_chars <= 0 )
-      return -1;
-
-   keyboard_number_chars--;
-   char c = keyboard_buffer[keyboard_number_chars];
-   return c;
-}
-
 //ONLY called by userland threads
 void keyboard_request(int total, char *buf){
    if( keyboard_number_chars < total ){
@@ -66,11 +59,4 @@ void keyboard_request(int total, char *buf){
    }
 }
 
-void keyboard_process_request(){
-   if( request.buf != NULL ){
-      if( keyboard_number_chars >= request.total ){
-         request.buf[0] = keyboard_buffer[--keyboard_number_chars];
-         request.blocked_process->state = TASK_READY;
-      }
-   }
-}
+

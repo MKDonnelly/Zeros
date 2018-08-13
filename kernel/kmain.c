@@ -61,22 +61,17 @@ int stdout_test(fs_node_t *self, int offset, int len, char *buffer){
    for(int i = 0; i < len; i++){
       k_printf("%c", buffer[i]);
    }
+
+   //TODO return the number of bytes written
+   return 0;
 }
 
 int stdin_test(fs_node_t *self, int offset, int len, char *buffer){
    keyboard_request(len, buffer);
-//   buffer[0] = 'a';
    k_printf("Returning with %c\n", buffer[0]);
-/*   //offset is ignored right now
-   for(int i = 0; i < len; i++){
-      int key = keyboard_getchar();
-      while( key == -1 ){
-         current_scheduler->scheduler_yield_task();
-         key = keyboard_getchar();
-      }
-      buffer[i] = (char)key;
-   }
-   k_printf("Returning with %c%c\n", buffer[0], buffer[1]);*/
+
+   //TODO return the number of bytes read
+   return 0;
 }
 
 fs_node_t stdin_fs = {
@@ -140,7 +135,7 @@ void kmain(struct multiboot_info *multiboot_info){
    syscalls_init();
 
    zsfs_init();
-   initrd_init(&ldscript_initrd_start);
+   initrd_init((size_t*)&ldscript_initrd_start);
    k_printf("Initrd at %x\n", &ldscript_initrd_start);
    ata_enumerate();
 
@@ -161,6 +156,5 @@ void kmain(struct multiboot_info *multiboot_info){
       current_scheduler->scheduler_start();
    }
 
-//   arch_enable_ints();
    while(1) arch_halt_cpu();
 }

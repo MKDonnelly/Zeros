@@ -5,3 +5,6 @@ Given the file test.asm, do the following
    -> ld -o test -T userland_link.ld -m elf_i386 test.o
    -> ./makeinitrd test ../arch/x86/initrd
 
+nasm -f elf32 -o stdlib-asm.o stdlib-asm.asm
+../../tools/bin/i686-elf-gcc -nostdlib test.c stdlib-asm.o -o test
+

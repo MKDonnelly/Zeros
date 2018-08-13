@@ -128,6 +128,9 @@ void vm_copy_to_physical(char *vbuf, uint32_t paddr, uint32_t len);
 void vm_copy_from_pdir(uint32_t vaddr, pd_t *page_directory,
                        char *to, uint32_t len);
 
+void vm_copy_str(uint32_t vaddr, pd_t *page_directory, 
+                       char *to, uint32_t max);
+
 //Used to find a mapping between virtual and physical addresses
 uint32_t virt_to_phys(uint32_t uaddr, pd_t *page_directory);
 

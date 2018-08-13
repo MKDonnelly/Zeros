@@ -101,6 +101,7 @@ initrd_inode_t *initrd_find_closed_inode(fs_node_t *node_on_initrd,
          return inodes;
       inodes++;
    }
+   return NULL;
 }
 
 //Searches for the inode of the given fs_node_t. THE INODE MUST HAVE
@@ -110,6 +111,7 @@ initrd_inode_t *initrd_find_open_inode(fs_node_t *node){
       if( iter_node->inode == node->inode )
          return iter_node;
    }
+   return NULL;
 }
 
 int initrd_read(fs_node_t *file, int foffset, int len, char *buffer){
@@ -122,18 +124,22 @@ int initrd_read(fs_node_t *file, int foffset, int len, char *buffer){
    //we were asked to.
    memcpy(buffer, (char*)file->fs->superblock + inode->offset + foffset,
           len);
+
+   //TODO return the number of bytes read
+   return 0;
 }
 
 
 int initrd_write(fs_node_t *file, int offset, int len, char *buffer){
-
+   return 0;
 }
 
 int initrd_open(fs_node_t *node, int flags){
+   return 0;
 }
 
 int initrd_close(fs_node_t *node){
-
+   return 0;
 }
 
 dirent_t *initrd_readdir(fs_node_t *dir, int index){
@@ -186,7 +192,7 @@ fs_node_t *initrd_finddir(fs_node_t *dir, char *name){
    
    //Get pointer to directory entries
    initrd_dirent_t *dir_entries = 
-         (initrd_inode_t*)((char*)dir->fs->superblock + dir_inode->offset);
+        (initrd_dirent_t*)((char*)dir->fs->superblock + dir_inode->offset);
 
    for(int i = 0; i < dir_inode->length; i++){
       if( strcmp(name, dir_entries[i].name) == 0 ){

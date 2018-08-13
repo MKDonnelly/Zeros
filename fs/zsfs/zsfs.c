@@ -59,10 +59,10 @@ void zsfs_create(blkdev_t *block){
    memset(zeros, 0, block->block_size);
 
    for(int i = 0; i < new_sb.fsentry_block; i++){
-      block->write_lba( block, zeros, i, 1 );
+      block->write_lba( block, i, 1, zeros );
    }
 
-   block->write_lba( block, (char*)&new_sb, 0, sizeof(zsfs_sb_t));
+   block->write_lba( block, 0, sizeof(zsfs_sb_t), (char*)&new_sb);
 }
 
 uint32_t zsfs_get_id(char *buf){
@@ -72,36 +72,25 @@ uint32_t zsfs_get_id(char *buf){
 
 
 int zsfs_read(fs_node_t *file, int offset, int len, char *buffer){
-
+   return 0;
 }
 
 int zsfs_write(fs_node_t *file, int offset, int len, char *buffer){
-
+   return 0;
 }
 
 int zsfs_open(fs_node_t *fsnode, int flags){
-
+   return 0;
 }
 
 int zsfs_close(fs_node_t *fsnode){
-
+   return 0;
 }
 
 dirent_t *zsfs_readdir(fs_node_t *dir, int index){
-
+   return NULL;
 }
 
 fs_node_t *zsfs_finddir(fs_node_t *dir, char *name){
-
+   return NULL;
 }
-
-/*char *zsfs_get_sb(fstype_t *fstype){
-   char *sb = k_malloc(sizeof(zsfs_sb_t), 0);
-   char *buf = k_malloc(fstype->parent->block_size, 0);
-
-   fstype->parent->read_lba( fstype->parent, buf, 0, 1 );
-   memcpy( sb, buf, sizeof(zsfs_sb_t));
-    
-   k_free(buf);
-   return sb;
-}*/

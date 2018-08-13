@@ -52,5 +52,7 @@ void fsmanager_check(blkdev_t *blkdev);
 //Register a new filesystem with the fsmanager
 void fsmanager_register_fstype(fstype_t *fstype);
 
+void fsmanager_add_active_fs(fstype_t *new_fs);
+
 //Search for an active filesystem given its unique 32-bit ID
 fstype_t *fsmanager_find_id(uint32_t id);

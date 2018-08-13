@@ -14,6 +14,8 @@ int sys_getpid(){
 
 #define STACK_SIZE 0x1000
 
+//TODO create ktask_t *ktask_fork(ktask_t *task)
+
 ktask_t *ktask_create( void (*start)(), void *param, void (*exit)()){
 
    KASSERT( start != NULL );

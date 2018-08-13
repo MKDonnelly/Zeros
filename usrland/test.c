@@ -6,6 +6,11 @@ void main(){
 
    char input[2];
    syscall_read(stdin, input, 2);
+   char msg2[] = "Read in: ";
+   syscall_write(stdout, msg2, sizeof(msg2));
+   syscall_write(stdout, input, 2);
+
+
 //   syscall_write(stdout, input, 2);
 /*   char name[] = "data.txt";
    char msg[] = "Usrland: opening data.txt";

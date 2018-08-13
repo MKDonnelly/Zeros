@@ -16,6 +16,7 @@ context_t *get_current_context(){
       int stack = current_task->callstack.stacks[0] != NULL ? 0 : 1;
       return current_task->callstack.stacks[stack];
    }
+   return NULL;
 }
 
 //Called during isr to save current context into the
@@ -36,6 +37,7 @@ context_t *arch_set_context(){
       current_task->callstack.stacks[current_stack] = NULL;
       return temp;
    }
+   return NULL;
 }
 
 //Higher level code calls this to set the next task to run
