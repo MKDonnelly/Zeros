@@ -1,0 +1,70 @@
+Overall Model for Design:
+   Everything is an actor: a living entity that can do stuff. 
+      -A file is an actor: it can handle requests for open/close/read/write
+       and can actively respond to them.   
+      -Threads are an actor
+      -Actors communicate using messages.
+      -Every actor can be globally identified by using its UAL 
+       (universal actor locator)
+   Everything communicates using messages.
+      -Messages are plain strings. The meaning of those strings
+       is defined by a protocol. i.e. HTTP has its own protocol,
+       system calls have their own.
+      -A thread on one machine can seamlessly communicate to a thread
+       on a remote as if it were local.
+      -Systemcalls are simply a form of message passing with a 
+       well-defined protocol.
+   Channels provide a way of connecting two actors
+      -Before messages are passed, a channel must be established 
+       between the two.
+      -Channel 0 is always open: it is the channel to communicate
+       to the kernel.
+      -In order to accept channels from external sources, the main
+       actor of a process must call channel_accept()
+
+Message implementation:
+   Messages are 4K pages requested by a uland app with msg_create()
+   and freed with msg_free(). The advantage of this is that the OS
+   can lock the pages it is passed when performing operations on it.
+   This is in contrast to a syscall-based interface where the OS must
+   copy all data from uland to kernelland. This means that the OS only
+   interacts with the application through messages: the os will never
+   read/write from anything but a message passed to it by uland code.
+
+
+Core functions:
+   Two categories: one to manage channels and one to do messages. All else
+      is done by sending a message.
+
+
+Examples:
+
+void helper_actor(int ch){
+   msg_t *m = msg_create();
+   msg_write(m, "hello, there");
+   msg_send(m, ch);
+   channel_close(ch);
+   msg_free(m);
+}
+
+void main_actor(){
+   //Creates a message and utilizes it to set the
+   //current actor's name
+   msg_t *cmd_msg = msg_create();
+   msg_write(cmd_msg, "set_actor_name myserver");
+   msg_send(0, cmd_msg);
+
+   int cont = 1;
+   while( cont ){
+      //Accept all new incoming connections
+      int new_ch = channel_accept();
+
+      //Spawn a helper actor to handle the new channel
+      msg_write(cmd_msg, "spawn, %x, %d", helper_actor, new_ch);
+
+      //Execute the actual message
+      msg_send(0, cmd_msg);
+   }
+}
+
+
