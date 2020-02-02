@@ -14,8 +14,9 @@ int8_t elf_can_exec(Elf32_Ehdr *elf_header){
        elf_header->e_ident[EI_DATA]  != ELFDATA2LSB ||
        elf_header->e_machine         != MACHINE_X86 || 
        elf_header->e_version != 1                   ||
-       (elf_header->e_type != ET_REL && elf_header->e_type != ET_EXEC) )
+       (elf_header->e_type != ET_REL && elf_header->e_type != ET_EXEC) ){
       return 0;
+   }
    return 1;
 }
 
@@ -23,8 +24,10 @@ int8_t elf_can_exec(Elf32_Ehdr *elf_header){
 uint32_t arch_create_from_elf(Elf32_Ehdr *elf_data, pd_t *task_pd){
 
    //Make sure we can execute the ELF file.
-   if( !elf_verify_magic(elf_data) || !elf_can_exec(elf_data) )
+   if( !elf_verify_magic(elf_data) || !elf_can_exec(elf_data) ){
+      k_printf("Cannot execute ELF!\n");
       return 0;
+   }
 
    Elf32_Phdr *elf_pheader = (Elf32_Phdr*)( (char*)elf_data  
                                             + elf_data->e_phoff);

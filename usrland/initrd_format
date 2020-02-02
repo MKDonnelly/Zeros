@@ -1,0 +1,16 @@
+Basic initrd with no directory support, single level
+
+Superblock:
+  magic (4 bytes)
+  entires offset (just after sb)
+  entries len (number of entries)
+
+Entry:
+  byte offset (4 bytes)
+  byte len (4 bytes)
+  name (24 max)
+
+
+  
+
+

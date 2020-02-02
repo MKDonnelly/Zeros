@@ -60,5 +60,8 @@ static inline int mbr_part_number(int num){
 }
 
 void mbr_setup_parttable(drive_t *drive);
-size_t mbr_get_partstart_lba(drive_t *drive, int part_number);
-size_t mbr_get_partsize(drive_t *drive, int part_number);
+uint32_t mbr_get_partstart_lba(drive_t *drive, int part_number);
+uint32_t mbr_get_partsize(drive_t *drive, int part_number);
+
+//size_t mbr_get_partstart_lba(drive_t *drive, int part_number);
+//size_t mbr_get_partsize(drive_t *drive, int part_number);

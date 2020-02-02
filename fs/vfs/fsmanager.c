@@ -62,8 +62,9 @@ void fsmanager_add_active_fs(fstype_t *new_fs){
 //Find an active file system given its 32-bit unique ID
 fstype_t *fsmanager_find_id(uint32_t id){
    for(int i = 0; i < active_fses_count; i++){
-      if(active_fses[i]->fs_id == id )
+      if(active_fses[i]->fs_id == id ){
          return active_fses[i];
+      }
    }
    return NULL;
 }

@@ -41,14 +41,6 @@ void thread1(){
    }
 }
 
-void thread2(){
-   int t2count = 0;
-   while(t2count < 5){
-      k_puts_at("2", t2count++, 1);
-      for(int i = 0; i < 50000000; i++);
-   }
-}
-
 //Defined in linker script
 extern unsigned int ldscript_text_start;
 extern unsigned int ldscript_text_end;
@@ -67,8 +59,8 @@ int stdout_test(fs_node_t *self, int offset, int len, char *buffer){
 }
 
 int stdin_test(fs_node_t *self, int offset, int len, char *buffer){
+   k_printf("In stdin_test\n");
    keyboard_request(len, buffer);
-   k_printf("Returning with %c\n", buffer[0]);
 
    //TODO return the number of bytes read
    return 0;
@@ -134,27 +126,47 @@ void kmain(struct multiboot_info *multiboot_info){
    current_scheduler->scheduler_setup();
    syscalls_init();
 
-   zsfs_init();
-   initrd_init((size_t*)&ldscript_initrd_start);
+   zsfs_register();
+   //initrd_init((size_t*)&ldscript_initrd_start);
+   initrd_sb_t *initrd = (initrd_sb_t*)&ldscript_initrd_start;
    k_printf("Initrd at %x\n", &ldscript_initrd_start);
    ata_enumerate();
 
-   fstype_t *initrd = fsmanager_find_id(0x11111111);
+//   zsfs_create(blkdev_find(0));
+
+   fstype_t *zsfs = fsmanager_find_id(0x1234ABCD);
+   k_printf("%x\n", zsfs);
+   root_fs = zsfs_get_root(zsfs);
+   k_printf("%x\n", root_fs);
+
+   fs_node_t *f = root_fs->finddir(root_fs, "test.txt");
+//   char data[] = "Hello, World!";
+//   f->write(f, 0, strlen(data), data);
+   char temp[20];
+   f->read(f, 0, 14, temp);
+   k_printf("Read %s\n", temp);
+   k_printf("Len is %d\n", f->len(f));
+   k_printf("file is %x\n", f);
+
+//   dirent_t *d = zsfs_readdir(root_fs, 1);
+//   k_printf("File is %s\n", d->name);
+//   create_file(root_fs, "test.txt");
+//   zsfs_create_dir(root_fs, "testdir"); 
+   
+
+/*
    if( initrd != NULL ){
-      root_fs = &initrd->root_dir;
-      dirent_t *first = root_fs->readdir(root_fs, 0);
-      k_printf("Name is %s, %d\n", first->name, first->inode);
+      char *buf = k_malloc(20000, 0);
+      int bytes_read = initrd_read(initrd, "test", 20000, buf);
 
-      fs_node_t *file = root_fs->finddir(root_fs, first->name); 
-      k_free(first);
-      char *buf = k_malloc(2000, 0);
-      file->read( file, 0, file->len(file), buf );
-
+      //Starting userland program
+      k_printf("Starting userland program\n");
       ktask_t *new_task = utask_from_elf(buf);
       init_usrland_fds(new_task);
       current_scheduler->scheduler_add_task(new_task);
       current_scheduler->scheduler_start();
    }
+*/
 
    while(1) arch_halt_cpu();
 }

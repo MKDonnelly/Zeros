@@ -7,10 +7,9 @@
 #include <arch/current_arch>
 
 
-fs_node_t *fs_root = NULL;
-
-//System call
 extern fs_node_t *root_fs;
+
+//System calls
 int sys_open(char *name){
    ktask_t *ctask = current_scheduler->scheduler_current_ktask();
 
@@ -41,7 +40,6 @@ int sys_write(int fd, char *ubuf, int len){
 }
 
 int sys_read(int fd, char *ubuf, int len){
-   k_printf("Readcalled!\n");
    ktask_t *ctask = current_scheduler->scheduler_current_ktask();
    
    char *kbuf = k_malloc(len, 0);
@@ -58,40 +56,3 @@ int sys_read(int fd, char *ubuf, int len){
    return 0; 
 }
 
-
-
-int read_fs(fs_node_t *node, size_t offset, size_t len, char *buffer){
-   if( node->read != NULL )
-      return node->read(node, offset, len, buffer);
-   return -1;
-}
-
-int write_fs(fs_node_t *node, size_t offset, size_t len, char *buffer){
-   if( node->write != NULL )
-      return node->write(node, offset, len, buffer);
-   return -1;
-}
-
-int open_fs(fs_node_t *node, int flags){
-   if( node->open != NULL )
-      return node->open(node, flags);
-   return -1;
-}
-
-int close_fs(fs_node_t *node){
-   if( node->close != NULL )
-      return node->close(node);
-   return -1;
-}
-
-dirent_t *readdir_fs(fs_node_t *node, int index){
-   if( node->readdir != NULL && (node->flags & FS_DIRECTORY))
-      return node->readdir(node, index);
-   return NULL;
-}
-
-fs_node_t *finddir_fs(fs_node_t *node, char *name){
-   if( node->finddir != NULL && (node->flags & FS_DIRECTORY))
-      return node->finddir(node, name);
-   return NULL;
-}

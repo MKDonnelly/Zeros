@@ -3,6 +3,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+
 //Used to align a memory address. Take the address
 //and add the align size minus 1 to have the address
 //rounded up. Then and this with the align size minus

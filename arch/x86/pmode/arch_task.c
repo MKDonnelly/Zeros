@@ -68,6 +68,7 @@ arch_task_t arch_utask_from_elf( char *elf_file_buffer ){
 
    uint32_t start_addr = arch_create_from_elf((Elf32_Ehdr*)elf_file_buffer,
                                                user_task.task_pd);
+   k_printf("Start addr: %x\n", start_addr);
 
    //Map in a stack for the task
    uint32_t ustack = framepool_first_free();
