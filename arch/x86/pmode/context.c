@@ -67,7 +67,7 @@ context_t *arch_ucontext_create( void (*start)(void*), void *param,
    *stack_addr = (uint32_t)exit;
 
    //Put the context_t on the stack
-   context_t *context = (context_t*)((char*)stack_addr- sizeof(context_t));
+   context_t *context = (context_t*)((char*)stack_addr - sizeof(context_t));
 
    context->eip = (uint32_t)start;
    //The gdt selectors for userland code/data, with 
@@ -81,5 +81,3 @@ context_t *arch_ucontext_create( void (*start)(void*), void *param,
    //Return a pointer to the head of the stack of type context_t
    return context;
 }
-
-

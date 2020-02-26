@@ -63,6 +63,7 @@ int main(char argc, char **argv){
    for(int i = 0; i < total_files; i++){
       entries[i].entry_offset = offset;
       entries[i].entry_len = file_size(argv[i+2]);
+      offset += entries[i].entry_len;
       strcpy(entries[i].name, argv[i+2]);
    }
 

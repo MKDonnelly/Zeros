@@ -32,4 +32,4 @@ arch_task_t arch_ktask_create(void (*start)(), void *params,
                                    void (*exit)(), size_t stack_addr);
 arch_task_t arch_utask_create(void (*start)(), void *params,
                                    void (*exit)(), size_t stack_addr);
-arch_task_t arch_utask_from_elf(char*);
+arch_task_t arch_utask_from_elf(char*,int);

@@ -103,6 +103,8 @@ typedef struct pd pd_t;
 //TODO make {get,set}_kernel_page_dir
 extern pd_t *kernel_page_dir;
 
+extern pd_t *current_page_dir;
+
 //Map a physical to virtual address in the paging structure
 void vm_pmap(uint32_t vaddr, uint32_t paddr, pd_t *page_directory, 
               uint8_t rw, uint8_t user_access);

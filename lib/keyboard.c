@@ -46,21 +46,20 @@ void keyboard_main_handler(char key_entered){
       }
       keyboard_buffer[keyboard_number_chars] = key_entered;
    }
-   k_printf("%c", key_entered);
-//   keyboard_process_request();
+//   k_printf("%c", key_entered);
 }
 
 //ONLY called by userland threads
 void keyboard_request(int total, char *buf){
-
-   if( keyboard_number_chars < total ){
-      request.total = total;
-      request.buf = buf;
-      request.bufcount = 0;
-      request.blocked_process = current_scheduler->scheduler_current_ktask();
-      request.blocked_process->state = TASK_BLOCKED;
+   while( keyboard_number_chars < total ){
       current_scheduler->scheduler_yield_task();
-   }else{
-      k_printf("Returning from keyboard_request\n");
+   } 
+
+   memcpy(buf, keyboard_buffer, total);
+
+   //Shift elements down
+   for(int i = 0; i < keyboard_number_chars-total; i++){
+      keyboard_buffer[i] = keyboard_buffer[i+total];
    }
+   keyboard_number_chars -= total;
 }

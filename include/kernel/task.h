@@ -26,10 +26,11 @@ typedef struct ktask{
    void *ret_val;
    int task_id;
    int is_kernel_task;
+   char *args;
+   char *pwd;
 
    //Open file nodes
-   int next_free_node;
-   fs_node_t *open_fs[4];
+   fs_node_t *open_fs[20];
 
    //Later, I might add a void* to point to a structure to
    //store scheduler-specific data.
@@ -48,4 +49,4 @@ ktask_t *ktask_create(void (*start)(), void *param, void (*exit)());
 ktask_t *utask_create(void (*start)(), void *param,
                         void (*exit)(), size_t stack_addr);
 
-ktask_t *utask_from_elf(char *elf_data);
+ktask_t *utask_from_elf(char *elf_data, int skip);

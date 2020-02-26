@@ -8,6 +8,9 @@
 #include <arch/x86/pmode/context.h>
 #include <kernel/mm/heap.h>
 
+#include <kernel/sched/sched.h>
+#include <kernel/task.h>
+
 #include <lib/string.h>
 #include <lib/types.h>
 #include <lib/print.h>
@@ -20,6 +23,7 @@
 //Points to current page directory in use as well
 //as the page directory used by the kernel.
 pd_t *kernel_page_dir;
+pd_t *current_page_dir;
 
 //Given a page directory and a virtual address, return the 
 //pte corresponding to it. If create_pt is set, create any
@@ -95,7 +99,6 @@ void vm_pmap_range( uint32_t vaddr, uint32_t paddr, pd_t *page_directory,
 void vm_pmap_temp( uint32_t vaddr, uint32_t paddr, pd_t *page_directory){
    //We expect the mapping to change frequently, so this ensure that when
    //we return, there is no cached reference to the page we mapped.
-
    vm_pmap( vaddr, paddr, page_directory, PAGE_RW, PAGE_KERNEL_ACCESS );
 
    //TODO fix inval_page. it does not work
@@ -112,11 +115,14 @@ void vm_copy_to_physical(char *vbuf, uint32_t paddr, uint32_t len){
    //the desired physical address. If we need to copy more than one page,
    //we increment the physical frame pointed to as we copy.
    //Align page frame on 4K boundary
-   vm_pmap_temp( 0x0, ALIGN_4K(paddr), kernel_page_dir );
 
-   //FIXME len is assumed to be less than the page size and
-   //      does not cross a page boundary.
-   memcpy( (char*)0x0 + (uint32_t)(paddr & 0xfff), vbuf, len );
+   //vm_pmap_temp( 0x0, ALIGN_4K(paddr), kernel_page_dir);
+   //vm_pmap_temp( 0x1000, ALIGN_4K(paddr+0x1000), kernel_page_dir);
+
+   vm_pmap_temp( 0x600000, ALIGN_4K(paddr), current_page_dir);
+   vm_pmap_temp( 0x601000, ALIGN_4K(paddr+0x1000), current_page_dir);
+   uint32_t offset = paddr & 0xfff;
+   memcpy( (char*)0x600000 + offset, vbuf, len ); 
 }
 
 //Copies data from a virtual address in a page directory to the given
@@ -169,10 +175,12 @@ void vm_copy_str(uint32_t vaddr, pd_t *page_directory,
 //Copies the page at one physical address to another 
 //We map the page 0x0 to pdest and 0x1000 to psrc
 static void copy_page( uint32_t pdest, uint32_t psrc ){
-   vm_pmap_temp( 0x0, pdest, kernel_page_dir );
-   vm_pmap_temp( 0x1000, psrc, kernel_page_dir );
+//   vm_pmap_temp( 0x0, pdest, kernel_page_dir );
+//   vm_pmap_temp( 0x1000, psrc, kernel_page_dir );
    
-   memcpy( (char*)0x0, (char*)0x1000, ARCH_PAGE_SIZE );
+   vm_pmap_temp( 0x8000, pdest, current_page_dir );
+   vm_pmap_temp( 0x9000, psrc, current_page_dir );
+   memcpy( (char*)0x8000, (char*)0x9000, ARCH_PAGE_SIZE );
 
    //No need to unmap the pages since we called using quick_map
 }
@@ -252,13 +260,14 @@ void vm_init(){
                  PAGE_KERNEL_ACCESS, 0x500000 );
 
    //Setup a frame pool
-   framepool_create( 0x600000, 100 );
+   framepool_create( 0x600000, 500 );
 
    //Setup the interrupt handler for paging BEFORE enabling paging
    //arch_register_interrupt( PAGE_INTERRUPT, page_int_handler);
 
    //Let the processor know where our page table is
    //and enable paging.
+   current_page_dir = kernel_page_dir;
    load_pd( (void*)VIRT_TO_PHYS(kernel_page_dir));
 }
 

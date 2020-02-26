@@ -46,7 +46,7 @@ int zsfs_check(char *buf){
 }
 
 void zsfs_create(blkdev_t *block){
-   k_printf("Creating new zsfs filesystem\n");
+   k_printf("[zsfs] Creating new zsfs filesystem\n");
    //The new superblock
    zsfs_sb_t new_sb;
    //Set magic field
@@ -75,15 +75,17 @@ void zsfs_create(blkdev_t *block){
       block->write_lba( block, i, 1, zeros );
    }
 
-   //Set the first few bits for the superblock, FBL, and RDE
+   //Set the first few bits for the superblock, FBL, and RDS
    for(int i = 0; i <= new_sb.rds_index; i++){
       bit_set(zeros, i);
    }
    block->write_lba(block, new_sb.fbl_index, 1, zeros);
 
-
    //Also, zero out the RDE since it starts empty
-   memset(zeros, block->block_size, 0);
+   //memset(zeros, block->block_size, 0);
+   zsfs_ds_t d;
+   memset(&d, sizeof(zsfs_ds_t), 0);
+   d.aux_entry.linked_dir = 0;
    block->write_lba(block, new_sb.rds_index, 1, zeros);
 
    //Write the new superblock.
@@ -118,9 +120,82 @@ fs_node_t *zsfs_get_root(fstype_t *zsfs){
 
    zsfs_root->readdir = zsfs_readdir;
    zsfs_root->finddir = zsfs_finddir;
+   zsfs_root->close = zsfs_close;
 
    return zsfs_root;
 }
+
+
+fs_node_t *zsfs_finddir2(fs_node_t *zsfs_dir, fs_node_t *new_node, char *name){
+   fstype_t *zsfs = zsfs_dir->fs;
+   //Read in DS for the directory
+   zsfs_ds_t ds_search;
+   int ds_blk_idx = ((zsfs_dinode_t*)zsfs_dir->inode)->blk_idx;
+   zsfs->parent->read_lba(zsfs->parent, ((zsfs_dinode_t*)zsfs_dir->inode)->blk_idx, 1, (char*)&ds_search);
+
+   //Loop through the DS and all of the linked DSes until the entry is found
+   //or we have reached the end.
+   while( 1 ){
+      //Search through the current DS
+      for(int ds_entry = 0; ds_entry < ZSFS_DSE_IN_DS; ds_entry++){
+         //Found the entry.  Now return a fs_node_t to it.
+         if( strcmp(ds_search.entries[ds_entry].entry_name, name) == 0 ){
+            //Check if this is a directory or a file
+            if( ds_search.entries[ds_entry].type == 0 ){ //0 == file
+               strcpy(new_node->name, name);
+               new_node->type = FS_FILE;
+               new_node->fs = zsfs_dir->fs;
+               new_node->offset = 0;
+
+               //Create inode for this file.
+               zsfs_finode_t *finode = k_malloc(sizeof(zsfs_finode_t), 0);
+               finode->ds_blk_idx = ds_blk_idx;
+               finode->ds_entry_idx = ds_entry;
+
+               new_node->inode = finode;
+
+               new_node->read = zsfs_read;
+               new_node->write = zsfs_write;
+               new_node->open = zsfs_open;
+               new_node->close = zsfs_close;
+               new_node->len = zsfs_len;
+            }else{ //1 == directory
+               strcpy(new_node->name, name);
+               new_node->type = FS_DIRECTORY;
+               new_node->fs = zsfs_dir->fs;
+               new_node->offset = 0;
+
+               //Create inode for this directory.
+               zsfs_dinode_t *dinode = k_malloc(sizeof(zsfs_dinode_t), 0);
+               dinode->blk_idx = ds_search.entries[ds_entry].blk_idx;
+
+               new_node->inode = dinode;
+
+               new_node->readdir = zsfs_readdir;
+               new_node->finddir = zsfs_finddir;
+            }
+
+            return new_node;
+         }
+      }
+
+      //If we get here, then the last DS did not contain the entry. 
+      //Check to see if there is a linked directory using the AUX field
+      if( ds_search.aux_entry.linked_dir != 0 ){
+         arch_halt_cpu();
+         //Set the blk idx for this next DS
+         ds_blk_idx = ds_search.aux_entry.linked_dir;
+
+         //Read in the next DS
+         zsfs->parent->read_lba(zsfs->parent, ds_blk_idx, 1, (char*)&ds_search);
+          
+      }else{
+         //Object not found
+         return 0;
+      }
+   }
+}
+
 
 //Reads the entry specified at index for the directory
 fs_node_t *zsfs_finddir(fs_node_t *zsfs_dir, char *name){
@@ -198,7 +273,7 @@ dirent_t *zsfs_readdir(fs_node_t *dir, int index){
    //Read in DS for the directory
    zsfs_ds_t ds_search;
    int ds_blk_idx = ((zsfs_dinode_t*)dir->inode)->blk_idx;
-   zsfs->parent->read_lba(zsfs->parent, ((zsfs_dinode_t*)dir->inode)->blk_idx, 1, (char*)&ds_search);
+   zsfs->parent->read_lba(zsfs->parent, ds_blk_idx, 1, (char*)&ds_search);
 
    //Loop through the DS and all of the linked DSes until the entry is found
    //or we have reached the end.
@@ -233,9 +308,19 @@ dirent_t *zsfs_readdir(fs_node_t *dir, int index){
 //Returns the inode of the object at "path" if it exists, NULL otherwise.
 fs_node_t *zsfs_open(fs_node_t *root, char *path){
 
+   if( strcmp(path, "/") == 0 ){
+      return zsfs_get_root(root->fs);
+   }
+
+   //We only work with absolute paths
+   if( path[0] != '/' ){
+      return NULL;
+   }
+
    //Parse each path component
    //Make a copy of path since we modify it
-   char *newpath = k_malloc(strlen(path), 0);
+   char *newpath = k_malloc(strlen(path)+1, 0);
+   memset(newpath, strlen(path)+1, 0);
    strcpy(newpath, path);
 
    //Parse each component of the path
@@ -243,36 +328,42 @@ fs_node_t *zsfs_open(fs_node_t *root, char *path){
    for(int i = 0; i < strlen(newpath); i++){
       //Number of '/' should equal the number of components
       //in the path if we leave off an optional trailing '/'
-      if( newpath[i] == '/' && i+1 >= strlen(newpath) ){
+      //if( newpath[i] == '/' && i+1 >= strlen(newpath) ){
+      if( newpath[i] == '/' && i+1 <= strlen(newpath) ){
          ccount++;
       }
    }
 
    int cnum = 0;
-   char **path_components;
-   path_components = k_malloc(sizeof(char*) * ccount, 0);
+   char **path_components = k_malloc(sizeof(char*) * ccount, 0);
+   memset(path_components, sizeof(char*) * ccount, 0);
    int newpath_len = strlen(newpath);
+   
    for(int i = 0; i < newpath_len; i++){
       if( newpath[i] == '/' ){
          newpath[i] = '\0';
          if( newpath[i+1] != '\0' ){
-            path_components[cnum] = &newpath[i+1];
-            cnum++;
+            path_components[cnum++] = &newpath[i+1];
          }
       }
    }
 
+   fs_node_t *f = k_malloc(sizeof(fs_node_t), 0);
+   memcpy(f, root, sizeof(fs_node_t));
+
    //Loop through every component
-/*   root = get_root(zsfs);
-   for(int i = 0; i < cnum; i++){
+   for(int i = 0; i < ccount; i++){
       //Search for the component in root and place its inode in root (overwrite)
-      int ret = dir_search(root, root, path_components[i], zsfs);
+      int ret = zsfs_finddir2(f, f, path_components[i]);
       if( ret == 0 ){
          k_printf("Couldn't find component %s\n", path_components[i]);
          return NULL;
       }
-   }*/
-   return NULL;
+   }
+
+   k_free(newpath);
+   k_free(path_components);
+   return f;
 }
 
 
@@ -372,6 +463,9 @@ int allocate_block(fstype_t *zsfs){
    return -1;
 }
 
+void free_block(fstype_t *zsfs, int blk_idx){
+   clear_fbl_entry(blk_idx, zsfs);
+}
 
 //Creates a new directory under parent_dir with the given name. 
 void zsfs_create_dir(fs_node_t *parent_dir, char *name){
@@ -384,8 +478,16 @@ void zsfs_create_dir(fs_node_t *parent_dir, char *name){
    //Find a free location in the DS to add a new DSE for the new directory
    while( 1 ){
 
+      //Check if the directory already exists
+      for(int dse = 0; dse < ZSFS_DSE_IN_DS; dse++){
+         if( strcmp(ds.entries[dse].entry_name, name) == 0 ){
+            //Directory already exists, so don't do anything
+            return -1;
+         }
+      }
+
       //Scan through the current directory for a free spot
-      for(int dse = 0; dse < 7; dse++){
+      for(int dse = 0; dse < ZSFS_DSE_IN_DS; dse++){
          //Found a free DSE location.  Add new directory
          if( ds.entries[dse].blk_idx == 0 && ds.entries[dse].entry_len == 0 ){
             //Allocate new block for the subdir and zero it out
@@ -396,8 +498,10 @@ void zsfs_create_dir(fs_node_t *parent_dir, char *name){
                return -1;
             }
  
-            memset(zeros, 512, 0);
-            zsfs->parent->write_lba(zsfs->parent, new_subdir_blk_idx, 1, zeros);
+            zsfs_ds_t new_dir;
+            memset(&new_dir, 512, 0);
+            new_dir.aux_entry.parent_ds = ds_idx;
+            zsfs->parent->write_lba(zsfs->parent, new_subdir_blk_idx, 1, (char*)&new_dir);
 
             //Add the entry in this DS
             ds.entries[dse].type = 1; //1 == directory
@@ -407,7 +511,7 @@ void zsfs_create_dir(fs_node_t *parent_dir, char *name){
 
             //Finally, write the modified DS back to the drive
             zsfs->parent->write_lba(zsfs->parent, ds_idx, 1, (char*)&ds);
-            return;
+            return 0;
          }
       }
 
@@ -438,11 +542,13 @@ void zsfs_create_dir(fs_node_t *parent_dir, char *name){
          int new_subdir_blk = allocate_block(zsfs);
          zsfs_ds_t new_subdir;
          memset((void*)&new_subdir, sizeof(zsfs_ds_t), 0);
+         new_subdir.aux_entry.parent_ds = linked_dir_idx;
          zsfs->parent->write_lba(zsfs->parent, new_subdir_blk, 1, (char*)&new_subdir);
 
          //Add the subdirectory to the linked directory
          linked_dir.entries[0].type = 1; //1 == directory
          linked_dir.entries[0].blk_idx = new_subdir_blk;
+         linked_dir.aux_entry.parent_ds = ds_idx;
          strcpy(linked_dir.entries[0].entry_name, name);
          
          //Write out the linked directory
@@ -462,7 +568,7 @@ void zsfs_create_dir(fs_node_t *parent_dir, char *name){
 }
 
 //Creates a new directory under parent_dir with the given name. 
-void create_file(fs_node_t *parent_dir, char *name){
+int zsfs_create_file(fs_node_t *parent_dir, char *name){
    fstype_t *zsfs = parent_dir->fs;
    //Read in the parent directory DS
    zsfs_ds_t ds;
@@ -472,10 +578,22 @@ void create_file(fs_node_t *parent_dir, char *name){
    //Find a free location in the DS to add a new DSE for the new file
    while( 1 ){
 
+      //Check to see if this file already exists
+      for(int dse = 0; dse < ZSFS_DSE_IN_DS; dse++){
+         if( strcmp(ds.entries[dse].entry_name, name) == 0 ){
+            //File already exists, so don't do anything
+            return -1;
+         }
+      }
+
       //Scan through the current directory for a free spot
-      for(int dse = 0; dse < 7; dse++){
+      for(int dse = 0; dse < ZSFS_DSE_IN_DS; dse++){
          //Found a free DSE location.  Add new file
+
          if( ds.entries[dse].blk_idx == 0 && ds.entries[dse].entry_len == 0 ){
+            //reset name field
+            memset(ds.entries[dse].entry_name, ZSFS_NAME_MAX_LEN, 0);
+
             //Allocate new block for the file and zero it out
             int new_file_blk_idx = allocate_block(zsfs); 
 
@@ -495,7 +613,7 @@ void create_file(fs_node_t *parent_dir, char *name){
 
             //Finally, write the modified DS back to the drive
             zsfs->parent->write_lba(zsfs->parent, ds_idx, 1, (char*)&ds);
-            return;
+            return 0;
          }
       }
 
@@ -515,6 +633,7 @@ void create_file(fs_node_t *parent_dir, char *name){
          zsfs_ds_t linked_dir;
          //Zero it out
          memset((void*)&linked_dir, sizeof(zsfs_ds_t), 0);
+         linked_dir.aux_entry.parent_ds = ds_idx;
 
          //Because the linked directory was just created, it must be empty.
          //Therefore, the new DSE can be directly added
@@ -547,6 +666,7 @@ void create_file(fs_node_t *parent_dir, char *name){
 
 
 int zsfs_read(fs_node_t *file, int offset, int len, char *buf){
+
    //Read in the DS that holds the file DSE
    int ds_blk_idx = ((zsfs_finode_t*)file->inode)->ds_blk_idx;
    int ds_entry_idx = ((zsfs_finode_t*)file->inode)->ds_entry_idx;
@@ -568,44 +688,50 @@ int zsfs_read(fs_node_t *file, int offset, int len, char *buf){
       offset -= 508;
       //Read in next block of the file
       file_blk_idx = f.next_blk;
+      if( file_blk_idx == 0 ){
+         return -1;
+      }
       file->fs->parent->read_lba(file->fs->parent, f.next_blk, 1, (char*)&f);
    }
 
    //Now we know the block in "file" contains at least the first index to write.
    int file_idx = offset;
    int buf_idx = 0;
-   while( len > 0 ){
+   int file_len = file->len(file);
+   while( len > 0 && buf_idx + offset <= file_len){
 
       buf[buf_idx++] = f.data[file_idx++];
       len--;
 
       //Need to read in next block of file if there is one.
-      if( file_idx == 508 ){
+      if( file_idx >= 508 ){
          file_idx = 0;
 
          //Next block exists, read it in
          if( f.next_blk != 0 ){
             file_blk_idx = f.next_blk;
             file->fs->parent->read_lba(file->fs->parent, f.next_blk, 1, (char*)&f);
-         }else{ //next block does not exist.  Return bytes not read yet.
-            return len;  
+         }else{ //next block does not exist.  Return number of bytes read.
+            return buf_idx;  
          }
       }
    }
-
-   return len;
+   return buf_idx;
 }
 
 
 int zsfs_write(fs_node_t *file, int offset, int len, char *buf){
+   int len_temp = len;
+
    //Read in the DS that holds the file DSE
-   int ds_blk_idx = ((zsfs_finode_t*)file->inode)->ds_blk_idx;
-   int ds_entry_idx = ((zsfs_finode_t*)file->inode)->ds_entry_idx;
+   zsfs_finode_t *i = (zsfs_finode_t*)file->inode;
+   int ds_blk_idx = i->ds_blk_idx;
+   int ds_entry_idx = i->ds_entry_idx;
 
    zsfs_ds_t ds;
    file->fs->parent->read_lba(file->fs->parent, ds_blk_idx, 1, (char*)&ds);
 
-   //Get reference to DSE for this file
+   //Get reference to the DSE for this file
    zsfs_dse_t *dse = &ds.entries[ds_entry_idx];
 
    zsfs_file_t f;
@@ -631,17 +757,27 @@ int zsfs_write(fs_node_t *file, int offset, int len, char *buf){
       len--;
 
       //Need to read in next block of file if there is one.
-      if( file_idx == 508 ){
+      if( file_idx >= 508 ){
          file_idx = 0;
-         //Write out this current block
-         file->fs->parent->write_lba(file->fs->parent, file_blk_idx, 1, (char*)&f);
 
          //Next block exists, read it in
          if( f.next_blk != 0 ){
+            //Write out the current block
+            file->fs->parent->write_lba(file->fs->parent, file_blk_idx, 1, (char*)&f);
+            //Read in next block
             file_blk_idx = f.next_blk;
-            file->fs->parent->read_lba(file->fs->parent, f.next_blk, 1, (char*)&f);
+            file->fs->parent->read_lba(file->fs->parent, file_blk_idx, 1, (char*)&f);
          }else{ //next block does not exist.  Create it
-            file_blk_idx = allocate_block(file->fs);  
+            int temp_next_block = allocate_block(file->fs);
+
+            //Add the next link to the current block
+            f.next_blk = temp_next_block;
+
+            //Write out current block
+            file->fs->parent->write_lba(file->fs->parent, file_blk_idx, 1, (char*)&f);
+            file_blk_idx = temp_next_block; 
+
+            f.next_blk = 0;
          }
       }
    }
@@ -649,11 +785,94 @@ int zsfs_write(fs_node_t *file, int offset, int len, char *buf){
    file->fs->parent->write_lba(file->fs->parent, file_blk_idx, 1, (char*)&f);
 
    //Update file length if needed
-   if( file_idx > dse->entry_len ){
-      dse->entry_len = file_idx;
+   if( offset + len_temp > dse->entry_len ){
+      dse->entry_len = offset + len_temp;
       //Write out updates DSE
       file->fs->parent->write_lba(file->fs->parent, ds_blk_idx, 1, (char*)&ds);
    }
 
    return len;
+}
+
+//Remove a directory/file from a ZSFS filesystem
+int zsfs_delete(fs_node_t *zsfs_obj){
+   if( zsfs_obj->type == FS_FILE ){
+      //Read in file DSE
+      zsfs_ds_t ds_temp;
+      int ds_blk_idx = ((zsfs_finode_t*)zsfs_obj->inode)->ds_blk_idx;
+      int ds_entry_idx = ((zsfs_finode_t*)zsfs_obj->inode)->ds_entry_idx;
+
+      zsfs_obj->fs->parent->read_lba(zsfs_obj->fs->parent, ds_blk_idx, 1, (char*)&ds_temp);
+
+      zsfs_dse_t *file_dse = &ds_temp.entries[ds_entry_idx];
+
+      //Free the first block
+      free_block(zsfs_obj->fs, file_dse->blk_idx);
+
+      //Read in the first block
+      zsfs_file_t file_block;
+      zsfs_obj->fs->parent->read_lba(zsfs_obj->fs->parent, file_dse->blk_idx, 1, (char*)&file_block);
+
+      while( file_block.next_blk != 0 ){
+         free_block(zsfs_obj->fs, file_block.next_blk);
+         zsfs_obj->fs->parent->read_lba(zsfs_obj->fs->parent, file_block.next_blk, 1, (char*)&file_block);
+      }
+
+      //Zero out the DSE and write modified DS back
+      memset(file_dse, sizeof(zsfs_dse_t), 0);
+
+      zsfs_obj->fs->parent->write_lba(zsfs_obj->fs->parent, ds_blk_idx, 1, (char*)&ds_temp);
+
+      //Go to the DS containing the file.  If it is an auxiliary DS, we may be
+      //able to delete it if it is empty
+      
+
+   }else if( zsfs_obj->type == FS_DIRECTORY ){
+      //NOTE: we can only delete a directory if 
+      // 1) there are no DSE entries
+      // 2) there is no linked directory
+      //Just like on linux, rmdir on a directory that
+      //is not empty will fail.
+
+      //Read in the DS to check if there is an aux field
+      
+      //Get information from inode
+      int ds_idx = ((zsfs_dinode_t*)zsfs_obj->inode)->blk_idx;
+ 
+      //Read in DS of the directory
+      zsfs_ds_t dir_ds;
+      zsfs_obj->fs->parent->read_lba(zsfs_obj->fs->parent, ds_idx, 1, (char*)&dir_ds);
+
+      //Check if the directory is empty
+      int is_empty = 1;
+      for(int ds_entry = 0; ds_entry < ZSFS_DSE_IN_DS; ds_entry++){
+         if( dir_ds.entries[ds_entry].blk_idx != 0 || dir_ds.entries[ds_entry].entry_len != 0 ){
+            is_empty = 0;
+         }
+      }
+
+      //If the directory is empty and there is no aux field, we can delete it
+      if( is_empty && dir_ds.aux_entry.linked_dir == 0 ){
+         //Free the block the directory is using
+         free_block(zsfs_obj->fs, ds_idx);
+
+         //Go to parent and remove the DSE entry for the directory
+         int parent_ds_idx = dir_ds.aux_entry.parent_ds;
+         zsfs_ds_t parent_ds;
+         zsfs_obj->fs->parent->read_lba(zsfs_obj->fs->parent, parent_ds_idx, 1, (char*)&parent_ds);
+         
+         //Search for and remove the directory
+         for(int ds_entry = 0; ds_entry < ZSFS_DSE_IN_DS; ds_entry++){
+            if( parent_ds.entries[ds_entry].blk_idx == ds_idx){
+               parent_ds.entries[ds_entry].blk_idx = 0;
+               parent_ds.entries[ds_entry].entry_len = 0;
+               memset(parent_ds.entries[ds_entry].entry_name, ZSFS_NAME_MAX_LEN, 0);
+            }
+         }
+         //Write directory back to the drive
+         zsfs_obj->fs->parent->write_lba(zsfs_obj->fs->parent, parent_ds_idx, 1, (char*)&parent_ds);
+      }else{
+         return -1;
+      }
+   }
 }

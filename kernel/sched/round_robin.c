@@ -70,17 +70,27 @@ void rr_yield_task(){
 void rr_exit_task(void *return_value){
    current_task->state = TASK_EXIT;
    current_task->ret_val = return_value;
+
+   //Free all file descriptors
+   for(int i = 0; i < 20; i++){
+      if( current_task->open_fs[i] != NULL ){
+         if( current_task->open_fs[i]->close != NULL ){
+            current_task->open_fs[i]->close(current_task->open_fs[i]);
+         }
+      } 
+   }
+
    rr_yield_task();
 }
 
 void *rr_join_task(ktask_t *descriptor){
+   if( descriptor != NULL ){
+      while( descriptor->state != TASK_EXIT ){
+         rr_yield_task();
+      }
+   }
    return NULL;
 }
-
-//Fork the calling task
-void scheduler_fork(){
-}
-
 
 schedalg_t rr_scheduler = {
    .scheduler_setup      = rr_setup,

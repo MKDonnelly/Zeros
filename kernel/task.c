@@ -72,16 +72,13 @@ ktask_t *utask_create( void (*start)(), void *param,
    return new_task;
 }
 
-ktask_t *utask_from_elf( char *elf_data ){ 
-
-   KASSERT( elf_data != NULL );
+ktask_t *utask_from_elf( char *elf_data, int skip ){ 
 
    //Create a task descriptor
    ktask_t *new_task = k_malloc( sizeof(ktask_t), 0 );
-   KASSERT( new_task != NULL );
 
    //Create bare arch-specific task info
-   new_task->task_info = arch_utask_from_elf(elf_data);
+   new_task->task_info = arch_utask_from_elf(elf_data, skip);
 
    //Initilize generic task info
    new_task->state = TASK_READY;

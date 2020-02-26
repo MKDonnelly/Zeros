@@ -21,7 +21,8 @@ int8_t elf_can_exec(Elf32_Ehdr *elf_header){
 }
 
 //Returns starting address of program.
-uint32_t arch_create_from_elf(Elf32_Ehdr *elf_data, pd_t *task_pd){
+uint32_t arch_create_from_elf(Elf32_Ehdr *elf_data, pd_t *task_pd, int skip){
+
 
    //Make sure we can execute the ELF file.
    if( !elf_verify_magic(elf_data) || !elf_can_exec(elf_data) ){
@@ -40,6 +41,7 @@ uint32_t arch_create_from_elf(Elf32_Ehdr *elf_data, pd_t *task_pd){
          uint32_t frame = framepool_first_free(); 
          vm_pmap( ALIGN_DOWN(elf_pheader->p_vaddr, 0x1000), 
                   frame, task_pd, 1, 1);
+
          vm_copy_to_physical( (char*)elf_data + elf_pheader->p_offset, 
                          frame + ((uint32_t)elf_pheader->p_vaddr & 0xfff),
                          elf_pheader->p_filesize);

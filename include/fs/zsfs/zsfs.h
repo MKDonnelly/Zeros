@@ -11,7 +11,7 @@ extern fstype_t zsfs_fs;
 #define ZSFS_TYPE	0
 #define ZSFS_MAGIC	"ZSFS"
 #define ZSFS_MAGIC_LEN	4
-#define ZSFS_NAME_MAX_LEN 26
+#define ZSFS_NAME_MAX_LEN 24
 //16 DSEs in a DS.  The last one is for the
 //aux entry.
 #define ZSFS_DSE_IN_DS	15
@@ -38,17 +38,18 @@ typedef struct zsfs_sb{
 //Directories have 15 of these which can
 //point to a subdirectory or file
 typedef struct zsfs_dse{
-   uint32_t type : 1;
+   char type : 1;
    uint32_t blk_idx : 31;
    uint32_t entry_len;
-   char entry_name[ZSFS_NAME_MAX_LEN];
+   char entry_name[ZSFS_NAME_MAX_LEN]; 
 }zsfs_dse_t;
 
 //The last entry of a Directory Structure is
 //the auxiliary entry, which can point to a linked
 //directory if needed.
 typedef struct zsfs_aux_entry{
-   char unused[28];
+   char unused[24];
+   uint32_t parent_ds;
    //Next linked directory if not 0
    uint32_t linked_dir;
 }zsfs_aux_entry_t;
@@ -67,15 +68,15 @@ typedef struct zsfs_file{
    uint32_t next_blk;
 }zsfs_file_t;
 
-//An inode to a file allows us to access the DSE
-//that points to the file.
+//An inode describes where the DSE for a file/directory
+//is stored on the drive.  The only exception is for the
+//root directory, which only uses ds_blk_idx and points
+//to the RDS instead of the RDE for this directory.
 typedef struct zsfs_finode{
    uint32_t ds_blk_idx;
    uint32_t ds_entry_idx;
 }zsfs_finode_t;
 
-//A directory inode tells us where the directory
-//is on the drive.
 typedef struct zsfs_dinode{
    uint32_t blk_idx;
 }zsfs_dinode_t;
@@ -100,11 +101,12 @@ uint32_t zsfs_get_id(char *block);
 //the file. Instead, the node must call open in order for an inode
 //to be allocated.
 fs_node_t *zsfs_open(fs_node_t *root, char *name);
-void zsfs_close(fs_node_t *fsnode); //done
-dirent_t *zsfs_readdir(fs_node_t *dir, int index); //done
-fs_node_t *zsfs_finddir(fs_node_t *dir, char *name); //done
-int zsfs_read(fs_node_t *file, int offset, int len, char *buffet);
+void zsfs_close(fs_node_t *fsnode); 
+dirent_t *zsfs_readdir(fs_node_t *dir, int index); 
+fs_node_t *zsfs_finddir(fs_node_t *dir, char *name); 
+int zsfs_read(fs_node_t *file, int offset, int len, char *buffer);
 int zsfs_write(fs_node_t *file, int offset, int len, char *buffer);
-int zsfs_len(fs_node_t *file); //done
+int zsfs_len(fs_node_t *file); 
+int zsfs_delete(fs_node_t *zsfs_object);
 
 fs_node_t *zsfs_get_root(fstype_t *zsfs);

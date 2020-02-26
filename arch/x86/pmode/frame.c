@@ -62,6 +62,7 @@ uint32_t framepool_first_free(){
       }
    }
    //No free frames
+   k_printf("No free frames left!\n");
    return 0;
 }
 

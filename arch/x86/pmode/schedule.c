@@ -23,7 +23,8 @@ context_t *get_current_context(){
 //given arch_task_t
 void arch_save_context(context_t *saved_context){
    if( current_task != NULL ){
-      int next_stack = current_task->callstack.stacks[0] != NULL ? 0 : 1;
+      //int next_stack = current_task->callstack.stacks[0] != NULL ? 0 : 1;
+      int next_stack = current_task->callstack.stacks[0] == NULL ? 0 : 1;
       current_task->callstack.stacks[next_stack] = saved_context;
    }
 }
@@ -44,6 +45,7 @@ context_t *arch_set_context(){
 void arch_run_next(arch_task_t *next_task){
    current_task = next_task;
 
+   current_page_dir = next_task->task_pd;
    load_pd( (void*)VIRT_TO_PHYS(next_task->task_pd) );
 
    //Kernel tasks will have a interrupt_stack of NULL

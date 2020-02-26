@@ -48,22 +48,21 @@ extern unsigned int ldscript_kernel_end;
 extern unsigned int ldscript_initrd_start;
 
 
+fs_node_t *root_fs = NULL;
+
 int stdout_test(fs_node_t *self, int offset, int len, char *buffer){
    //self and offset are ignored
    for(int i = 0; i < len; i++){
       k_printf("%c", buffer[i]);
    }
 
-   //TODO return the number of bytes written
-   return 0;
+   return len;
 }
 
 int stdin_test(fs_node_t *self, int offset, int len, char *buffer){
-   k_printf("In stdin_test\n");
+   //self and offset are ignored
    keyboard_request(len, buffer);
-
-   //TODO return the number of bytes read
-   return 0;
+   return len;
 }
 
 fs_node_t stdin_fs = {
@@ -73,6 +72,7 @@ fs_node_t stdin_fs = {
    .fs = NULL,
    .inode = 0,
    .read = stdin_test,
+   .close = NULL,
 };
 
 fs_node_t stdout_fs = {
@@ -82,19 +82,81 @@ fs_node_t stdout_fs = {
    .fs = NULL,
    .inode = 0,
    .write = stdout_test,
+   .close = NULL,
 };
 
 void init_usrland_fds(ktask_t *usr_task){
+   //initialize all fds to null
+   memset(usr_task->open_fs, sizeof(fs_node_t*) * 20, 0);
+
    usr_task->open_fs[0] = &stdin_fs;
    usr_task->open_fs[1] = &stdout_fs;
-
-   //0 for stdin, 1 for stdout, 2 for stderr, 
-   //3 is the next free
-   usr_task->next_free_node = 3;
 }
 
 
-fs_node_t *root_fs = NULL;
+//Syscall
+ktask_t *sys_spawn(char *binary, char *args, int stdinfd, int stdoutfd){
+   //Read in binary
+   fs_node_t *bin = zsfs_open(root_fs, binary);
+   if( bin == NULL ){
+      return NULL;
+   }
+   int bin_len = bin->len(bin);
+
+   char *buf = k_malloc(bin_len, 0);
+   bin->read(bin, 0, bin_len, buf);
+
+   ktask_t *new_task = utask_from_elf(buf, 0);
+
+   ktask_t *ctask = current_scheduler->scheduler_current_ktask();
+   char *pwd = k_malloc(100, 0);
+   strcpy(pwd, ctask->pwd);
+   new_task->pwd = pwd;
+
+   if( args != NULL ){
+      char *arguments = k_malloc(100, 0);
+      memset(arguments, 100, 0);
+      memcpy(arguments, args, strlen(args)); 
+      new_task->args = arguments;
+   }else{
+      new_task->args = NULL;
+   }
+   
+   memset(new_task->open_fs, sizeof(fs_node_t*)*20, 0);   
+   new_task->open_fs[0] = ctask->open_fs[stdinfd];
+   new_task->open_fs[1] = ctask->open_fs[stdoutfd];
+   current_scheduler->scheduler_add_task(new_task);
+   //k_free(buf);
+
+   return new_task;
+}
+
+
+void initrd_to_zsfs(initrd_sb_t *initrd, fs_node_t *zsfs_root, char *name){
+  
+   char path[100];
+   memset(path, 100, 0);
+   strcpy(path, "/");
+   strcat(path, name);
+
+   k_printf("Copying over %s\n", path);
+ 
+   //TODO create function initrd_to_zsfs
+   int len = initrd_sizeof(initrd, name);
+   char *buf = k_malloc(len, 0);
+   int read_bytes = initrd_read(initrd, name, len, buf);
+
+   fs_node_t *f = zsfs_open(zsfs_root, path);
+   if( f == NULL ){
+      //File does not exist, so create it
+      zsfs_create_file(zsfs_root, name);
+      f = zsfs_open(zsfs_root, path);
+   }
+   f->write(f, 0, len, buf);
+
+   k_free(buf);
+}
+
 
 void kmain(struct multiboot_info *multiboot_info){
 
@@ -105,9 +167,9 @@ void kmain(struct multiboot_info *multiboot_info){
  
    //Setup the heap on an aligned address after the end of the kernel
    //image. the ldscript already aligned the address.
-   heap_create(&global_kernel_heap,(size_t)&ldscript_kernel_end, 0x200000, 
+   heap_create(&global_kernel_heap,(size_t)&ldscript_kernel_end, 0x300000, 
                 &bitmap_heap);
-   
+
    //Copy the multiboot header since we will not be able to access
    //it once paging is setup
    multiboot_info_t *mb_copy = k_malloc(sizeof(multiboot_info_t), 0);
@@ -135,38 +197,41 @@ void kmain(struct multiboot_info *multiboot_info){
 //   zsfs_create(blkdev_find(0));
 
    fstype_t *zsfs = fsmanager_find_id(0x1234ABCD);
-   k_printf("%x\n", zsfs);
+   k_printf("zsfs %x\n", zsfs);
    root_fs = zsfs_get_root(zsfs);
-   k_printf("%x\n", root_fs);
+   k_printf("root_fs %x\n", root_fs);
 
-   fs_node_t *f = root_fs->finddir(root_fs, "test.txt");
-//   char data[] = "Hello, World!";
-//   f->write(f, 0, strlen(data), data);
-   char temp[20];
-   f->read(f, 0, 14, temp);
-   k_printf("Read %s\n", temp);
-   k_printf("Len is %d\n", f->len(f));
-   k_printf("file is %x\n", f);
-
-//   dirent_t *d = zsfs_readdir(root_fs, 1);
-//   k_printf("File is %s\n", d->name);
-//   create_file(root_fs, "test.txt");
-//   zsfs_create_dir(root_fs, "testdir"); 
-   
-
-/*
    if( initrd != NULL ){
-      char *buf = k_malloc(20000, 0);
-      int bytes_read = initrd_read(initrd, "test", 20000, buf);
+      //Copy over programs from initrd to zsfs
+      initrd_to_zsfs(initrd, root_fs, "echo");
+      initrd_to_zsfs(initrd, root_fs, "pwd");
+      initrd_to_zsfs(initrd, root_fs, "rinput");
+      initrd_to_zsfs(initrd, root_fs, "sar");
+      initrd_to_zsfs(initrd, root_fs, "mkfile");
+      initrd_to_zsfs(initrd, root_fs, "ls");
+      initrd_to_zsfs(initrd, root_fs, "touch");
+      initrd_to_zsfs(initrd, root_fs, "mkdir");
+      initrd_to_zsfs(initrd, root_fs, "cat");
+      initrd_to_zsfs(initrd, root_fs, "rm");
+      initrd_to_zsfs(initrd, root_fs, "mydata");
 
-      //Starting userland program
-      k_printf("Starting userland program\n");
-      ktask_t *new_task = utask_from_elf(buf);
-      init_usrland_fds(new_task);
-      current_scheduler->scheduler_add_task(new_task);
+      //Read in shell from initrd
+      int len = initrd_sizeof(initrd, "shell");
+      k_printf("Allocating %d bytes for shell binary...\n", len);
+      char *buf = k_malloc(len, 0);
+      initrd_read(initrd, "shell", len, buf);
+
+      //Start the shell
+      k_printf("Starting userland shell\n");
+      ktask_t *shell = utask_from_elf(buf, 0);
+      char *pwd = k_malloc(100, 0);
+      strcpy(pwd, "/");
+      shell->pwd = pwd;
+      init_usrland_fds(shell);
+      current_scheduler->scheduler_add_task(shell);
       current_scheduler->scheduler_start();
    }
-*/
 
+   //Should never reach here.
    while(1) arch_halt_cpu();
 }

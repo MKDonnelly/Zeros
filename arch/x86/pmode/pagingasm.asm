@@ -37,4 +37,5 @@ load_pd:
    mov eax, [esp+4]
    mov cr3, eax
    call arch_enable_paging
+
    ret

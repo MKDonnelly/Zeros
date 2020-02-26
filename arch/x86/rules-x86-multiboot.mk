@@ -100,7 +100,8 @@ kernel_srcs := 		\
 	kernel/syscall.c	\
 	kernel/task.c		\
 	kernel/blkdev/blkdev.c	\
-	kernel/blkdev/drive.c
+	kernel/blkdev/drive.c	\
+        kernel/pipe.c
 
 kernel_src_dirs := 		\
 	kernel/mm		\
@@ -130,7 +131,7 @@ lib_objs = $(lib_srcs:%.c=$(objdir)/%.o)
 ROOTDIR := .
 
 CFLAGS := -ffreestanding -nostdlib -Wall -g
-CFLAGS += -fno-pie -m32 -fno-stack-protector
+CFLAGS += -fno-pie -m32 -fno-stack-protector -O0
 CFLAGS += -I$(ROOTDIR)/include -I. -I$(ROOTDIR)
 
 LDFLAGS = -m elf_i386 -T arch/x86/x86_link.ld

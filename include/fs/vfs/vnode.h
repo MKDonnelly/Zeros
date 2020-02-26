@@ -42,6 +42,7 @@ typedef struct fs_node{
    char name[FS_NODE_NAME_MAXLEN];
    int flags; 
    char type;
+   int offset;
    fstype_t *fs;
 
    //Pointer to fs-specific data structure.
@@ -61,3 +62,13 @@ typedef struct fs_node{
 int sys_open(char *name);
 int sys_write(int fd, char *buf, int len);
 int sys_read(int fd, char *ubuf, int len);
+int sys_getargs(char*,int);
+int sys_createf(char*,char*);
+int sys_created(char*,char*);
+int sys_exists(char*);
+int sys_chdir(char*);
+int sys_getpwd(char*,int);
+int sys_readdir(int,char*,int,int);
+int sys_close(int);
+int sys_seek(int fd, int offset, int from);
+int sys_delete(char*);
